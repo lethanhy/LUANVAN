@@ -9,14 +9,13 @@ const CustomerSchema = mongoose.Schema(
             unique: true,
         },
 
-        password: {
-            type: String,
-            required: [ true, 'Password field is required'],
-        },
+        // password: {
+        //     type: String,
+        //     required: [ true, 'Password field is required'],
+        // },
         email: {
             type: String,
             require: [true, 'Email field is required'],
-            unique: true
 
         },
         phone: {
@@ -33,6 +32,21 @@ const CustomerSchema = mongoose.Schema(
             type: String,
             required: true
         },
+        cccd: {
+            type: String,
+            required: true
+        },
+        gioitinh: {
+            type: String,
+            required: true
+        },
+        
+        bookings: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Booking' // Liên kết đến booking
+            }
+        ],
         refreshToken: {
             type: String,
         }

@@ -8,6 +8,7 @@ const auth = require('../middleware/auth.js');
 
 router.post("/", roomController.addRoom); // Thêm mới một phòng
 router.get("/", roomController.getRooms); // Lấy danh sách tất cả phòng
+router.get("/:id", roomController.getRoomById); // Lấy danh sách tất cả phòng
 router.put("/:id", roomController.updateRoom); // Cập nhật thông tin của một phòng
 router.delete("/:id", roomController.deleteRoom); // Xóa một phòng
 

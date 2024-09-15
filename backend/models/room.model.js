@@ -8,7 +8,6 @@ const RoomSchema = mongoose.Schema(
             required: [true, 'Room number is required'],
             unique: true,
         },
-
         type: {
             type: String,
             required: [ true, 'Room type is required'],
@@ -19,10 +18,19 @@ const RoomSchema = mongoose.Schema(
             require: [true, 'Room price is required'],
            
         },
+        // available: {
+        //     type: Boolean,
+        //     default: true,
+        // },
         status: {
             type: String,
-            enum: ["Available", "Booked", "Maintenance"], // Có sẵn, đã đặt, bảo trì
-            default: "Available",
+            enum: ["trống", "đã đặt", "đã nhận"], // Có sẵn, đã đặt, bảo trì
+            default: "trống",
+        },
+        trangthai: {
+            type: String,
+            enum: ["Chưa dọn dẹp","Đã dọn dẹp"],
+            default: "Đã dọn dẹp",
 
         },
         rating: {
@@ -37,7 +45,8 @@ const RoomSchema = mongoose.Schema(
         maxGuests: {
             type: Number,
             required: [true, "Maximum number of guests is required"],
-        }
+        },
+        bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],  // Reference to Booking
     },
     {
         timestamps: true,

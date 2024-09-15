@@ -3,6 +3,7 @@ const connectDB = require('./utils/db.js');
 const bookingRoutes = require('./routes/booking.route.js');
 const customerRoutes = require('./routes/customer.route.js');
 const roomRoutes = require('./routes/room.route.js');
+const cartRoutes = require('./routes/cart.route.js');
 const staffRoutes = require('./routes/staff.route.js');
 const cors = require('cors');
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.urlencoded({extended: false}));
 app.use("/bookings", bookingRoutes);
 app.use("/customers", customerRoutes);
 app.use("/rooms", roomRoutes);
+app.use("/cart", cartRoutes);
 app.use("/staff", staffRoutes);
 
 // // Backend (Express.js)
