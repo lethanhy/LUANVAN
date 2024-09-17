@@ -96,7 +96,7 @@
                                                 <td>{{ new Date(rooms.checkin).toLocaleDateString() }}</td> <!-- Access checkin -->
                                                 <td>{{ new Date(rooms.checkout).toLocaleDateString() }}</td> <!-- Access checkout -->
                                                 <td>
-                                                <button class="btn btn-danger rounded" @click="deleteCart(rooms._id)">
+                                                <button class="btn btn-danger rounded" @click="deleteCart(rooms.roomId._id)">
                                                     <i class="fa-solid fa-xmark"></i>
                                                 </button>
                                                 </td>
@@ -168,159 +168,78 @@ export default {
         }
     },
     
-    // async addCart(room) {
-    //     try {
-    //         const roomId = room._id;
-    //         const { checkin, checkout } = this;
 
-    //         if (!checkin || !checkout) {
-    //       alert('Vui lòng chọn thời gian check-in và check-out.');
-    //       return;
-    //     }
 
-    //         //Thêm phòng vào giỏ hàng
-    //         await api.post('/bookings/order/cart', { rooms: [{ roomId, checkin, checkout}]});
+        async addCart(room) {
+    try {
+        const { checkin, checkout } = this;
 
-    //         // Cập nhật danh sách phòng đã chọn
-    //         this.selectedRooms.push({
-    //             ...room,
-    //             checkin,
-    //             checkout
-    //         });
+        if (!checkin || !checkout) {
+        alert('Vui lòng chọn thời gian check-in và check-out.');
+        return;
+        }
 
-    //         alert('phòng đã được thêm vào giỏ hàng!');
-    //         // Điều hướng trở lại trang /order
-    //         this.$router.push('bookings/order');
-            
+        // Create the cartData object
+        const cartData = {
+        roomId: room._id,
+        checkin,
+        checkout
+        };
 
-    //     } catch (error) {
-    //         console.error('Failed to add room to cart:', error);
-            
-    //     }
-    // },
+        // Send the request to the server to add the room to the cart
+        const response = await api.post('/bookings/order/cart', cartData);
+        console.log('Room added to cart successfully:', response.data);
 
-    //  async addCart(room) {
-    //   try {
-    //     const { checkin, checkout } = this;
+        // Update the carts array with the new room
+        this.carts.push({
+        room: room,  // This stores the room object with its _id
+        checkin,
+        checkout
+        });
 
-    //     if (!checkin || !checkout) {
-    //       alert('Vui lòng chọn thời gian check-in và check-out.');
-    //       return;
-    //     }
-
-    //     const cartData = {
-    //       roomId: room._id,
-    //       checkin,
-    //       checkout
-    //     };
-
-    //     const response = await api.post('/bookings/order/cart', { rooms: [cartData] });
-    //     console.log('Cart added successfully:', response.data);
-    //     this.carts.push({ ...cartData, room }); // Cập nhật giỏ hàng
-    //     alert('Phòng đã được thêm vào giỏ hàng!');
-    //   } catch (error) {
-    //     console.error('Failed to add room to cart:', error);
-    //     alert('Failed to add cart. ' + error.message);
-    //   }
-    // },
-
-    async addCart(room) {
-  try {
-    const { checkin, checkout } = this;
-
-    if (!checkin || !checkout) {
-      alert('Vui lòng chọn thời gian check-in và check-out.');
-      return;
+        alert('Phòng đã được thêm vào giỏ hàng!');
+    } catch (error) {
+        console.error('Failed to add room to cart:', error);
+        alert('Failed to add cart. ' + error.message);
     }
-
-    // Create the cartData object
-    const cartData = {
-      roomId: room._id,
-      checkin,
-      checkout
-    };
-
-    // Send the request to the server to add the room to the cart
-    const response = await api.post('/bookings/order/cart', cartData);
-    console.log('Room added to cart successfully:', response.data);
-
-    // Update the carts array with the new room
-    this.carts.push({
-      room: room,  // This stores the room object with its _id
-      checkin,
-      checkout
-    });
-
-    alert('Phòng đã được thêm vào giỏ hàng!');
-  } catch (error) {
-    console.error('Failed to add room to cart:', error);
-    alert('Failed to add cart. ' + error.message);
-  }
-},
+    },
 
 
 
    
 
-    async deleteCart(cartId) {
-      try {
-        console.log('Attempting to delete cart with ID:', cartId);
-        const response = await api.delete(`/bookings/order/${cartId}`);
-        if (response.status === 200) {
-           alert('Cart deleted successfully');
-          // Cập nhật lại danh sách giỏ hàng sau khi xóa thành công
-          await this.getCart();
-          
-        } else {
-          alert('Failed to delete the cart. Status code: ' + response.status);
+    async deleteCart(roomId) {
+        try {
+            // Gửi yêu cầu đến API để xóa phòng khỏi giỏ hàng
+            const response = await api.delete(`/bookings/order/${roomId}`);
+            
+            if (response.status === 200) {
+                // Xóa phòng khỏi giỏ hàng trong frontend
+                this.carts = this.carts.map(cart => {
+                    return {
+                        ...cart,
+                        rooms: cart.rooms.filter(room => room.roomId._id !== roomId)
+                    };
+                }).filter(cart => cart.rooms.length > 0); // Loại bỏ giỏ hàng rỗng
+                
+                alert('Phòng đã được xóa khỏi giỏ hàng và trạng thái phòng đã được cập nhật thành công!');
+            } else {
+                alert('Không thể xóa phòng khỏi giỏ hàng. Mã trạng thái: ' + response.status);
+            }
+        } catch (error) {
+            console.error('Lỗi khi xóa phòng khỏi giỏ hàng:', error.response ? error.response.data : error.message);
+            alert('Lỗi khi xóa phòng khỏi giỏ hàng. ' + (error.response ? error.response.data.message : error.message));
         }
-      } catch (error) {
-        console.error('Error deleting cart:', error.response ? error.response.data : error.message);
-        alert('Failed to delete the cart. ' + (error.response ? error.response.data : error.message));
-      }
     },
 
-    // async createBooking() {
-    //         try {
-    //             const bookingData = {
-    //                 customerName: this.customerName,
-    //                 cccd: this.cccd,
-    //                 gioitinh: this.gioitinh,
-    //                 // email: this.email,
-    //                 phone: this.phone,
-    //                 address: this.address,
-    //                 // checkin: this.checkin,
-    //                 // checkout: this.checkout,
-    //                 // amount: this.calculateTotalAmount(), // Placeholder for amount calculation
-    //                 // guests: this.guests,
-    //                 // adults: this.adults,
-    //                 // children: this.children,
-    //                 rooms: this.carts.map(cart => ({
-    //                     roomId: cart.room._id,
-    //                     checkin: cart.checkin,
-    //                     checkout: cart.checkout
-    //                 })),
-    //             };
 
-    //             const response = await api.post('/bookings/order', bookingData);
-    //             if (response.status === 201) {
-    //                 alert('Booking created successfully');
-    //                 this.$router.push('/bookings'); // Redirect to bookings page or another appropriate page
-    //             } else {
-    //                 alert('Failed to create booking. Status code: ' + response.status);
-    //             }
-    //         } catch (error) {
-    //             console.log('Failed to create booking:', error);
-    //             alert('Failed to create booking. ' + (error.response ? error.response.data.message : error.message));
-    //         }
-    //     },
 
     async createBooking() {
   try {
     // Log carts to debug
     console.log('Carts:', this.carts);
 
-    const email = 'lethanhYYY@gmail.com';
+    const email = 'Nguyenthibetu@gmail.com';
     // Prepare the data to send to the backend
     const bookingData = {
       customerName: this.customerName,

@@ -3,65 +3,20 @@ const Room = require("../models/room.model.js");
 const Customer = require("../models/customer.model.js");
 const Cart = require("../models/cart.model.js");
 
+const getBooking = async (req, res) => {
+    try {
+        // Tìm booking và populate thông tin phòng
+        const booking = await Booking.find().populate('customer');
 
-// const createBooking = async (req, res) => {
-//     try {
-//         const { customerName,cccd, gioitinh, email, phone, address, checkin, checkout, amount, guests, adults, children, roomId } = req.body;
+        if(!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
 
-//         // Kiểm tra khách hàng đã tồn tại dựa vào email hoặc số điện thoại
-//         let customer = await Customer.findOne({ email });
-//         if(!customer) {
-//             // Nếu khách hàng chưa tồn tại, tạo khách hàng mới
-//             customer = new Customer({
-//                 name: customerName,
-//                 email,
-//                 phone,
-//                 address,
-//                 cccd,
-//                 gioitinh,
-//             });
-//             await customer.save();
-//         }
-//         // console.log(customer);
-
-//         // Tạo booking mới 
-//         const booking = new Booking({
-//             checkin,
-//             checkout,
-//             amount,
-//             guests,
-//             adults,
-//             children,
-//             customer: customer._id,
-//             room: roomId, // Liên kết đặt phòng với phòng
-//         });
-//         // console.log(booking);
-
-
-
-//         //Lưu thông tin đặt phòng
-//         await booking.save();
-
-//         // // Thêm booking vào lịch sử của khách hàng
-//         // customer.bookings.push(booking._id);
-//         // await customer.save();
-
-//         // Cập nhật trạng thái phòng
-//         const room = await Room.findById(roomId);
-//         room.status = 'đã đặt'; // Đánh dấu phòng là đã được đặt
-//         // room.bookingInfo = {
-//         //     customerName: customer.name,
-//         //     checkInDate: checkin,
-//         //     checkOutDate: checkout,
-//         //     guests: guests
-//         // };
-//         await room.save();
-
-//         res.status(201).json({ message: 'Booking created successfully', booking });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Server error', error });
-//     }
-// };
+        res.status(200).json(booking);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+};
 
 
 
@@ -374,35 +329,70 @@ const getCart = async (req, res) => {
 //     }
 // }
 
+// const deleteCart = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+
+//         // Find the cart by its ID and delete it
+//         const cart = await Cart.findByIdAndDelete(id);
+
+//         if (cart) {
+//             // Loop through all rooms in the cart and update their status
+//             for (const roomObj of cart.rooms) {
+//                 const room = await Room.findById(roomObj.roomId);
+//                 if (room) {
+//                     room.status = 'trống'; // Mark room as available
+//                     await room.save();
+//                 }
+//             }
+
+//             res.status(200).json({ message: 'Cart and rooms updated successfully' });
+//         } else {
+//             res.status(404).json({ message: 'Cart not found' });
+//         }
+
+//     } catch (error) {
+//         console.error('Error deleting cart:', error);
+//         res.status(500).json({ message: 'Error deleting cart', error });
+//     }
+// };
+
 const deleteCart = async (req, res) => {
     try {
-        const { id } = req.params;
+        const { roomId } = req.params; // Lấy ID phòng từ tham số URL
 
-        // Find the cart by its ID and delete it
-        const cart = await Cart.findByIdAndDelete(id);
+        // Tìm giỏ hàng chứa phòng với ID đã cho
+        const cart = await Cart.findOne({ 'rooms.roomId': roomId });
 
         if (cart) {
-            // Loop through all rooms in the cart and update their status
+            // Lọc phòng cần xóa ra khỏi danh sách phòng trong giỏ hàng
+            const updatedRooms = cart.rooms.filter(roomObj => roomObj.roomId.toString() !== roomId);
+
+            // Cập nhật trạng thái của các phòng đã xóa
             for (const roomObj of cart.rooms) {
-                const room = await Room.findById(roomObj.roomId);
-                if (room) {
-                    room.status = 'trống'; // Mark room as available
-                    await room.save();
+                if (roomObj.roomId.toString() === roomId) {
+                    const room = await Room.findById(roomObj.roomId);
+                    if (room) {
+                        room.status = 'trống'; // Đánh dấu phòng là trống
+                        await room.save();
+                    }
                 }
             }
 
-            res.status(200).json({ message: 'Cart and rooms updated successfully' });
+            // Cập nhật giỏ hàng với danh sách phòng đã được cập nhật
+            cart.rooms = updatedRooms;
+            await cart.save();
+
+            res.status(200).json({ message: 'Phòng đã được xóa khỏi giỏ hàng và trạng thái phòng đã được cập nhật thành công' });
         } else {
-            res.status(404).json({ message: 'Cart not found' });
+            res.status(404).json({ message: 'Không tìm thấy giỏ hàng chứa phòng với ID đã cho' });
         }
 
     } catch (error) {
-        console.error('Error deleting cart:', error);
-        res.status(500).json({ message: 'Error deleting cart', error });
+        console.error('Lỗi khi xóa phòng khỏi giỏ hàng:', error);
+        res.status(500).json({ message: 'Lỗi khi xóa phòng khỏi giỏ hàng', error });
     }
 };
-
-
 
 
 
@@ -417,6 +407,7 @@ module.exports = {
     addCart,
     getCart,
     deleteCart,
+    getBooking
    
 
 

@@ -5,6 +5,32 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
 
 
+
+const createRoom = async (req, res) => {
+    try {
+        const { roomNumber,type,price,status,trangthai,maxGuests} = req.body;
+
+        // Xác nhận dữ liệu đầu vào
+        if (!roomNumber || !type || !price || !status || !trangthai || !maxGuests) {
+            return res.status(400).json({ message: 'Thiếu thông tin cần thiết' });
+        }
+
+        const newRoom = new Room({
+            roomNumber,
+            type,
+            price,
+            status,
+            trangthai,
+            maxGuests,
+        });
+
+        await newRoom.save();
+        res.status(201).json(newRoom);
+    } catch (error) {
+        console.error('Error adding room:', error);
+        res.status(500).json({ message: 'Có lỗi xảy ra khi thêm phòng' });
+    }
+};
 const addRoom = async (req, res) => {
     try {
         const room = new Room(req.body);
@@ -18,25 +44,46 @@ const addRoom = async (req, res) => {
 const updateRoom = async (req, res) => {
     try {
         const { id } = req.params;
-        const room = await Room.findByIdAndUpdate(id, req.body, {new: true});
+        const updateData = req.body;
 
-        if( !room ) {
-            return res.status(404).send({message: "Room not found"});
+        // Tìm phòng theo ID
+        const room = await Room.findById(id);
+
+        if (!room) {
+            return res.status(404).send({ message: "Không tìm thấy phòng" });
         }
+
+        // Cập nhật các trường khác trong phòng
+        Object.assign(room, updateData);
+
+        // Đặt trạng thái thành 'đã nhận'
+        room.status = 'đã nhận';
+
+        // Lưu phòng đã cập nhật
+        await room.save();
+
         res.send(room);
     } catch (error) {
-        res.status(404).send({message: error.message});
+        res.status(500).send({ message: error.message });
     }
 };
 
-// const getRooms = async (req, res) => {
-//     try {
-//         const rooms = await Room.find();
-//         res.send(rooms);
-//     } catch (error) {
-//         res.status(500).send({ message: error.message });
-//     }
-// };
+
+const getAllRooms = async (req, res) => {
+    try {
+        // Fetch all rooms from the database
+        const rooms = await Room.find();
+        
+        // Send the list of rooms in the response
+        res.status(200).json(rooms);
+    } catch (error) {
+        // Log the error for debugging purposes
+        console.error('Error fetching rooms:', error);
+        
+        // Send an error response
+        res.status(500).json({ message: 'Failed to fetch rooms', error });
+    }
+};
 
 // const getRooms = async (req, res) => {
 //     try {
@@ -142,37 +189,86 @@ const deleteRoom = async (req, res) => {
 const getRoomById = async (req, res) => {
     try {
         const roomId = req.params.id;
-
         // Fetch the room by its ID
         const room = await Room.findById(roomId);
 
         if (!room) {
             return res.status(404).json({ message: 'Room not found' });
         }
+        
+        // Fetch all unpaid bookings and populate customer information
+        const bookings = await Booking.find({ paid: false }).populate('customer');
 
-        // Fetch bookings for the room
-        const bookings = await Booking.find({ room: roomId }).populate('customer');
+        // Tìm booking liên quan đến phòng này
+        const relatedBookings = bookings.filter(booking => 
+            booking.rooms.some(bookedRoom => bookedRoom.roomId.toString() === room._id.toString())
+        );
 
-        // Send room and booking information
-        res.status(200).json({
-            room,
-            bookings: bookings.map(booking => ({
-                _id: booking._id,
-                checkin: booking.checkin,
-                checkout: booking.checkout,
-                amount: booking.amount,
-                guests: booking.guests,
-                customer: booking.customer ? {
-                    name: booking.customer.name,
-                    email: booking.customer.email,
-                    phone: booking.customer.phone
-                } : null
-            }))
+        // Thêm thông tin người đặt và số ngày
+        const bookingDetails = relatedBookings.map(booking => {
+            const roomBooking = booking.rooms.find(bookedRoom => bookedRoom.roomId.toString() === room._id.toString());
+
+            // Tính số ngày ở lại
+            const checkinDate = new Date(roomBooking.checkin);
+            const checkoutDate = new Date(roomBooking.checkout);
+            const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Tính số ngày
+
+            return {
+                customerName: booking.customer?.name || 'Unknown',
+                customerPhone: booking.customer?.phone || 'Unknown',
+                checkin: roomBooking.checkin,
+                checkout: roomBooking.checkout,
+                daysBooked: daysBooked
+            };
         });
+
+        // Tạo đối tượng phản hồi với thông tin phòng và chi tiết booking
+        const roomData = {
+            ...room.toObject(),
+            isBooked: bookingDetails.length > 0, // Xác định phòng đã được đặt hay chưa
+            bookings: bookingDetails // Danh sách chi tiết booking liên quan đến phòng này
+        };
+
+        res.status(200).json(roomData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
+
+// const getRoomById = async (req, res) => {
+//     try {
+//         const roomId = req.params.id;
+
+//         // Fetch the room by its ID
+//         const room = await Room.findById(roomId);
+
+//         if (!room) {
+//             return res.status(404).json({ message: 'Room not found' });
+//         }
+
+//         // Fetch bookings for the room
+//         const bookings = await Booking.find({ room: roomId }).populate('customer');
+
+//         // Send room and booking information
+//         res.status(200).json({
+//             room,
+//             bookings: bookings.map(booking => ({
+//                 _id: booking._id,
+//                 checkin: booking.checkin,
+//                 checkout: booking.checkout,
+//                 amount: booking.amount,
+//                 guests: booking.guests,
+//                 customer: booking.customer ? {
+//                     name: booking.customer.name,
+//                     email: booking.customer.email,
+//                     phone: booking.customer.phone
+//                 } : null
+//             }))
+//         });
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
 
 
 
@@ -183,5 +279,7 @@ module.exports = {
    getRooms,
    deleteRoom,
    getRoomById,
+   getAllRooms,
+   createRoom
 //    getoneRoom,
 };

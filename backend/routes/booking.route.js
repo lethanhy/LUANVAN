@@ -6,7 +6,9 @@ const auth = require('../middleware/auth.js');
 
 
 // Tạo một booking mới (yêu cầu xác thực)
+router.get('/', bookingController.getBooking);
 router.post('/order', bookingController.createBooking);
+
 router.post('/order/cart', bookingController.addCart);
 router.get('/order/cart', bookingController.getCart);
 router.get('/order', bookingController.getRoomByAvailable);
@@ -21,6 +23,6 @@ router.patch('/:id', auth, bookingController.updateBooking);
 // Xóa một booking (yêu cầu xác thực)
 router.delete('/:id', auth, bookingController.deleteBooking);
 
-router.delete('/order/:id', bookingController.deleteCart);
+router.delete('/order/:roomId', bookingController.deleteCart);
 
 module.exports = router;

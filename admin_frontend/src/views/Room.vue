@@ -1,155 +1,50 @@
 <template>
-    <div class="card--room">
-        <h3 class="mb-3">Phòng đơn</h3>
-        <div class="room" >
-            <div class="main--room" v-for="room in rooms" :key="room.id" :class="{ 'room-booked': room.status === 'đã đặt', 'room-available': room.status === 'trống' }" >
-                <div class="header--room">
-                    <p class="room-code">{{ room.roomNumber }}</p>
-                    <p class="room-status">{{ room.status }}</p>
-                </div>
-                <div class="body--room">
-                    <div class="icon-circle mt-2">
-                        <i :class="room.status === 'đã đặt' ? 'fa-solid fa-users' : 'fa-solid fa-check'"></i>
-                    </div>
-                    <router-link :to="{ name: 'roomDetails', params: { id: room._id } }" tag="p" class="text-dark no-underline">
-                        <p class="mt-3">
-                            <span v-if="room.status === 'đã đặt'">
-                                <!-- Handle multiple bookings for a room -->
-                                <span v-for="(booking, index) in room.bookings" :key="index">
-                                {{ booking.customerName }}<span v-if="index < room.bookings.length - 1">, </span>
-                                </span>
-                            </span>
-                            <span v-else>Phòng trống</span>
-                        </p>
-                    </router-link>
-                </div>
-                <div class="footer--room">
-                    <div class="footer--room--time">
-                        <div class="footer--room--type d-flex">
-                            <i class="fa-regular fa-clock m-2"></i>
-                            <p>8 giờ</p>
-                        </div>
-                        <div class="footer--room--type d-flex">
-                            <i :class="room.status === 'đã đặt' ? 'fa-solid fa-users' : 'fa-solid fa-check'"></i>
-                            <p>{{ room.status }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div>
+      <!-- Phòng đơn -->
+      <RoomType :roomType="'Phòng đơn'" :rooms="singleRooms" />
+      
+      <!-- Phòng đôi -->
+      <RoomType :roomType="'Phòng đôi'" :rooms="doubleRooms" />
 
-            <div class="main--room">
-                <div class="header--room">
-                    <p class="room-code">P02</p>
-                    <p class="room-status">Phòng đã đặt</p>
-                </div>
-                <div class="body--room">
-                    <div class="icon-circle mt-2">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <p class="mt-3">Lê Thành Y</p>
-                </div>
-                <div class="footer--room">
-                    <div class="footer--room--time">
-                        <p>8 giờ</p>
-                        <div class="footer--room--type d-flex">
-                            <i class="fa-solid fa-check m-2"></i>
-                            <p>Đã dọn dẹp</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="main--room">
-                <div class="header--room">
-                    <p class="room-code">P02</p>
-                    <p class="room-status">Phòng đã đặt</p>
-                </div>
-                <div class="body--room">
-                    <div class="icon-circle mt-2">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <p class="mt-3">Lê Thành Y</p>
-                </div>
-                <div class="footer--room">
-                    <div class="footer--room--time">
-                        <p>8 giờ</p>
-                        <div class="footer--room--type d-flex">
-                            <i class="fa-solid fa-check m-2"></i>
-                            <p>Đã dọn dẹp</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="main--room">
-                <div class="header--room">
-                    <p class="room-code">P02</p>
-                    <p class="room-status">Phòng đã đặt</p>
-                </div>
-                <div class="body--room">
-                    <div class="icon-circle mt-2">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <p class="mt-3">Lê Thành Y</p>
-                </div>
-                <div class="footer--room">
-                    <div class="footer--room--time">
-                        <p>8 giờ</p>
-                        <div class="footer--room--type d-flex">
-                            <i class="fa-solid fa-check m-2"></i>
-                            <p>Đã dọn dẹp</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
-            <!-- Các phòng khác có thể tương tự -->
-
-           
-    
-
-        </div>
-
+      <!-- Phòng đôi -->
+      <RoomType :roomType="'Phòng gia đình'" :rooms="familyRooms" />
     </div>
-
-    
-</template>
+  </template>
 
 <script>
 import api from '../api';
-import { useUserStore } from '../stores/userStore';
+import RoomType from '../components/RoomType.vue'; // Import RoomType component
 
 export default {
+  components: {
+    RoomType
+  },
   data() {
     return {
-      rooms: []
+      rooms: [],          // Tất cả phòng
+      singleRooms: [],    // Phòng đơn
+      doubleRooms: [],      // Phòng đôi
+      familyRooms: []   // Phòng gia đình
     };
   },
-
   async created() {
     await this.getAllRooms();
   },
   methods: {
     async getAllRooms() {
       try {
-        const response = await api.get('/rooms'); // Fetch all rooms
-        this.rooms = response.data; // Assign fetched rooms to data property
+        const response = await api.get('/rooms');
+        this.rooms = response.data;
+
+        // Phân loại các phòng đơn và phòng đôi và phòng gia đình
+        this.singleRooms = this.rooms.filter(room => room.type === 'single');
+        this.doubleRooms = this.rooms.filter(room => room.type === 'Double');
+        this.familyRooms = this.rooms.filter(room => room.type === 'family');
       } catch (error) {
         console.error('Failed to fetch rooms:', error);
       }
     }
   }
-//   computed: {
-//     user() {
-//       const userStore = useUserStore();
-//       console.log(userStore.user); // Kiểm tra xem user có chứa thông tin đúng không
-//       return userStore.user;
-//     },
-//     isLoggedIn() {
-//       return !!this.user;
-//     }
-//   }
 };
 </script>
 
@@ -198,7 +93,10 @@ export default {
 .room-available {
   background: #e0f7e9; /* Light green background for available rooms */
 }
-
+/* Phòng nhận */
+.room-checkin {
+  background: #758ff8; /* Light green background for available rooms */
+}
 /* Phần đầu của phòng */
 .header--room {
     display: flex;

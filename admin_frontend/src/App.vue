@@ -34,19 +34,20 @@ import TheWelcome from './components/TheWelcome.vue'
                     </router-link>
                 </li>
                 <li>
-                    <a href="">
+                    <router-link to="/customers" class="menu-item">
                     <i class="fa-regular fa-address-book"></i>
                         <span>Khách Hàng</span>
-                    </a>
+                    </router-link>
+                   
                 </li>
                 <li>
-                    <router-link to="" class="menu-item">
+                    <router-link to="/rooms/manager" class="menu-item">
                       <i class="fa-regular fa-clipboard"></i>
                         <span>QL phòng</span>
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/" class="menu-item">
+                    <router-link to="/service" class="menu-item">
                       <i class="fa-regular fa-clipboard"></i>
                         <span>QL dịch vụ</span>
                     </router-link>

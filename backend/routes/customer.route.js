@@ -5,6 +5,14 @@ const auth = require('../middleware/auth.js');
 // const bcrypt = require("bcrypt");
 const customerController = require('../controllers/customer.controller.js');
 
+
+router.post('/', customerController.createCustomer);
+
+router.get('/', customerController.getAllCustomer);
+
+router.delete('/:id', customerController.deleteCustomerById);
+
+router.put('/:id', customerController.updateCustomer);
 // Đăng ký
 router.post('/register', customerController.register);
 

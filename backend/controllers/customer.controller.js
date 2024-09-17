@@ -90,7 +90,98 @@ const me = async (req, res) => {
     } catch (error) {
     res.status(500).json({ message: 'Error fetching user details' });
     }
+};
+
+const getAllCustomer = async (req, res) => {
+    try {
+        // Fetch all customers from the database
+        const customers = await Customer.find();
+        
+        // Send the list of customers in the response
+        res.status(200).json(customers);
+    } catch (error) {
+        // Log the error for debugging purposes
+        console.error('Error fetching customers:', error);
+        
+        // Send an error response
+        res.status(500).json({ message: 'Failed to fetch customers', error });
+    }
+};
+
+const deleteCustomerById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find and delete the customer by ID
+        const result = await Customer.findByIdAndDelete(id);
+
+        if (result) {
+            res.status(200).json({ message: 'Customer deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Customer not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting customer:', error);
+        res.status(500).json({ message: 'Error deleting customer', error });
+    }
+};
+
+// Express route
+const createCustomer = async (req, res) => {
+    try {
+        const { name, email, cccd, phone, address, gioitinh, nationality } = req.body;
+
+        // Xác nhận dữ liệu đầu vào
+        if (!name || !email || !cccd || !phone || !address || !gioitinh || !nationality) {
+            return res.status(400).json({ message: 'Thiếu thông tin cần thiết' });
+        }
+
+        const newCustomer = new Customer({
+            name,
+            email,
+            cccd,
+            phone,
+            address,
+            gioitinh,
+            nationality
+        });
+
+        await newCustomer.save();
+        res.status(201).json(newCustomer);
+    } catch (error) {
+        console.error('Error adding customer:', error);
+        res.status(500).json({ message: 'Có lỗi xảy ra khi thêm khách hàng' });
+    }
 }
+
+const updateCustomer = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body; // Get the update data from the request body
+
+        // Ensure that update data is present
+        if (!updateData || Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'No update data provided' });
+        }
+
+        // Update customer data
+        const result = await Customer.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (result) {
+            res.status(200).json({ message: 'Customer updated successfully', data: result });
+        } else {
+            res.status(404).json({ message: 'Customer not found' });
+        }
+
+    } catch (error) {
+        console.error('Error updating customer:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
+
+
 
 
 
@@ -102,6 +193,10 @@ module.exports = {
     login,
     refreshToken,
     logout,
-    me
+    me,
+    getAllCustomer,
+    deleteCustomerById,
+    createCustomer,
+    updateCustomer,
     
 };
