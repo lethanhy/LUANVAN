@@ -7,6 +7,40 @@
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm phòng</button>
             </div>
 
+            <div class="d-flex">
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="searchQuery" 
+                        placeholder="Tìm kiếm theo số phòng" 
+                        class="form-control mb-3" 
+                    />
+                </div>
+
+                <!-- Search Bar for Room Type -->
+                <div class="search-bar">
+                    <!-- <label for="type" class="form-label">Loại phòng</label> -->
+                    <select id="type" v-model="roomTypeQuery" class="form-select" required>
+                        <option value="">Chọn loại phòng</option>
+                        <option value="single">Phòng đơn</option>
+                        <option value="Double">Phòng đôi</option>
+                        <option value="family">Phòng gia đình</option>
+                    </select>
+                </div>
+
+                <!-- Search Bar for Room Type -->
+                <div class="search-bar">
+                    <!-- <label for="type" class="form-label">Loại phòng</label> -->
+                     <select id="type" v-model="roomTrangthai" class="form-select" required>
+                        <option value="">Trạng thái phòng</option>
+                        <option value="Đã dọn dẹp">Đã dọn dẹp</option>
+                        <option value="Chưa dọn dẹp">Chưa dọn dẹp</option>
+                    </select>
+                </div>
+
+            </div>
+
             <table class="table table-bordered text-center">
                 <thead class="table-secondary">
                     <tr>
@@ -19,8 +53,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(room, index) in rooms" :key="room._id">
-                        <th scope="row">{{ index + 1 }}</th>
+                    <tr v-for="(room, index) in paginatedRooms" :key="room._id">
+                        <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ room.roomNumber }}</td>
                         <td>{{ room.trangthai }}</td>
                         <td>{{ room.type }}</td>
@@ -31,8 +65,27 @@
                             <button type="button" class="btn btn-danger" @click="deleteRoom(room._id)">Xóa</button>
                         </td>
                     </tr>
+                    <tr v-if="!filteredRooms.length">
+                        <td colspan="6">Không tìm thấy phòng</td>
+                    </tr>
                 </tbody>
             </table>
+
+
+                <!-- Pagination Controls -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+                        </li>
+                        <li class="page-item" :class="{ 'active': currentPage === page }" v-for="page in totalPages" :key="page">
+                            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
 
             <!-- Success Message -->
             <div v-if="showSuccessMessage" class="success-message">
@@ -88,7 +141,7 @@
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
                     <h2 class="modal-title">Sửa Phòng</h2>
-                    <form @submit.prevent="updateRoom">
+                    <form @submit.prevent="updateRooms">
                         <div class="mb-3">
                             <label for="editRoomNumber" class="form-label">Số phòng</label>
                             <input type="text" id="editRoomNumber" v-model="editRoom.roomNumber" class="form-control" required>
@@ -158,16 +211,50 @@ export default {
                 trangthai: '',
                 maxGuests: '',
             },
-            rooms: [] // Array to hold rooms data
+            rooms: [],// Array to hold rooms data
+            currentPage: 1, // Current active page
+            itemsPerPage: 5, // Number of items to show per page
+            totalItems: 0 ,// Total number of items (rooms)
+            searchQuery: '', // Holds the search input for filtering by room number
+            roomTypeQuery: '',    // For room type search
+            roomTrangthai: '', 
         };
+    },
+    computed: {
+        // Filter rooms based on the search query for both room number and room type
+        filteredRooms() {
+            return this.rooms.filter(room => {
+                const matchesRoomNumber = room.roomNumber.toString().includes(this.searchQuery);
+                const matchesRoomType = room.type.toLowerCase().includes(this.roomTypeQuery.toLowerCase());
+                const matchesRoomTrangthai = room.trangthai.toLowerCase().includes(this.roomTrangthai.toLowerCase());
+                return matchesRoomNumber && matchesRoomType && matchesRoomTrangthai; // Match both room number and room type
+            });
+        },
+        paginatedRooms() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.filteredRooms.slice(start, end); // Paginate only the filtered rooms
+        },
+        // Update total pages based on filtered rooms
+    totalPages() {
+        return Math.ceil(this.filteredRooms.length / this.itemsPerPage); // Calculate total pages from filtered rooms
+    }
+
     },
     methods: {
         async getAllRooms() {
             try {
                 const response = await api.get('/rooms/manager');
                 this.rooms = response.data; // Set rooms data
+                this.totalItems = this.rooms.length; // Set total number of rooms for pagination
             } catch (error) {
                 console.log('Error fetching rooms:', error);
+            }
+        },
+         // ... existing methods
+        changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
             }
         },
         async addRoom() {
@@ -201,7 +288,7 @@ export default {
         },
         async deleteRoom(id) {
             try {
-                const response = await api.delete(`/rooms/${id}`);
+                const response = await api.delete(`/rooms/manager/${id}`);
                 if (response.status === 200) { // 200 OK status
                     await this.getAllRooms();
                     this.successMessage = 'Xóa phòng thành công!';
@@ -219,9 +306,9 @@ export default {
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
-        async updateRoom() {
+        async updateRooms() {
             try {
-                const response = await api.put(`/rooms/${this.editRoom._id}`, this.editRoom);
+                const response = await api.put(`/rooms/manager/${this.editRoom._id}`, this.editRoom);
                 if (response.status === 200) { // 200 OK status
                     this.showModalEdit = false;
                     await this.getAllRooms();
@@ -316,7 +403,7 @@ export default {
     position: fixed;
     top: 10px;
     right: 10px;
-    background: #d4edda;
+    background: #7bef83;
     color: #155724;
     border: 1px solid #c3e6cb;
     border-radius: 5px;
@@ -329,5 +416,12 @@ export default {
 .checkmark {
     font-size: 20px;
     margin-right: 10px;
+}
+.search-bar{
+    margin-right: 10px;
+}
+.search-bar input {
+    max-width: 300px;
+    margin-bottom: 15px;
 }
 </style>

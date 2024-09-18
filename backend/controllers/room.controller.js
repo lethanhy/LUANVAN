@@ -41,6 +41,32 @@ const addRoom = async (req, res) => {
     }
 };
 
+const updateRooms = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body; // Get the update data from the request body
+
+        // Ensure that update data is present
+        if (!updateData || Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'No update data provided' });
+        }
+
+        // Update room data
+        const result = await Room.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (result) {
+            res.status(200).json({ message: 'Room updated successfully', data: result });
+        } else {
+            res.status(404).json({ message: 'Room not found' });
+        }
+
+    } catch (error) {
+        console.error('Error updating room:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+
 const updateRoom = async (req, res) => {
     try {
         const { id } = req.params;
@@ -161,17 +187,23 @@ const getRooms = async (req, res) => {
 };
 
 
+const deleteRoomById = async (req, res) => {
+    try {
+        const { id } = req.params;
 
-// const getoneRoom = async (req, res) => {
+        // Find and delete the room by ID
+        const result = await Room.findByIdAndDelete(id);
 
-//     try {
-//         const { id } = req.params;
-//         const rooms = await Room.findById(id);
-//         res.status(200).json(rooms);
-//     } catch (error) {
-//         res.status(500).json({message: error.message});
-//     }
-// };
+        if (result) {
+            res.status(200).json({ message: 'Room deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Room not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting room:', error);
+        res.status(500).json({ message: 'Error deleting room', error });
+    }
+};
 
 const deleteRoom = async (req, res) => {
     try {
@@ -280,6 +312,8 @@ module.exports = {
    deleteRoom,
    getRoomById,
    getAllRooms,
-   createRoom
+   createRoom,
+   updateRooms,
+   deleteRoomById,
 //    getoneRoom,
 };

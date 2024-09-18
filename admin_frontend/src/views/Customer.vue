@@ -7,6 +7,30 @@
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm Khách hàng</button>
             </div>
 
+            <div class="d-flex">
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="customerPhoneQuery" 
+                        placeholder="Tìm số điện thoại" 
+                        class="form-control mb-3" 
+                    />
+                </div>
+
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="customerCccd" 
+                        placeholder="Tìm kiếm theo cccd" 
+                        class="form-control mb-3" 
+                    />
+                </div>
+
+                
+
+            </div>
+
             <table class="table table-bordered text-center">
                 <thead class="table-secondary">
                     <tr>
@@ -22,8 +46,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(customer, index) in customers" :key="customer._id">
-                        <th scope="row">{{ index + 1 }}</th>
+                    <tr v-for="(customer, index) in paginatedCustomers" :key="customer._id">
+                        <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ customer.name }}</td>
                         <td>{{ customer.cccd }}</td>
                         <td>{{ customer.phone }}</td>
@@ -31,14 +55,32 @@
                         <td>{{ customer.gioitinh }}</td>
                         <td>{{ customer.nationality }}</td>
                         <td>
-                            <button @click="editCustomerData(customer)" type="button" class="btn btn-warning">Sửa</button>
+                            <button @click="editCustomerData(customer)" type="button" class="btn btn-warning shadow">Sửa</button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger" @click="deleteCustomer(customer._id)">Xóa</button>
+                            <button type="button" class="btn btn-danger shadow" @click="deleteCustomer(customer._id)">Xóa</button>
                         </td>
+                    </tr>
+                    <tr v-if="!filteredCustomers.length">
+                        <td colspan="6">Không tìm thấy khách hàng</td>
                     </tr>
                 </tbody>
             </table>
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+                        </li>
+                        <li class="page-item" :class="{ 'active': currentPage === page }" v-for="page in totalPages" :key="page">
+                            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ 'disabled': currentPage === totalPages }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+                        </li>
+                    </ul>
+                </nav>
 
             <!-- Success Message -->
             <div v-if="showSuccessMessage" class="success-message">
@@ -163,16 +205,52 @@ export default {
                 gioitinh: '',
                 nationality: ''
             },
-            customers: [] // Array to hold customers data
+            customers: [], // Array to hold customers data
+            currentPage: 1, // Current active page
+            itemsPerPage: 5, // Number of items to show per page
+            totalItems: 0 ,// Total number of items (rooms)
+            searchQuery: '', // Holds the search input for filtering by room number
+            customerPhoneQuery: '',    // For room type search
+            customerCccd: '', 
         };
+    },
+    computed: {
+        // Filter rooms based on the search query for both room number and room type
+        filteredCustomers() {
+        return this.customers.filter(customer => {
+            const matchesCustomerName = customer.name?.toString().includes(this.searchQuery);
+            const matchesCustomerPhone = (customer.phone || '').toLowerCase().includes(this.customerPhoneQuery.toLowerCase());
+            const matchesCustomerCccd = (customer.cccd || '').toLowerCase().includes(this.customerCccd.toLowerCase());
+
+            return matchesCustomerName && matchesCustomerPhone && matchesCustomerCccd;
+        });
+    },
+        paginatedCustomers() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.filteredCustomers.slice(start, end); // Paginate only the filtered rooms
+        },
+        // Update total pages based on filtered rooms
+        totalPages() {
+            return Math.ceil(this.filteredCustomers.length / this.itemsPerPage); // Calculate total pages from filtered rooms
+        }
+
     },
     methods: {
         async getAllCustomer() {
             try {
-                const response = await api.get('/customers');
-                this.customers = response.data; // Set customers data
-            } catch (error) {
-                console.log('Error fetching customers:', error);
+        const response = await api.get('/customers');
+        console.log(response.data); // Log data to check if it's correct
+        this.customers = response.data; // Set customers data
+        this.totalItems = this.customers.length; // Set total number of customers
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+    }
+        },
+         // ... existing methods
+         changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
             }
         },
         async addCustomer() {
@@ -335,5 +413,8 @@ export default {
 .checkmark {
     font-size: 20px;
     margin-right: 10px;
+}
+.search-bar{
+    margin-left: 10px;
 }
 </style>

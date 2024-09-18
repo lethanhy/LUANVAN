@@ -34,6 +34,12 @@ import TheWelcome from './components/TheWelcome.vue'
                     </router-link>
                 </li>
                 <li>
+                    <router-link to="/" class="menu-item">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Hóa đơn</span>
+                    </router-link>
+                </li>
+                <li>
                     <router-link to="/customers" class="menu-item">
                     <i class="fa-regular fa-address-book"></i>
                         <span>Khách Hàng</span>
@@ -59,12 +65,12 @@ import TheWelcome from './components/TheWelcome.vue'
                     </a>
                 </li>
                 
-                <li class="logout">
+                <!-- <li class="logout">
                     <a href="" >
                         <i class="fas fa-sign-out-alt"></i>
                         <span>Logout</span>
                     </a>
-                </li>
+                </li> -->
             </ul>
     </div>
 
