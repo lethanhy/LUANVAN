@@ -246,6 +246,7 @@ const getRoomById = async (req, res) => {
             const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Tính số ngày
 
             return {
+                bookingId: booking._id, // Thêm booking ID vào đây
                 customerName: booking.customer?.name || 'Unknown',
                 customerPhone: booking.customer?.phone || 'Unknown',
                 checkin: roomBooking.checkin,
@@ -258,7 +259,8 @@ const getRoomById = async (req, res) => {
         const roomData = {
             ...room.toObject(),
             isBooked: bookingDetails.length > 0, // Xác định phòng đã được đặt hay chưa
-            bookings: bookingDetails // Danh sách chi tiết booking liên quan đến phòng này
+            bookings: bookingDetails, // Danh sách chi tiết booking liên quan đến phòng này
+            customerId: relatedBookings.length > 0 ? relatedBookings[0].customer._id : null // Lấy customerId từ booking đầu tiên
         };
 
         res.status(200).json(roomData);

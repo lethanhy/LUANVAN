@@ -8,6 +8,17 @@
             </div>
 
             <div class="d-flex">
+
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="searchQuery" 
+                        placeholder="Tìm theo tên" 
+                        class="form-control mb-3" 
+                    />
+                </div>
+                
                 <!-- Search Bar -->
                 <div class="search-bar">
                     <input 
@@ -17,6 +28,8 @@
                         class="form-control mb-3" 
                     />
                 </div>
+
+                
 
                 <div class="search-bar">
                     <input 

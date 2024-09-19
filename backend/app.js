@@ -5,6 +5,8 @@ const customerRoutes = require('./routes/customer.route.js');
 const roomRoutes = require('./routes/room.route.js');
 const cartRoutes = require('./routes/cart.route.js');
 const staffRoutes = require('./routes/staff.route.js');
+const menuRoutes = require('./routes/menu.route.js');
+const orderRoutes = require('./routes/order.route.js');
 const cors = require('cors');
 const app = express();
 
@@ -25,6 +27,8 @@ app.use("/customers", customerRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/cart", cartRoutes);
 app.use("/staff", staffRoutes);
+app.use("/menu", menuRoutes);
+app.use("/orders", orderRoutes);
 
 // // Backend (Express.js)
 // app.get('/api/customers', (req, res) => {

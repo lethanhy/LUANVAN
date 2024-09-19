@@ -64,7 +64,8 @@ const BookingSchema = mongoose.Schema(
             type: String,
             enum: ["đã đặt", "đã nhận", "thanh toán"], // Trạng thái đặt phòng: đang hoạt động, đã hoàn thành, hoặc đã huỷ
             default: "đã đặt"
-        }
+        },
+        orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }], // Đơn hàng liên quan
 
     },
     {

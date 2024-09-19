@@ -32,14 +32,23 @@
           </div>
         </div>
   
-        <!-- Room Amenities and Status Update -->
-        <div class="DetailRoom--body d-flex">
-          <div class="DetailRoom--service bg-white">
-            <h1>Dịch vụ</h1>
-            <ul>
-              <li v-for="amenity in room.amenities" :key="amenity">{{ amenity }}</li>
-            </ul>
-          </div>
+         <!-- Room Amenities and Status Update -->
+         <div class="DetailRoom--body d-flex">
+                <div class="DetailRoom--service bg-white">
+                    <div>
+                        <h1>Dịch vụ</h1>
+                        <!-- Display ordered services -->
+                        <ul>
+                            <li v-for="(item, index) in menuItems" :key="index">
+                                {{ item.name }} - {{ item.price }} VND
+                            </li>
+                        </ul>
+                        
+                        <button @click="showModal = true" class="btn btn-success">Thêm dịch vụ</button>
+                    </div>
+                </div>
+
+             
   
           <div class="DetailRoom--status bg-white">
             <div class="col-md-12 mb-3">
@@ -72,6 +81,43 @@
         </router-link>
       </div>
     </div>
+
+
+    <!-- Phần modal thêm dịch vụ -->
+    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+        <div class="modal-content">
+            <h2 class="modal-title">Thêm Dịch Vụ</h2>
+            <form @submit.prevent="addMenu">
+
+                <div class="menu d-flex text-center">
+                    <!-- Danh sách món ăn trong menu -->
+                    <div class="menu--1">
+                        <h3>Menu</h3>
+                        <ul>
+                            <li v-for="item in menuItems" :key="item._id">
+                                {{ item.name }} - {{ item.price }} VND
+                                <button type="button" @click="selectItem(item)">Chọn</button>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Danh sách món đã chọn -->
+                    <div class="menu--2">
+                        <h3>Menu đã chọn</h3>
+                        <ul>
+                            <li v-for="(item, index) in selectedItems" :key="index">
+                                {{ item.name }} - {{ item.price }} VND
+                                <button type="button" @click="removeItem(index)">Bỏ</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Thêm</button>
+                <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+            </form>
+        </div>
+    </div>
   </template>
   
 <script>
@@ -81,7 +127,11 @@ import { format } from 'date-fns';
 export default {
   data() {
     return {
-      room: null
+      room: null,
+      showModal: false, // Điều khiển hiển thị modal
+      menuItems: [], // Danh sách món ăn từ menu
+      selectedItems: [], // Danh sách món đã chọn
+      bookingId: null, // Lưu booking ID
     };
   },
   computed: {
@@ -102,27 +152,27 @@ export default {
   },
   methods: {
     async checkInRoom() {
-    try {
-        // Tạo một đối tượng chứa trạng thái cập nhật
-        const updateData = {
-            status: 'đã nhận',
-            // Bạn có thể thêm các thuộc tính khác nếu cần thiết
-        };
+      try {
+          // Tạo một đối tượng chứa trạng thái cập nhật
+          const updateData = {
+              status: 'đã nhận',
+              // Bạn có thể thêm các thuộc tính khác nếu cần thiết
+          };
 
-        // Gửi yêu cầu cập nhật phòng với trạng thái mới
-        const response = await api.put(`/rooms/${this.room._id}`, updateData);
-        console.log('Nhận phòng thành công:', response.data);
+          // Gửi yêu cầu cập nhật phòng với trạng thái mới
+          const response = await api.put(`/rooms/${this.room._id}`, updateData);
+          console.log('Nhận phòng thành công:', response.data);
 
-        // Cập nhật trạng thái phòng trong UI
-        this.room.status = 'đã nhận';
+          // Cập nhật trạng thái phòng trong UI
+          this.room.status = 'đã nhận';
 
-        // Thông báo thành công cho người dùng
-        alert('Nhận phòng thành công!');
-    } catch (error) {
-        console.log('Lỗi khi nhận phòng:', error);
-        alert('Đã xảy ra lỗi, vui lòng thử lại sau.');
-    }
-},
+          // Thông báo thành công cho người dùng
+          alert('Nhận phòng thành công!');
+      } catch (error) {
+          console.log('Lỗi khi nhận phòng:', error);
+          alert('Đã xảy ra lỗi, vui lòng thử lại sau.');
+      }
+  },
 
     formatDate(dateString) {
       if (!dateString) return 'Chưa có thông tin';
@@ -137,7 +187,112 @@ export default {
         console.log('Failed to save changes:', error);
       }
     },
+
+    // Hàm để gọi API và lấy danh sách menu
+    async fetchMenuItems() {
+      try {
+        const response = await api.get('/menu'); // API gọi danh sách món ăn
+        this.menuItems = response.data;
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách món ăn:', error);
+      }
+    },
+   // Hàm thêm món vào danh sách đã chọn
+   selectItem(item) {
+      const exists = this.selectedItems.find(selectedItem => selectedItem._id === item._id);
+      if (!exists) {
+        this.selectedItems.push(item); // Chỉ thêm nếu món chưa có trong danh sách đã chọn
+      }
+    },
+
+
+    // Hàm xóa món khỏi danh sách đã chọn
+    removeItem(index) {
+      this.selectedItems.splice(index, 1); // Xóa món tại vị trí được chọn
+    },
+
+
+   // Hàm gửi đơn hàng đã chọn
+   async addMenu() {
+  if (this.selectedItems.length === 0) {
+    alert('Vui lòng chọn ít nhất một món ăn!');
+    return;
+  }
+
+  
+
+  // Prepare order data
+  const orderData = {
+    roomId: this.room._id,
+    customerId:  this.room.customerId, // Sử dụng customerId vừa lấy
+    bookingId:this.room.bookings[0]?.bookingId, // Gửi bookingId từ booking đầu tiên
+    items: this.selectedItems.map(item => ({
+      menuItem: item._id,
+      quantity: 1
+    }))
+  };
+
+  // Log order data for debugging
+  console.log('Order Data:', orderData);
+
+  if (this.room.bookings.length > 0) {
+  const booking = this.room.bookings[0];
+  console.log('Booking:', booking);
+  console.log('Customer ID:', booking.customerId); // Kiểm tra xem có tồn tại không
+  console.log('Booking ID:', booking._id); // Kiểm tra xem có tồn tại không
+}
+
+  try {
+    const response = await api.post('/orders', orderData);
+    alert('Đơn hàng đã được tạo thành công!');
+
+    // // Cập nhật orderedServices
+    // if (!this.room.orderedServices) {
+    //   this.room.orderedServices = []; // Khởi tạo nếu chưa có
+    // }
+
+    // // Thêm dịch vụ đã chọn vào orderedServices
+    // this.selectedItems.forEach(item => {
+    //   this.room.orderedServices.push(item);
+    // });
+    this.showModal = false;
+    this.selectedItems = [];
+  } catch (error) {
+    console.log('Lỗi khi tạo đơn hàng:', error);
+    if (error.response) {
+      console.log('Error Response:', error.response.data);
+      alert('Có lỗi xảy ra khi tạo đơn hàng: ' + error.response.data.message);
+    } else {
+      alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+    }
+  }
+},
+        async getOrder() {
+          if (!this.room) {
+            console.error('Room is not loaded yet.');
+            return; // Ngừng thực hiện nếu room chưa được tải
+          }
+
+          try {
+            const roomId = this.room._id; // Lấy roomId từ room hiện tại
+            const response = await api.get(`/orders?roomId=${roomId}`); // Gọi API với roomId
+
+            console.log('Order Data:', response.data);
+            // Xử lý dữ liệu đơn hàng ở đây, có thể lưu vào state nếu cần
+          } catch (error) {
+            console.log('Lỗi khi lấy thông tin đơn hàng:', error);
+            alert('Có lỗi xảy ra khi lấy thông tin đơn hàng.');
+          }
+        }
+
+
+
     
+  },
+  mounted() {
+    // Tự động lấy danh sách món ăn khi component được khởi tạo
+    this.fetchMenuItems();
+   
   }
 };
 </script>
@@ -191,4 +346,47 @@ export default {
 .DetailRoom--button button:hover {
     background-color: #0056b3;
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* .d-flex {
+  display: flex;
+  justify-content: space-between;
+} */
+
+.menu--1, .menu--2 {
+  width: 45%;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+button {
+  margin-left: 10px;
+}
+
 </style>
