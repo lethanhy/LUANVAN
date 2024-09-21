@@ -53,7 +53,7 @@ import TheWelcome from './components/TheWelcome.vue'
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/service" class="menu-item">
+                    <router-link to="/menu" class="menu-item">
                       <i class="fa-regular fa-clipboard"></i>
                         <span>QL dịch vụ</span>
                     </router-link>

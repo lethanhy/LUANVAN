@@ -8,6 +8,9 @@ const MenuSchema = mongoose.Schema(
         },
         price: {
             type: Number,
+        },
+        quantity: {
+            type: Number,
         } 
     },
     {

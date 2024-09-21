@@ -23,6 +23,31 @@ const createMenu = async (req, res) => {
     }
 }
 
+const updateMenu = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body; // Get the update data from the request body
+
+        // Ensure that update data is present
+        if (!updateData || Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'No update data provided' });
+        }
+
+        // Update Menu data
+        const result = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (result) {
+            res.status(200).json({ message: 'Customer updated successfully', data: result });
+        } else {
+            res.status(404).json({ message: 'Customer not found' });
+        }
+
+    } catch (error) {
+        console.error('Error updating customer:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 
 
@@ -33,6 +58,7 @@ const createMenu = async (req, res) => {
 module.exports = {
    getMenu,
    createMenu,
+   updateMenu
 
 
 };

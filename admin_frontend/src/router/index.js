@@ -22,7 +22,7 @@ const routes = [
   { path: '/rooms/:id', name: 'roomDetails', component: RoomDetails },
   { path: '/customers', name: 'Customer', component: Customer },
   { path: '/rooms/manager', name: 'RoomManager', component: RoomManager },
-  { path: '/service', name: 'Service', component: Service },
+  { path: '/menu', name: 'Service', component: Service },
   
 ];
 

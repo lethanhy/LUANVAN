@@ -239,7 +239,7 @@ export default {
     // Log carts to debug
     console.log('Carts:', this.carts);
 
-    const email = 'Nguyenthibetu@gmail.com';
+    const email = 'Nguyenthibesau@gmail.com';
     // Prepare the data to send to the backend
     const bookingData = {
       customerName: this.customerName,

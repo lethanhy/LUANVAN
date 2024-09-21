@@ -42,7 +42,6 @@ const CustomerSchema = mongoose.Schema(
         },
         nationality: {
             type: String,
-            required: true
         },
         
         bookings: [
