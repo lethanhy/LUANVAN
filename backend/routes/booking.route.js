@@ -10,12 +10,15 @@ router.get('/', bookingController.getBooking);
 router.post('/order', bookingController.createBooking);
 
 router.post('/order/cart', bookingController.addCart);
-router.get('/order/cart', bookingController.getCart);
+// router.get('/order/cart', bookingController.getCart);
 router.get('/order', bookingController.getRoomByAvailable);
+
+// Endpoint to get bookings by date
+router.get('/date/:date', bookingController.getRoomDate);
 
 
 // Xem chi tiết một booking (yêu cầu xác thực)
-router.get('/:id', auth, bookingController.getBookingId);
+router.get('/:id', bookingController.getBookingId);
 
 // Cập nhật một booking (yêu cầu xác thực)
 router.patch('/:id', auth, bookingController.updateBooking);
@@ -24,5 +27,7 @@ router.patch('/:id', auth, bookingController.updateBooking);
 router.delete('/:id', auth, bookingController.deleteBooking);
 
 router.delete('/order/:roomId', bookingController.deleteCart);
+
+
 
 module.exports = router;

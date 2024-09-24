@@ -10,11 +10,13 @@ import Order from '@/views/Order.vue';
 import Customer from '@/views/Customer.vue';
 import RoomManager from '@/views/RoomManager.vue';
 import Service from '@/views/Service.vue';
+import DetailsBooking from '@/views/DetailsBooking.vue';
 
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
   { path: '/bookings', name: 'Booking', component: Booking },
+  { path: '/bookings/:id', name: 'DetailsBooking', component: DetailsBooking },
   { path: '/bookings/order', name: 'Order', component: Order },
   { path: '/customers/login', name: 'Login', component: Login },
   { path: '/customers/register', name: 'Register', component: Register },

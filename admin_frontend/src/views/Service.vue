@@ -218,22 +218,22 @@ export default {
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
-        async deleteRoom(id) {
+        async deleteMenu(id) {
             try {
-                const response = await api.delete(`/rooms/manager/${id}`);
+                const response = await api.delete(`/menu/${id}`);
                 if (response.status === 200) { // 200 OK status
-                    await this.getAllRooms();
-                    this.successMessage = 'Xóa phòng thành công!';
+                    await this.getAllMenu();
+                    this.successMessage = 'Xóa sản phẩm thành công!';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
-                    this.successMessage = 'Xóa phòng thất bại';
+                    this.successMessage = 'Xóa sản phẩm thất bại';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
             } catch (error) {
-                console.log('Error deleting room:', error);
-                this.successMessage = 'Có lỗi xảy ra khi xóa phòng';
+                console.log('Error deleting menu:', error);
+                this.successMessage = 'Có lỗi xảy ra khi xóa sản phẩm';
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }

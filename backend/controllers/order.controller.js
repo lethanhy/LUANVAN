@@ -7,56 +7,40 @@ const mongoose = require('mongoose');
 // Tạo đơn hàng và liên kết với booking
 const createOrder = async (req, res) => {
   try {
-    const { roomId, customerId, bookingId, items } = req.body;
+      const { bookingId, items } = req.body;
 
-    // Kiểm tra xem dữ liệu đầu vào có đầy đủ không
-    if (!roomId || !customerId || !bookingId || !items || items.length === 0) {
-      return res.status(400).json({ message: "Thiếu thông tin đơn hàng" });
-    }
-
-    // Tính tổng số tiền cho đơn hàng
-    let totalAmount = 0;
-    for (const item of items) {
-      const menuItem = await MenuItem.findById(item.menuItem);
-
-      // Nếu không tìm thấy món ăn trong cơ sở dữ liệu
-      if (!menuItem) {
-        return res.status(404).json({ message: `Món ăn với ID ${item.menuItem} không tồn tại` });
+      // Validate that there are items in the order
+      if (!items || !items.length) {
+          return res.status(400).json({ message: 'No items in the order' });
       }
 
-      totalAmount += menuItem.price * item.quantity;
-    }
+      // Find the booking by its ID
+      const booking = await Booking.findById(bookingId);
 
-    // Tìm booking trước khi tạo đơn hàng để kiểm tra xem booking có tồn tại không
-    const booking = await Booking.findById(bookingId);
+      if (!booking) {
+          return res.status(404).json({ message: 'Booking not found' });
+      }
 
-    // Nếu không tìm thấy booking
-    if (!booking) {
-      return res.status(404).json({ message: `Không tìm thấy booking với ID ${bookingId}` });
-    }
+      // Add new items to the booking's orders
+      items.forEach(item => {
+          booking.orders.push({
+              id: item._id,
+              itemName: item.itemName,
+              quantity: item.quantity,
+              price: item.price
+          });
+      });
 
-    // Tạo đơn hàng mới
-    const newOrder = new Order({
-      roomId,
-      customerId,
-      bookingId, // Liên kết với booking
-      items,
-      totalAmount,
-    });
+      // Save the updated booking with new orders
+      await booking.save();
 
-    // Lưu đơn hàng vào cơ sở dữ liệu
-    await newOrder.save();
-
-    // Thêm đơn hàng vào danh sách đơn hàng của booking đó
-    booking.orders.push(newOrder._id);
-    await booking.save();
-
-    res.status(201).json({ message: 'Đơn hàng đã được tạo và liên kết với booking', order: newOrder });
+      res.status(200).json({ message: 'Order added successfully', orders: booking.orders });
   } catch (error) {
-    console.error('Lỗi khi tạo đơn hàng:', error);
-    res.status(500).json({ message: 'Có lỗi xảy ra khi tạo đơn hàng' });
+      console.error('Error creating order:', error.message || error);
+      res.status(500).json({ message: 'Failed to create order', error: error.message || error });
   }
 };
+
 
 const getOrder = async (req, res) => {
     try {
@@ -68,7 +52,7 @@ const getOrder = async (req, res) => {
       }
   
       // Tìm các đơn hàng theo roomId
-      const orders = await Order.find({ roomId }).populate('items.menuItem');
+      const orders = await Booking.find({ roomId }).populate('orders');
   
       if (!orders || orders.length === 0) {
         return res.status(404).json({ message: 'Không tìm thấy đơn hàng nào.' });

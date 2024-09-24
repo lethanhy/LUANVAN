@@ -1,12 +1,37 @@
 <template>
     <div>
+
+        <!-- Search Bar -->
+    <div>
+      <input 
+        type="date" 
+        class="form-date mb-3" 
+        v-model="searchDate" 
+        @change="fetchBookings"
+      />
+    </div>
+
+    <div v-if="bookedRooms.length > 0">
+      <h4>Phòng đã đặt vào {{ searchDate }}</h4>
+      <RoomType 
+        v-for="room in bookedRooms" 
+        :key="room._id" 
+        :roomType="room.type" 
+        :rooms="[room]" 
+      />
+    </div>
+    
+    <div v-else-if="searchDate">
+      <p>Không có phòng nào đã đặt vào {{ searchDate }}</p>
+    </div>
+
       <!-- Phòng đơn -->
       <RoomType :roomType="'Phòng đơn'" :rooms="singleRooms" />
       
       <!-- Phòng đôi -->
       <RoomType :roomType="'Phòng đôi'" :rooms="doubleRooms" />
 
-      <!-- Phòng đôi -->
+      <!-- Phòng gia đình -->
       <RoomType :roomType="'Phòng gia đình'" :rooms="familyRooms" />
     </div>
   </template>
@@ -21,6 +46,8 @@ export default {
   },
   data() {
     return {
+      searchDate: '', // To hold the date input
+      bookedRooms: [], // To hold the rooms booked on the searched date
       rooms: [],          // Tất cả phòng
       singleRooms: [],    // Phòng đơn
       doubleRooms: [],      // Phòng đôi
@@ -43,13 +70,30 @@ export default {
       } catch (error) {
         console.error('Failed to fetch rooms:', error);
       }
-    }
+    },
+    async fetchBookings() {
+      if (!this.searchDate) return; // Exit if no date is selected
+      try {
+        const response = await api.get(`/bookings/date/${this.searchDate}`);
+        this.bookedRooms = response.data; // Assign booked rooms based on the searched date
+      } catch (error) {
+        console.error('Failed to fetch bookings:', error);
+      }
+    },
+
   }
 };
 </script>
 
 
 <style>
+.form-date {
+    width: 20%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-left: 0.5rem;
+}
 /* Thẻ chính bao bọc toàn bộ nội dung */
 .card--room {
     background: #fff;

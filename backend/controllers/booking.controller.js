@@ -2,6 +2,7 @@ const Booking = require("../models/booking.model.js");
 const Room = require("../models/room.model.js");
 const Customer = require("../models/customer.model.js");
 const Cart = require("../models/cart.model.js");
+const MenuItem = require("../models/menu.model.js");
 
 const getBooking = async (req, res) => {
     try {
@@ -21,50 +22,65 @@ const getBooking = async (req, res) => {
 
 
 const createBooking = async (req, res) => {
-    try {
-      const { customerName, cccd, gioitinh, phone, email, address, rooms } = req.body;
+    const { customerName, cccd, gioitinh, email, phone, address, rooms } = req.body;
   
-      if (!rooms || rooms.length === 0) {
+    if (!rooms || rooms.length === 0) {
         return res.status(400).json({ message: 'No rooms selected' });
-      }
-  
-      let customer = await Customer.findOne({ phone });
-      if (!customer) {
-        customer = new Customer({
-          name: customerName,
-          cccd,
-          gioitinh,
-          phone,
-          address,
-          email
-        });
-        await customer.save();
-      }
-  
-      const bookedRooms = rooms.map(room => ({
-        roomId: room.roomId, 
-        checkin: new Date(room.checkin), 
-        checkout: new Date(room.checkout)
-      }));
-  
-      const newBooking = new Booking({
-        customer: customer._id,
-        rooms: bookedRooms,
-        paid: false
-      });
-  
-      await newBooking.save();
-
-      // Clear all carts
-      await Cart.deleteMany({});
-  
-      res.status(201).json(newBooking);
-  
-    } catch (error) {
-      console.error('Error creating booking:', error.message || error);
-      res.status(500).json({ message: 'Failed to create booking', error: error.message || error });
     }
-  };
+  
+    try {
+        // Find or create a new customer based on phone number
+        let customer = await Customer.findOne({ phone });
+        if (!customer) {
+            customer = new Customer({
+                name: customerName,
+                cccd,
+                gioitinh,
+                phone,
+                address,
+                email,
+            });
+            await customer.save();
+        }
+  
+        // Create bookings and update room statuses
+        const bookingPromises = rooms.map(async (room) => {
+            // Create new booking for each room
+            const newBooking = new Booking({
+                customer: customer._id,
+                room: room.id, // Assuming room.id is ObjectId
+                paid: false,
+                checkin: room.checkin,
+                checkout: room.checkout,
+            });
+            await newBooking.save();
+  
+            // Update room status to "booked"
+            const roomToUpdate = await Room.findById(room.id);
+            if (!roomToUpdate) {
+                throw new Error(`Room with id ${room.id} not found`);
+            }
+            roomToUpdate.status = 'đã đặt'; // Mark room as booked
+            await roomToUpdate.save();
+
+            return newBooking;
+        });
+  
+        // Wait for all booking and room updates to complete
+        const bookings = await Promise.all(bookingPromises);
+  
+        // Optionally clear the cart (if needed)
+        // await Cart.deleteMany({});
+  
+        res.status(201).json(bookings);
+    } catch (error) {
+        console.error('Error creating bookings:', error.message || error);
+        res.status(500).json({ message: 'Failed to create bookings', error: error.message || error });
+    }
+};
+
+  
+
   
 
 
@@ -73,7 +89,7 @@ const getBookingId = async (req, res) => {
         const bookingId = req.params.id;
 
         // Tìm booking và populate thông tin phòng
-        const booking = await Booking.findById(bookingId).populate('room');
+        const booking = await Booking.findById(bookingId).populate('room').populate('customer');
 
         if(!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -245,117 +261,12 @@ const addCart = async (req, res) => {
 
 
 
-// const addCart = async (req, res) => {
-//     try {
-//         const { rooms } = req.body; // rooms is now expected to be an array
 
-//         if (!Array.isArray(rooms) || rooms.length === 0) {
-//             return res.status(400).json({ message: 'Rooms must be an array with at least one room ID' });
-//         }
-
-//         // Cập nhật trạng thái phòng
-//         for (const roomData of rooms) {
-//             const room = await Room.findById(roomData.roomId);
-
-//             if (!room) {
-//                 return res.status(404).json({ message: `Room with ID ${roomData.roomId} not found` });
-//             }
-
-//             room.status = 'đã đặt'; // Đánh dấu phòng là đã được đặt
-//             await room.save();
-//         }
-        
-//         cart.rooms.push(...rooms);
-
-//         await cart.save();
-//         res.status(201).json(cart);
-//     } catch (error) {
-//         console.error('Error adding cart:', error.message); // Log the error
-//         res.status(400).json({ message: error.message });
-//     }
-// };
-
-
-
-
-
-// const getCart = async (req, res) => {
-//     try {
-//         // Lấy thông tin giỏ hàng
-//         const carts = await Cart.find().populate('rooms.roomId'); // Giả sử bạn có trường `rooms` chứa các ID phòng
-        
-//         // Nếu bạn cần thêm thông tin về phòng, bạn có thể tìm và ghép thông tin phòng vào giỏ hàng
-//         for (const cart of carts) {
-//             // Tìm thông tin phòng tương ứng với ID phòng trong giỏ hàng
-//             cart.rooms.roomId = await Room.find({ _id: { $in: cart.rooms.roomId } });
-//         }
-        
-//         res.status(200).json(carts);
-//     } catch (error) {
-//         res.status(500).send({ message: error.message });
-//     }
-// };
-
-const getCart = async (req, res) => {
-  try {
-    // Fetch cart and populate room details
-    const carts = await Cart.find().populate('rooms.roomId', 'roomNumber type price description');
-
-    res.status(200).json(carts);
-  } catch (error) {
-    console.error('Failed to fetch cart:', error);
-    res.status(500).json({ message: 'Failed to fetch cart', error });
-  }
-};
 
   
   
 
-// const deleteCart = async (req, res) => {
-//     try {
-//         const { id } = req.params;
 
-//         const cart = await Cart.findByIdAndDelete(id);
-
-//         // Cập nhật trạng thái phòng
-//         const room = await Room.findById(cart.room);
-//         if (room) {
-//             room.status = 'trống'; // Đánh dấu phòng là có sẵn
-//             await room.save();
-//         }
-//         res.status(200).json({ message: 'Cart deleted successfully' });
-//     } catch (error) {
-//         res.status(500).json({ message: 'Error deleting cart', error });
-//     }
-// }
-
-// const deleteCart = async (req, res) => {
-//     try {
-//         const { id } = req.params;
-
-//         // Find the cart by its ID and delete it
-//         const cart = await Cart.findByIdAndDelete(id);
-
-//         if (cart) {
-//             // Loop through all rooms in the cart and update their status
-//             for (const roomObj of cart.rooms) {
-//                 const room = await Room.findById(roomObj.roomId);
-//                 if (room) {
-//                     room.status = 'trống'; // Mark room as available
-//                     await room.save();
-//                 }
-//             }
-
-//             res.status(200).json({ message: 'Cart and rooms updated successfully' });
-//         } else {
-//             res.status(404).json({ message: 'Cart not found' });
-//         }
-
-//     } catch (error) {
-//         console.error('Error deleting cart:', error);
-//         res.status(500).json({ message: 'Error deleting cart', error });
-//     }
-// };
 
 const deleteCart = async (req, res) => {
     try {
@@ -394,6 +305,26 @@ const deleteCart = async (req, res) => {
     }
 };
 
+// Endpoint to get bookings by date
+const getRoomDate =  async (req, res) => {
+    const { date } = req.params; // Expecting date in YYYY-MM-DD format
+  
+    try {
+      // Find all bookings for the given date
+      const bookings = await Booking.find({
+        $or: [
+          { checkin: { $lte: date }, checkout: { $gte: date } }, // Includes the date within check-in and check-out range
+        ],
+      });
+  
+      res.json(bookings);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
+
 
 
 module.exports = {
@@ -405,10 +336,9 @@ module.exports = {
     deleteBooking,
     getRoomByAvailable,
     addCart,
-    getCart,
     deleteCart,
-    getBooking
-   
+    getBooking,
+    getRoomDate,
 
 
 };

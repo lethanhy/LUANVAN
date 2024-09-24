@@ -39,11 +39,11 @@
                  <div>
                      <h3>Dịch vụ đã đặt</h3>
                     <!-- Display the ordered services -->
-                    <ul v-if="orders.length > 0">
-                      <li v-for="(order, index) in orders" :key="index">
+                    <ul >
+                      <li v-for="(order, index) in room.bookings" :key="index">
                         <ul>
-                          <li v-for="(item, itemIndex) in order.items" :key="itemIndex">
-                            {{ item.menuItem.name }} - {{ item.menuItem.price }} VND - Số lượng: {{ item.quantity }}
+                          <li v-for="(item, itemIndex) in order.orders" :key="itemIndex">
+                            {{ item.itemName }} - {{ item.price }} VND - Số lượng: {{ item.quantity }}
                           </li>
                         </ul>
                       </li>
@@ -51,7 +51,7 @@
                     </ul>
                     
 
-                    <p v-else>Chưa có dịch vụ nào được đặt.</p>
+                    <!-- <p v-else>Chưa có dịch vụ nào được đặt.</p> -->
 
                     <button @click="showModal = true" class="btn btn-success">Thêm dịch vụ</button>
                   </div>
@@ -172,7 +172,7 @@ export default {
       console.log('Room ID:', roomId);
 
        // Fetch the orders after getting the room details
-    await this.getOrder(); // Call getOrder here to fetch orders
+    // await this.getOrder(); // Call getOrder here to fetch orders
 
     } catch (error) {
       console.log('Failed to load room details:', error);
@@ -243,61 +243,55 @@ export default {
 
         // Hàm gửi đơn hàng đã chọn
         async addMenu() {
-        if (this.selectedItems.length === 0) {
-          alert('Vui lòng chọn ít nhất một món ăn!');
-          return;
-        }
+    if (this.selectedItems.length === 0) {
+        alert('Vui lòng chọn ít nhất một món ăn!');
+        return;
+    }
 
-  
+    // Prepare order data based on room and booking details
+    const orderData = {
+        bookingId: this.room.bookings[0]?.bookingId, // Ensure the booking ID exists
+        // roomId: this.room._id, // Include room ID for tracking
+        items: this.selectedItems.map(item => ({
+            id: item._id,
+            itemName: item.name,  // Item name
+            quantity: 1,          // Default quantity to 1 (can be modified as needed)
+            price: item.price     // Item price
+        }))
+    };
 
-        // Prepare order data
-        const orderData = {
-          roomId: this.room._id,
-          customerId:  this.room.customerId, // Sử dụng customerId vừa lấy
-          bookingId:this.room.bookings[0]?.bookingId, // Gửi bookingId từ booking đầu tiên
-          items: this.selectedItems.map(item => ({
-            menuItem: item._id,
-            quantity: 1
-          }))
-        };
+    // Log order data for debugging
+    console.log('Order Data:', orderData);
 
-        // Log order data for debugging
-        console.log('Order Data:', orderData);
+    try {
+        // Make the API call to create the order
+        const response = await api.post('/orders', orderData);
+        alert('Đơn hàng đã được tạo thành công!');
 
-        if (this.room.bookings.length > 0) {
-        const booking = this.room.bookings[0];
-        console.log('Booking:', booking);
-        console.log('Customer ID:', booking.customerId); // Kiểm tra xem có tồn tại không
-        console.log('Booking ID:', booking._id); // Kiểm tra xem có tồn tại không
-      }
-
-        try {
-          const response = await api.post('/orders', orderData);
-          alert('Đơn hàng đã được tạo thành công!');
-
-          this.showModal = false;
-          this.selectedItems = [];
-        } catch (error) {
-          console.log('Lỗi khi tạo đơn hàng:', error);
-          if (error.response) {
+        // Reset modal and selection
+        this.showModal = false;
+        this.selectedItems = [];
+    } catch (error) {
+        console.log('Lỗi khi tạo đơn hàng:', error);
+        if (error.response) {
             console.log('Error Response:', error.response.data);
             alert('Có lỗi xảy ra khi tạo đơn hàng: ' + error.response.data.message);
-          } else {
+        } else {
             alert('Có lỗi xảy ra, vui lòng thử lại sau.');
-          }
         }
-      },
+    }
+},
 
-      async getOrder() {
-          try {
-            const roomId = this.$route.params.id; // Get the room ID from the route
-            const orderResponse = await api.get(`/orders/${roomId}`);
-            console.log('Order Response:', orderResponse.data);
-            this.orders = orderResponse.data || []; // Store the orders
-          } catch (error) {
-            console.log('Failed to load orders:', error);
-          }
-        },
+      // async getOrder() {
+      //     try {
+      //       const roomId = this.$route.params.id; // Get the room ID from the route
+      //       const orderResponse = await api.get(`/orders/${roomId}`);
+      //       console.log('Order Response:', orderResponse.data);
+      //       this.orders = orderResponse.data || []; // Store the orders
+      //     } catch (error) {
+      //       console.log('Failed to load orders:', error);
+      //     }
+      //   },
 
 
 

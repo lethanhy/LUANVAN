@@ -24,10 +24,15 @@
             <td>{{ formatDate(booking.createdAt) }}</td>
             <td>Lê Thành Y</td>
             <td>
-              <button class="bill">Đã thanh toán</button>
+              <button 
+                :class="{ 'bill--false': booking.paid === false, 'bill--true': booking.paid === true }"
+                @click="togglePayment(booking)"
+              >
+                {{ booking.paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+              </button>
             </td>
             <td>
-              <button type="submit" class="btn btn-warning shadow"><i class="fa-solid fa-circle-info text-white"></i></button>
+              <button type="submit" class="btn btn-warning shadow"><router-link :to="{ name: 'DetailsBooking', params: { id: booking._id } }"><i class="fa-solid fa-circle-info text-white"></i></router-link></button>
             </td>
             <td>
               <button type="submit" class="btn btn-danger shadow"><i class="fa-solid fa-xmark"></i></button>
@@ -83,15 +88,27 @@ export default {
     padding: 2rem;
     border-radius: 10px;
   }
-  .bill {
+  .bill--false {
+    background: rgb(255, 219, 211);  /* Brighter green to white gradient */
+    padding: 5px;
+    border-radius: 12px;
+    border: 2px solid rgb(250, 119, 26); /* Brighter lime green border */
+    color: rgb(222, 103, 34); /* Stronger green color for text */
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3); /* Brighter shadow color */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
+}
+.bill--true {
     background: rgb(211, 255, 222);  /* Brighter green to white gradient */
-    padding: 10px;
+    padding: 5px;
     border-radius: 12px;
     border: 2px solid rgb(117, 236, 48); /* Brighter lime green border */
     color: rgb(57, 216, 57); /* Stronger green color for text */
     font-weight: bold;
     box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3); /* Brighter shadow color */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 14px;
 }
   
 

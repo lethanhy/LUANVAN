@@ -46,7 +46,6 @@ const RoomSchema = mongoose.Schema(
             type: Number,
             required: [true, "Maximum number of guests is required"],
         },
-        bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],  // Reference to Booking
     },
     {
         timestamps: true,

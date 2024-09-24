@@ -1,289 +1,216 @@
 <template>
     <div class="order--room">
-        <div class="order--main">
-            <h1 class="text-center text-primary fw-bold">Đặt phòng</h1>
-            <form action="">
-                    <div class="order--body d-flex">
-                        <div class="col-6">
-                            <h2 class="text-primary fw-bold">Thông tin khách hàng</h2>
-                                <div class="form-group">
-                                    <i class="fas fa-user"></i>
-                                    <input type="text" v-model="customerName" placeholder="Nhập thông tin khách hàng">
-                                </div>
-                                <div class="form-group">
-                                    <i class="fa-regular fa-id-card"></i>
-                                    <input type="text" v-model="cccd" placeholder="Nhập CCCD">
-                                </div>
-                                <div class="form-group">
-                                    <i class="fa-solid fa-phone"></i>
-                                    <input type="text" v-model="phone" placeholder="Nhập số điện thoại">
-                                </div>
-                                <div class="form-group">
-                                    <i class="fa-solid fa-location-dot"></i>
-                                    <input type="text" v-model="address" placeholder="Nhập địa chỉ">
-                                </div>
-                                <div class="form-group">
-                                    <i class="fa-solid fa-venus-mars"></i>
-                                    <select class="form-select" v-model="gioitinh" aria-label="Default select example">
-                                        <option value="" selected>Nhập giới tính</option>
-                                        <option value="1">Nam</option>
-                                        <option value="2">Nữ</option>
-                                        
-                                    </select>
-                                </div>
-                        </div>
-                        
-                        <div class="col-6">
-                            
-                            <h2 class="text-primary fw-bold">Thông tin phòng</h2>
-                            <div class="form-group-date">
-                                <label for="start-date">Thời gian bắt đầu</label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <input  type="date" v-model="checkin" id="start-date" placeholder="Thời gian bắt đầu">
-                                </div>
-                            </div>
-                            <div class="form-group-date">
-                                <label for="start-date">Thời gian kết thúc</label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    <input  type="date" v-model="checkout" id="start-date" placeholder="Thời gian bắt đầu">
-                                </div>
-                            </div>
-                            <div class="order--room--free">
-                                <div class="empty--room">
-                                    <h4 class="pb-2 text-primary">Danh sách phòng trống</h4>
-                                    <table class="table table-borderless bg-white shadow" >
-                                        <thead>
-                                            <tr class="table-info">
-                                                <th scope="col">Số phòng</th>
-                                                <th scope="col">Loại phòng</th>
-                                                <th scope="col">Thêm</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody v-for="room in rooms" :key="room.id">
-                                            <tr>
-                                                <th scope="row">{{ room.roomNumber }}</th>
-                                                <td>{{ room.type }}</td>
-                                                <td>
-                                                    <button class="btn btn-success rounded" @click="addCart(room)"><i class="fa-solid fa-plus"></i></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+      <h1 class="text-center text-primary fw-bold">Đặt phòng</h1>
+      <form @submit.prevent="createBooking">
+        <div class="order--body d-flex">
+          <div class="col-6">
+            <h2 class="text-primary fw-bold">Thông tin khách hàng</h2>
+            <div class="form-group">
+                <i class="fas fa-user"></i>
+              <input type="text" v-model="customerName" placeholder="Nhập thông tin khách hàng" required />
+            </div>
+            <div class="form-group">
+                <i class="fas fa-user"></i>
+              <input type="text" v-model="email" placeholder="Nhập email" required />
+            </div>
+            <div class="form-group">
+                <i class="fa-regular fa-id-card"></i>
+              <input type="text" v-model="cccd" placeholder="Nhập CCCD" required />
+            </div>
+            <div class="form-group">
+                <i class="fa-solid fa-phone"></i>
+              <input type="text" v-model="phone" placeholder="Nhập số điện thoại" required />
+            </div>
+            <div class="form-group">
+                <i class="fa-solid fa-location-dot"></i>
+              <input type="text" v-model="address" placeholder="Nhập địa chỉ" required />
+            </div>
+            <div class="form-group">
+                <i class="fa-solid fa-venus-mars"></i>
+              <select class="form-select" v-model="gioitinh" required>
+                <option value="" disabled selected>Nhập giới tính</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-6">
+            <h2 class="text-primary fw-bold">Thông tin phòng</h2>
+            <div class="form-group-date">
+                <label for="start-date">Thời gian bắt đầu</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" v-model="checkin" :min="minDate" placeholder="Thời gian bắt đầu" required />
+                </div>
+            </div>
+            <div class="form-group-date">
+                <label for="start-date">Thời gian kết thúc</label>
+                <div  class="input-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate" placeholder="Thời gian kết thúc" required />
+                </div>
+            </div>
 
+            <div class="order--room--free">
+                <div class="empty--room">
+                    <h4 class="text-primary">Danh sách phòng trống</h4>
+            <table class="table  table-borderless bg-white shadow">
+              <thead >
+                <tr class="table-info">
+                  <th>Số phòng</th> 
+                  <th>Loại phòng</th>
+                  <th>Thêm</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="room in rooms" :key="room.id">
+                  <td>{{ room.roomNumber }}</td>
+                  <td>{{ room.type }}</td>
+                  <td>
+                    <button class="btn btn-success rounded" @click.prevent="addRoom(room)"><i class="fa-solid fa-plus"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-                                </div>
-                                <div class="selected--room">
-                                    <h4 class="text-primary">Phòng đã chọn</h4>
-                                    <table class="table table-borderless bg-white shadow">
-                                        <thead>
-                                            <tr class="table-info">
-                                                <th scope="col">Số phòng</th>
-                                                <th scope="col">Số người</th>
-                                                <th scope="col">Ngày bắt đầu</th>
-                                                <th scope="col">Ngày kết thúc</th>
-                                                <th scope="col">Xóa</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody v-for="(cart, index) in carts" :key="index">
-                                            <tr v-for="(rooms, index) in cart.rooms">
-                                                <th scope="row">{{ rooms.roomId.roomNumber }}</th> <!-- Access room number -->
-                                                <td>
-                                                    <input type="number" id="num-people" class="num-people-input" placeholder="Nhập số người" min="1" />
-                                                </td>
+            </div>
 
-                                                <td>{{ new Date(rooms.checkin).toLocaleDateString() }}</td> <!-- Access checkin -->
-                                                <td>{{ new Date(rooms.checkout).toLocaleDateString() }}</td> <!-- Access checkout -->
-                                                <td>
-                                                <button class="btn btn-danger rounded" @click="deleteCart(rooms.roomId._id)">
-                                                    <i class="fa-solid fa-xmark"></i>
-                                                </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-                        </div>
-                   
-                    </div>
-
-                    <div class="order--footer pt-3">
-                        <div class="d-grid gap-2 d-md-flex justify-content-center">
-                            <button class="btn btn-success me-md-2" type="button" @click="createBooking">Lưu</button>
-                            <button class="btn btn-light" type="button">Hủy</button>
-                        </div>
-                    </div>
-            </form>
+            <div class="selected--room">
+                <h4 class="text-primary">Phòng đã chọn</h4>
+            <table class="table able-borderless bg-white shadow">
+                <thead>
+                    <tr class="table-info">
+                        <th scope="col">Số phòng</th>
+                        <th scope="col">Số người</th>
+                        <th scope="col">Ngày bắt đầu</th>
+                        <th scope="col">Ngày kết thúc</th>
+                        <th scope="col">Xóa</th>
+                    </tr>
+                </thead>
+              <tbody>
+                <tr v-for="(selectedRoom, index) in selectedRooms" :key="index">
+                  <td>{{ selectedRoom.roomNumber }}</td>
+                  <td>
+                    <input type="number" id=""  class="num-people-input" v-model="selectedRoom.numPeople" min="1" />
+                  </td>
+                  <td>{{ selectedRoom.checkin }}</td>
+                  <td>{{ selectedRoom.checkout }}</td>
+                  <td>
+                    <button class="btn btn-danger rounded" @click.prevent="removeRoom(index)"><i class="fa-solid fa-xmark"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
+
+            </div>
+
+
+            </div>
+            
+            
+        <div class="order--footer pt-3">
+            <div class="d-grid gap-2 d-md-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Lưu</button>
+                <button type="button" class="btn btn-light" @click="resetForm">Hủy</button>
+            </div>  
+        </div>
+      </form>
     </div>
-</template>
+  </template>
 
 <script>
 import api from '../api';
-import { useUserStore } from '../stores/userStore';
 
 export default {
   data() {
     return {
-      rooms:[],
-      carts:[],
-      selectedRooms: [], // Danh sách phòng đã chọn
-      checkin:'',
-      checkout:'',
-      customerName:'',
-      cccd:'',
-      phone:'',
-      address:'',
-      gioitinh:'',
-
+      rooms: [],
+      selectedRooms: [],
+      checkin: '',
+      checkout: '',
+      customerName: '',
+      email:'',
+      cccd: '',
+      phone: '',
+      address: '',
+      gioitinh: '',
+      minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
     };
   },
   async mounted() {
-    // Gọi getRoomAvailable sau khi component được mount
     await this.getRoomAvailable();
-    await this.getCart();
   },
   methods: {
     async getRoomAvailable() {
-        try {
-        
-            const response = await api.get(`/bookings/order`); 
-            this.rooms = response.data; // Store the response data in the `room` object
-        } catch (error) {
-            console.log('Failed to load room details:', error);
-        }
+      try {
+        const response = await api.get('/bookings/order');
+        this.rooms = response.data;
+      } catch (error) {
+        console.log('Failed to load room details:', error);
+      }
     },
-    async getCart() {
-        try {
-        
-            const response = await api.get(`/bookings/order/cart`); 
-            this.carts = response.data || []; // Store the response data in the `room` object
-        } catch (error) {
-            console.log('Failed to load room details:', error);
-        }
-    },
-    
-
-
-        async addCart(room) {
-    try {
-        const { checkin, checkout } = this;
-
-        if (!checkin || !checkout) {
-        alert('Vui lòng chọn thời gian check-in và check-out.');
-        return;
-        }
-
-        // Create the cartData object
-        const cartData = {
-        roomId: room._id,
-        checkin,
-        checkout
-        };
-
-        // Send the request to the server to add the room to the cart
-        const response = await api.post('/bookings/order/cart', cartData);
-        console.log('Room added to cart successfully:', response.data);
-
-        // Update the carts array with the new room
-        this.carts.push({
-        room: room,  // This stores the room object with its _id
-        checkin,
-        checkout
+    addRoom(room) {
+      const exists = this.selectedRooms.find(selectedRoom => selectedRoom.roomNumber === room.roomNumber);
+      if (!exists) {
+        this.selectedRooms.push({
+          id: room._id,
+          roomNumber: room.roomNumber,
+          type: room.type,
+          checkin: this.checkin,
+          checkout: this.checkout,
+          numPeople: 1,
         });
-
-        alert('Phòng đã được thêm vào giỏ hàng!');
-    } catch (error) {
-        console.error('Failed to add room to cart:', error);
-        alert('Failed to add cart. ' + error.message);
-    }
+      } else {
+        alert('Phòng đã được chọn!');
+      }
     },
+    removeRoom(index) {
+      this.selectedRooms.splice(index, 1);
+    },
+          async createBooking() {
+            const roomsToBook = this.selectedRooms.map(selectedRoom => ({
+              id: selectedRoom.id,
+              checkin: selectedRoom.checkin,
+              checkout: selectedRoom.checkout,
+            }));
 
+            const bookingData = {
+              email: this.email,
+              customerName: this.customerName,
+              cccd: this.cccd,
+              phone: this.phone,
+              address: this.address,
+              gioitinh: this.gioitinh,
+              rooms: roomsToBook,
+            };
 
-
-   
-
-    async deleteCart(roomId) {
-        try {
-            // Gửi yêu cầu đến API để xóa phòng khỏi giỏ hàng
-            const response = await api.delete(`/bookings/order/${roomId}`);
-            
-            if (response.status === 200) {
-                // Xóa phòng khỏi giỏ hàng trong frontend
-                this.carts = this.carts.map(cart => {
-                    return {
-                        ...cart,
-                        rooms: cart.rooms.filter(room => room.roomId._id !== roomId)
-                    };
-                }).filter(cart => cart.rooms.length > 0); // Loại bỏ giỏ hàng rỗng
-                
-                alert('Phòng đã được xóa khỏi giỏ hàng và trạng thái phòng đã được cập nhật thành công!');
-            } else {
-                alert('Không thể xóa phòng khỏi giỏ hàng. Mã trạng thái: ' + response.status);
+            try {
+              const response = await api.post('/bookings/order', bookingData);
+              console.log('Bookings created:', response.data);
+              // Thông báo thành công cho người dùng
+              this.resetForm();
+            } catch (error) {
+              console.log('Error creating bookings:', error.response.data);
+              // Thông báo lỗi cho người dùng
             }
-        } catch (error) {
-            console.error('Lỗi khi xóa phòng khỏi giỏ hàng:', error.response ? error.response.data : error.message);
-            alert('Lỗi khi xóa phòng khỏi giỏ hàng. ' + (error.response ? error.response.data.message : error.message));
-        }
+      },
+
+
+    resetForm() {
+      // Reset tất cả dữ liệu về giá trị ban đầu
+      this.selectedRooms = [];
+      this.customerName = '';
+      this.cccd = '';
+      this.phone = '';
+      this.address = '';
+      this.gender = '';
+      this.checkin = '';
+      this.checkout = '';
     },
-
-
-
-    async createBooking() {
-  try {
-    // Log carts to debug
-    console.log('Carts:', this.carts);
-
-    const email = 'Nguyenthibesau@gmail.com';
-    // Prepare the data to send to the backend
-    const bookingData = {
-      customerName: this.customerName,
-      cccd: this.cccd,
-      gioitinh: this.gioitinh,
-      phone: this.phone,
-      address: this.address,
-      email: email,
-      // Flatten the room data from the nested rooms array
-      rooms: this.carts.flatMap(cart => 
-        cart.rooms.map(room => ({
-          roomId: room.roomId._id || room.roomId, // Adjust based on structure
-          checkin: room.checkin,
-          checkout: room.checkout
-        }))
-      )
-    };
-
-    // Log the data to check if it's correct before sending the request
-    console.log('Booking data:', bookingData);
-
-    // Send the request to the backend API to create the booking
-    const response = await api.post('/bookings/order', bookingData);
-
-    // Check if the booking was successfully created
-    if (response && response.status === 201) {
-      alert('Booking created successfully');
-      // Optionally, redirect to a bookings page or clear form fields
-      // Clear the carts
-      this.carts = [];
-      this.$router.push('/bookings/order');
-    } else {
-      alert('Failed to create booking. Status code: ' + response.status);
-    }
-  } catch (error) {
-    console.log('Failed to create booking:', error.response ? error.response.data : error.message);
-    alert('Error creating booking. ' + (error.response ? error.response.data.message : error.message));
-  }
-}
-
-
-  }
+  },
 };
-
 </script>
 
 <style>
@@ -449,3 +376,4 @@ form {
 }
 
 </style>
+

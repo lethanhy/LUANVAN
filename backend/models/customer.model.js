@@ -6,7 +6,7 @@ const CustomerSchema = mongoose.Schema(
         name: {
             type: String,
             required: [true, 'Username field is required'],
-            unique: true,
+            // unique: true,
         },
 
         // password: {
@@ -44,15 +44,9 @@ const CustomerSchema = mongoose.Schema(
             type: String,
         },
         
-        bookings: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Booking' // Liên kết đến booking
-            }
-        ],
-        refreshToken: {
-            type: String,
-        }
+        // refreshToken: {
+        //     type: String,
+        // }
     },
     {
         timestamps: true,

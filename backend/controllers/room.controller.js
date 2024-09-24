@@ -145,38 +145,38 @@ const getRooms = async (req, res) => {
         // Fetch all rooms
         const rooms = await Room.find();
         
-        // Fetch all bookings and populate customer information
-        const bookings = await Booking.find({ paid: false }).populate('customer');
+        // Fetch all unpaid bookings and populate customer and room details
+        const bookings = await Booking.find({ paid: false })
+            .populate('customer')  // Populate customer details
+            .populate('room');     // Populate room details
 
-        // Tạo đối tượng để theo dõi các phòng đã được đặt và chi tiết booking
+        // Create an array to track rooms along with their booking details
         const roomData = rooms.map(room => {
-            // Tìm booking liên quan đến phòng này
+            // Find all bookings related to the current room
             const relatedBookings = bookings.filter(booking => 
-                booking.rooms.some(bookedRoom => bookedRoom.roomId.toString() === room._id.toString())
+                booking.room._id.toString() === room._id.toString()  // Compare room IDs
             );
 
-            // Thêm thông tin người đặt và số ngày
+            // Add customer and booking details, including the number of days booked
             const bookingDetails = relatedBookings.map(booking => {
-                const roomBooking = booking.rooms.find(bookedRoom => bookedRoom.roomId.toString() === room._id.toString());
-                
-                // Tính số ngày ở lại
-                const checkinDate = new Date(roomBooking.checkin);
-                const checkoutDate = new Date(roomBooking.checkout);
-                const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Tính số ngày
+                const checkinDate = new Date(booking.checkin);
+                const checkoutDate = new Date(booking.checkout);
+                const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Calculate number of days
 
                 return {
                     customerName: booking.customer?.name || 'Unknown',
                     customerPhone: booking.customer?.phone || 'Unknown',
-                    checkin: roomBooking.checkin,
-                    checkout: roomBooking.checkout,
-                    daysBooked: daysBooked
+                    checkin: booking.checkin,
+                    checkout: booking.checkout,
+                    daysBooked: daysBooked,
+                    status: booking.status || 'Unknown' // Status of the booking
                 };
             });
 
             return {
                 ...room.toObject(),
-                isBooked: bookingDetails.length > 0, // Xác định phòng đã được đặt hay chưa
-                bookings: bookingDetails // Danh sách chi tiết booking liên quan đến phòng này
+                isBooked: bookingDetails.length > 0, // Determine if the room is booked
+                bookings: bookingDetails // List of booking details related to this room
             };
         });
 
@@ -185,6 +185,7 @@ const getRooms = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 
 const deleteRoomById = async (req, res) => {
@@ -221,46 +222,50 @@ const deleteRoom = async (req, res) => {
 const getRoomById = async (req, res) => {
     try {
         const roomId = req.params.id;
+
         // Fetch the room by its ID
         const room = await Room.findById(roomId);
 
         if (!room) {
             return res.status(404).json({ message: 'Room not found' });
         }
-        
-        // Fetch all unpaid bookings and populate customer information
-        const bookings = await Booking.find({ paid: false }).populate('customer');
 
-        // Tìm booking liên quan đến phòng này
-        const relatedBookings = bookings.filter(booking => 
-            booking.rooms.some(bookedRoom => bookedRoom.roomId.toString() === room._id.toString())
-        );
+        // Fetch all unpaid bookings for this room and populate customer details
+        const bookings = await Booking.find({ room: roomId, paid: false })
+            .populate('customer')
+            .populate('room');
+            
 
-        // Thêm thông tin người đặt và số ngày
-        const bookingDetails = relatedBookings.map(booking => {
-            const roomBooking = booking.rooms.find(bookedRoom => bookedRoom.roomId.toString() === room._id.toString());
-
-            // Tính số ngày ở lại
-            const checkinDate = new Date(roomBooking.checkin);
-            const checkoutDate = new Date(roomBooking.checkout);
-            const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Tính số ngày
+        // Map booking details for the current room
+        const bookingDetails = bookings.map(booking => {
+            const checkinDate = new Date(booking.checkin);
+            const checkoutDate = new Date(booking.checkout);
+            const daysBooked = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24)); // Calculate number of days
 
             return {
-                bookingId: booking._id, // Thêm booking ID vào đây
+                bookingId: booking._id,
                 customerName: booking.customer?.name || 'Unknown',
                 customerPhone: booking.customer?.phone || 'Unknown',
-                checkin: roomBooking.checkin,
-                checkout: roomBooking.checkout,
-                daysBooked: daysBooked
+                checkin: booking.checkin,
+                checkout: booking.checkout,
+                daysBooked: daysBooked,
+                status: booking.status || 'Unknown', // Status of the booking
+                orders: booking.orders.map(order => ({
+                    orderId: order._id,
+                    itemName: order.itemName,
+                    quantity: order.quantity,
+                    price: order.price,
+                    totalPrice: order.quantity * order.price // Calculate total price for the order
+                }))
+               
             };
         });
 
-        // Tạo đối tượng phản hồi với thông tin phòng và chi tiết booking
+        // Construct the room data along with its bookings
         const roomData = {
             ...room.toObject(),
-            isBooked: bookingDetails.length > 0, // Xác định phòng đã được đặt hay chưa
-            bookings: bookingDetails, // Danh sách chi tiết booking liên quan đến phòng này
-            customerId: relatedBookings.length > 0 ? relatedBookings[0].customer._id : null // Lấy customerId từ booking đầu tiên
+            isBooked: bookingDetails.length > 0, // Check if the room is booked
+            bookings: bookingDetails // List of booking details related to this room
         };
 
         res.status(200).json(roomData);
@@ -268,6 +273,7 @@ const getRoomById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // const getRoomById = async (req, res) => {
 //     try {
