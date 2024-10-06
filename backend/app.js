@@ -8,7 +8,9 @@ const staffRoutes = require('./routes/staff.route.js');
 const menuRoutes = require('./routes/menu.route.js');
 const orderRoutes = require('./routes/order.route.js');
 const cors = require('cors');
+const multer = require('multer');
 const app = express();
+const path = require('path');
 
 
 // Cấu hình CORS
@@ -29,6 +31,15 @@ app.use("/cart", cartRoutes);
 app.use("/staff", staffRoutes);
 app.use("/menu", menuRoutes);
 app.use("/orders", orderRoutes);
+
+// Cấu hình thư mục chứa ảnh được phép truy cập công khai
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+
+// // Cấu hình lưu file bằng Multer trong bộ nhớ tạm
+// const storage = multer.memoryStorage(); // Multer sẽ lưu ảnh vào bộ nhớ tạm
+// const upload = multer({ storage: storage });
+
 
 // // Backend (Express.js)
 // app.get('/api/customers', (req, res) => {

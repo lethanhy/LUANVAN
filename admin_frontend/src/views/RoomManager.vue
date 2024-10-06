@@ -4,7 +4,7 @@
             <h1 class="text-center fw-bold">Quản lý phòng</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
-                <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm phòng</button>
+                <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> Thêm phòng</button>
             </div>
 
             <div class="d-flex">
@@ -46,7 +46,9 @@
                     <tr>
                         <th scope="col">STT</th>
                         <th scope="col">Số phòng</th>
+                        <th scope="col">Ảnh</th>
                         <th scope="col">Tình trạng</th>
+                        <th scope="col">Giá phòng</th>
                         <th scope="col">Loại phòng</th>
                         <th scope="col">Sửa</th>
                         <th scope="col">Xóa</th>
@@ -56,7 +58,12 @@
                     <tr v-for="(room, index) in paginatedRooms" :key="room._id">
                         <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ room.roomNumber }}</td>
+                        <td>
+                            <img v-if="room.image" :src="`http://localhost:3000/uploads/${room.image}`" alt="Room Image" style="width: 100px; height: 100px; object-fit: cover;" />
+                            <span v-else>Không có ảnh</span>
+                        </td>
                         <td>{{ room.trangthai }}</td>
+                        <td>{{ formatCurrency(room.price) }}</td>
                         <td>{{ room.type }}</td>
                         <td>
                             <button @click="editRoomData(room)" type="button" class="btn btn-warning">Sửa</button>
@@ -131,6 +138,10 @@
                             <label for="maxGuests" class="form-label">Số lượng khách</label>
                             <input type="text" id="maxGuests" v-model="newRoom.maxGuests" class="form-control" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="image">Room Image:</label>
+                            <input type="file" id="image" accept="image/*" required><br><br>
+                        </div>
                         <button type="submit" class="btn btn-primary">Thêm</button>
                         <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
                     </form>
@@ -151,7 +162,7 @@
                             <select id="editType" v-model="editRoom.type" class="form-select" required>
                                 <option value="">Chọn loại phòng</option>
                                 <option value="single">Phòng đơn</option>
-                                <option value="double">Phòng đôi</option>
+                                <option value="Double">Phòng đôi</option>
                                 <option value="family">Phòng gia đình</option>
                             </select>
                         </div>
@@ -201,6 +212,7 @@ export default {
                 status: '',
                 trangthai: '',
                 maxGuests: '',
+                image: '' // Add this line to store image filename
             },
             editRoom: {
                 _id: '',
@@ -244,13 +256,19 @@ export default {
     methods: {
         async getAllRooms() {
             try {
-                const response = await api.get('/rooms/manager');
+                const response = await api.get('/rooms');
                 this.rooms = response.data; // Set rooms data
                 this.totalItems = this.rooms.length; // Set total number of rooms for pagination
             } catch (error) {
                 console.log('Error fetching rooms:', error);
             }
         },
+        // Format currency to VND without leading zero
+            formatCurrency(value) {
+                // Convert to integer if the value is a number
+                const numberValue = typeof value === 'number' ? value : parseFloat(value);
+                return `${numberValue.toLocaleString('it-IT')} VND`;
+            },
          // ... existing methods
         changePage(page) {
             if (page >= 1 && page <= this.totalPages) {
@@ -258,34 +276,53 @@ export default {
             }
         },
         async addRoom() {
-            try {
-                const response = await api.post('/rooms/manager', this.newRoom);
-                if (response.status === 201) { // 201 Created status
-                    this.newRoom = {
-                        roomNumber: '',
-                        type: '',
-                        price: '',
-                        status: '',
-                        trangthai: '',
-                        maxGuests: '',
-                    };
-                    this.showModal = false;
-                    await this.getAllRooms();
-                    this.successMessage = 'Thêm phòng thành công!';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
-                } else {
-                    this.successMessage = 'Thêm phòng thất bại';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
-                }
-            } catch (error) {
-                console.log('Error adding room:', error);
-                this.successMessage = 'Có lỗi xảy ra khi thêm phòng';
-                this.showSuccessMessage = true;
-                setTimeout(() => this.showSuccessMessage = false, 3000);
-            }
-        },
+    try {
+        const formData = new FormData();
+        formData.append('roomNumber', this.newRoom.roomNumber);
+        formData.append('type', this.newRoom.type);
+        formData.append('price', this.newRoom.price);
+        formData.append('status', this.newRoom.status);
+        formData.append('trangthai', this.newRoom.trangthai);
+        formData.append('maxGuests', this.newRoom.maxGuests);
+
+        // Get the image file
+        const imageFile = document.getElementById('image').files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        } else {
+            console.warn('No image file selected.');
+        }
+
+        const response = await api.post('/rooms/manager', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        // Handle the response
+        if (response.status === 201) {
+            this.newRoom = { roomNumber: '', type: '', price: '', status: '', trangthai: '', maxGuests: '' };
+            this.showModal = false;
+            await this.getAllRooms(); // Refresh the room list
+            this.successMessage = 'Thêm phòng thành công!';
+            this.showSuccessMessage = true;
+
+            setTimeout(() => {
+                this.showSuccessMessage = false;
+            }, 3000);
+        }
+    } catch (error) {
+        console.error('Error adding room:', error);
+        this.successMessage = 'Có lỗi xảy ra khi thêm phòng';
+        this.showSuccessMessage = true;
+
+        setTimeout(() => {
+            this.showSuccessMessage = false;
+        }, 3000);
+    }
+},
+
+
+
+
         async deleteRoom(id) {
             try {
                 const response = await api.delete(`/rooms/manager/${id}`);

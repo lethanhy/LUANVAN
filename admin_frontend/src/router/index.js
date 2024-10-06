@@ -11,6 +11,8 @@ import Customer from '@/views/Customer.vue';
 import RoomManager from '@/views/RoomManager.vue';
 import Service from '@/views/Service.vue';
 import DetailsBooking from '@/views/DetailsBooking.vue';
+import Profile from '@/views/Profile.vue';
+import Bill from '@/views/Bill.vue';
 
 
 const routes = [
@@ -25,6 +27,8 @@ const routes = [
   { path: '/customers', name: 'Customer', component: Customer },
   { path: '/rooms/manager', name: 'RoomManager', component: RoomManager },
   { path: '/menu', name: 'Service', component: Service },
+  { path: '/profile/:id', name: 'Profile', component: Profile },
+  { path: '/bill', name: 'Bill', component: Bill },
   
 ];
 

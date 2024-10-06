@@ -33,9 +33,17 @@ const RoomSchema = mongoose.Schema(
             default: "Đã dọn dẹp",
 
         },
+        image: {
+            type: String, // Lưu trữ URL của hình ảnh
+            required: false // Không bắt buộc
+        },
+        
         rating: {
             type: Number,
+            min: 0, // Giá trị tối thiểu
+            max: 5  // Giá trị tối đa
         },
+        
         amenities: {
             type: [String], // Tiện nghi trong phòng, có thể là mảng các chuỗi
         },
@@ -46,6 +54,9 @@ const RoomSchema = mongoose.Schema(
             type: Number,
             required: [true, "Maximum number of guests is required"],
         },
+        bookings: {
+            type: [String],
+        }
     },
     {
         timestamps: true,

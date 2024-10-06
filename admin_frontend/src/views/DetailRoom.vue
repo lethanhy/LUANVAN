@@ -5,7 +5,7 @@
       <!-- Room Status Display -->
       <div class="DetailRoom--main">
         <!-- Show icon only if the room is available -->
-        <div v-if="room.status === 'trống'" class="DetailRoom--header">
+        <div v-if=" room.bookings.length === 0 " class="DetailRoom--header">
           <div class="d-flex">
             <i class="fa-solid fa-bed"></i>
             <p>Phòng trống</p>
@@ -20,11 +20,11 @@
           </div>
           <div class="d-flex">
             <i class="fa-regular fa-calendar-days"></i>
-            <p>Checkin: {{ formatDate(room.bookings[0]?.checkin) || 'Chưa có thông tin' }}</p>
+            <p>Checkin: {{ formatDate(room.bookings[0]?.checkin) || 'Chưa có thông tin' }} 14:00:00</p>
           </div>
           <div class="d-flex">
             <i class="fa-solid fa-calendar-day"></i>
-            <p>Checkout:  {{ formatDate(room.bookings[0]?.checkout) || 'Chưa có thông tin' }}</p>
+            <p>Checkout:  {{ formatDate(room.bookings[0]?.checkout) || 'Chưa có thông tin' }} 12:00:00</p>
           </div>
           <div class="d-flex">
             <i class="fa-solid fa-user"></i>
@@ -93,22 +93,25 @@
         </div>
       </div>
   
-      <!-- Buttons for Room Actions -->
-      <div class="DetailRoom--button">
-        <button v-if=" room.status === 'đã nhận'" type="submit">Thanh toán</button>
-        <button v-else type="submit" @click.prevent="checkInRoom" >Nhận Phòng</button>
-        <button type="submit" @click.prevent="saveChanges">Lưu</button>
-        <router-link to="/rooms">
-          <button class="btn text-white text-decoration-none">Thoát</button>
-        </router-link>
-      </div>
+      <!-- Room Actions -->
+          <div class="DetailRoom--button">
+            <!-- Check if bookings[0] exists before accessing its status -->
+            <button v-if="room.bookings.length > 0 && room.bookings[0].status === 'đã đặt'" type="submit" @click.prevent="checkInRoom">
+              Nhận Phòng
+            </button>
+            <button type="submit" @click.prevent="saveChanges">Lưu</button>
+            <router-link to="/rooms">
+              <button class="btn text-white text-decoration-none">Thoát</button>
+            </router-link>
+          </div>
+
     </div>
 
 
     <!-- Phần modal thêm dịch vụ -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
         <div class="modal-content">
-            <h2 class="modal-title">Thêm Dịch Vụ</h2>
+            <h2 class="modal-title text-center">Thêm Dịch Vụ</h2>
             <form @submit.prevent="addMenu">
 
                 <div class="menu d-flex text-center">
@@ -117,8 +120,8 @@
                         <h3>Menu</h3>
                         <ul>
                             <li v-for="item in menuItems" :key="item._id">
-                                {{ item.name }} - {{ item.price }} VND
-                                <button type="button" @click="selectItem(item)">Chọn</button>
+                                {{ item.name }} - {{ formatCurrency(item.price) }}
+                                <button type="button" class="btn btn-success" @click="selectItem(item)">Chọn</button>
                             </li>
                         </ul>
                     </div>
@@ -128,15 +131,19 @@
                         <h3>Menu đã chọn</h3>
                         <ul>
                             <li v-for="(item, index) in selectedItems" :key="index">
-                                {{ item.name }} - {{ item.price }} VND
-                                <button type="button" @click="removeItem(index)">Bỏ</button>
+                                {{ item.name }} - {{ formatCurrency(item.price) }}
+                                <button type="button" class="btn btn-danger" @click="removeItem(index)">Bỏ</button>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Thêm</button>
-                <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary">Thêm</button>
+                  <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+                </div>
+
+                
             </form>
         </div>
     </div>
@@ -180,33 +187,57 @@ export default {
 },
 
   methods: {
-          async checkInRoom() {
-            try {
-                // Tạo một đối tượng chứa trạng thái cập nhật
-                const updateData = {
-                    status: 'đã nhận',
-                    // Bạn có thể thêm các thuộc tính khác nếu cần thiết
-                };
-
-                // Gửi yêu cầu cập nhật phòng với trạng thái mới
-                const response = await api.put(`/rooms/${this.room._id}`, updateData);
-                console.log('Nhận phòng thành công:', response.data);
-
-                // Cập nhật trạng thái phòng trong UI
-                this.room.status = 'đã nhận';
-
-                // Thông báo thành công cho người dùng
-                alert('Nhận phòng thành công!');
-            } catch (error) {
-                console.log('Lỗi khi nhận phòng:', error);
-                alert('Đã xảy ra lỗi, vui lòng thử lại sau.');
+    async checkInRoom() {
+        try {
+            // Kiểm tra xem có booking ID hợp lệ không
+            const bookingId = this.room.bookings[0]?.bookingId;
+            if (!bookingId) {
+                alert('Không tìm thấy ID đặt phòng.');
+                return;
             }
-          },
+            console.log(bookingId)
+
+            // Tạo đối tượng dữ liệu cập nhật
+            const updateData = {
+                status: 'đã nhận',
+            };
+
+            // // Hiển thị trạng thái tải
+            // this.loading = true;
+
+            // Gửi yêu cầu cập nhật trạng thái phòng
+            const response = await api.put(`/bookings/rooms/${bookingId}`, updateData);
+            console.log('Nhận phòng thành công:', response.data);
+
+            // Cập nhật trạng thái phòng trong giao diện người dùng
+            this.room.bookings[0].status = 'đã nhận';
+
+            // Hiển thị thông báo thành công cho người dùng
+            alert('Nhận phòng thành công!');
+        } catch (error) {
+            console.log('Lỗi khi nhận phòng:', error);
+            alert('Đã xảy ra lỗi khi nhận phòng, vui lòng thử lại sau.');
+        } finally {
+            // // Tắt trạng thái tải
+            // this.loading = false;
+        }
+    },
+
+        // Format currency to VND without leading zero
+        formatCurrency(value) {
+              // Convert to integer if the value is a number
+              const numberValue = typeof value === 'number' ? value : parseFloat(value);
+              return `${numberValue.toLocaleString('it-IT')} VND`;
+        },
+
+    
+
+
 
         formatDate(dateString) {
             if (!dateString) return 'Chưa có thông tin';
             const date = new Date(dateString);
-            return format(date, 'dd/MM/yyyy HH:mm:ss'); // Format date as "dd/MM/yyyy HH:mm:ss"
+            return format(date, 'dd/MM/yyyy'); // Format date as "dd/MM/yyyy HH:mm:ss"
         },
         async saveChanges() {
             try {

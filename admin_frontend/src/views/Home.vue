@@ -1,204 +1,225 @@
 <template>
     <div class="card--container">
-    <h3 class="main--title">Today</h3>
-    <div class="card--wrapper">
+      <div class="card--wrapper">
         <div class="payment--card light-red">
-            <div class="card--header">
-                <div class="amount">
-                    <span class="title">
-                        Phòng
-                    </span>
-                     
-                    <span class="amount--value"></span>
-                </div>
-                <i class="fa-solid fa-calendar-days icon"></i>
+          <div class="card--header">
+            <div class="amount">
+              <span class="title">Phòng</span>
+              <span class="amount--value">25</span>
             </div>
-            <span class="card--detail"></span>
+            <i class="fa-solid fa-calendar-days icon dark-red"></i>
+          </div>
+          <span class="card--detail">Tổng số phòng</span>
         </div>
-
+  
         <div class="payment--card light-purple">
-            <div class="card--header">
-                <div class="amount">
-                    <span class="title">
-                        Đặt phòng
-                    </span>
-                    
-                    <span class="amount--value"></span>
-                </div>
-                <i class="fa-regular fa-clipboard icon dark-purple"></i>
+          <div class="card--header">
+            <div class="amount">
+              <span class="title">Đặt phòng</span>
+              <span class="amount--value">15</span>
             </div>
-            <span class="card--detail"></span>
+            <i class="fa-regular fa-clipboard icon dark-purple"></i>
+          </div>
+          <span class="card--detail">Đơn đặt phòng hôm nay</span>
         </div>
-
+  
         <div class="payment--card light-green">
-            <div class="card--header">
-                <div class="amount">
-                    <span class="title">
-                        Khách Hàng
-                    </span>
-                    
-                    <span class="amount--value"></span>
-                </div>
-                <i class="fa-regular fa-address-book icon dark-green"></i>
+          <div class="card--header">
+            <div class="amount">
+              <span class="title">Khách Hàng</span>
+              <span class="amount--value">35</span>
             </div>
-            <span class="card--detail"></span>
+            <i class="fa-regular fa-address-book icon dark-green"></i>
+          </div>
+          <span class="card--detail">Khách hàng hiện tại</span>
         </div>
-
+  
         <div class="payment--card light-blue">
-            <div class="card--header">
-                <div class="amount">
-                    <span class="title">
-                        Liên Hệ
-                    </span>
-                   
-                    <span class="amount--value"></span>
-                </div>
-                <i class="fas fa-question-circle icon dark-blue"></i>
+          <div class="card--header">
+            <div class="amount">
+              <span class="title">Liên Hệ</span>
+              <span class="amount--value">5</span>
             </div>
-            <span class="card--detail"></span>
+            <i class="fas fa-question-circle icon dark-blue"></i>
+          </div>
+          <span class="card--detail">Yêu cầu liên hệ</span>
         </div>
+      </div>
     </div>
-
-    
-</div>
-
-<div class="main--table">
-  <h3>Thông tin khách hàng</h3>
-  <table class="table border rounded">
-  <thead class="table-dark">
-    <tr>
-      <th scope="col">STT</th>
-      <th scope="col">Tên</th>
-      <th scope="col">Số điện thoại</th>
-      <th scope="col">Địa chỉ</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    
-</template>
-
-<style>
-    /******** trang chủ ****/
-    .card--container{
-        background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-    }
-
-    .card--wrapper{
-        display: flex;
-        flex-wrap: wrap;
-        gap:1rem;
-    }
-    .main--title{
-        color: rgba(113, 99, 186, 255);
-        padding-top: 10px;
-        font-size: 15px;
-    }
-
-    .payment--card{
-        background: rgb(229, 223,223);
-        border-radius:10px;
-        padding: 1.2rem;
-        width: 290px;
-        height: 150px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        transition: all 0.5s ease-in-out;
-
-    }
-
-    .payment-card:hover{
-        transform: translateY(-5px);
-    }
-    .card--header{
-        display:flex;
-        flex-direction:row;
-        justify-content:space-between;
-        align-items: center;
-        margin-bottom:20px;
-        
-
-    }
-    .amount{
-        display: flex;
-        flex-direction: column;
-    }
-    .title{
-        font-size: 20px;
-        font-weight: 200;
-    }
-
-    .amount--value{
-        font-size: 24px;
-        font-family: "Poppins", sans-serif;
-        font-weight: 600;
-    }
-
-    .icon{
-        color: #fff;
-        padding: 1rem;
-        height: 60px;
-        width: 60px;
-        text-align: center;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        background: red;
-    }
-
-    .light-red{
-        background: rgb(251,233,233);
-    }
-    .light-purple{
-        background: rgb(254,226,254);
-    }
-    .light-green{
-        background: rgb(235,254,235);
-    }
-    .light-blue{
-        background: rgb(236,236,254);
-    }
-    .dark-red{
-        background: red;
-    }
-    .dark-purple{
-        background: purple;
-    }
-    .dark-green{
-        background: green;
-    }
-    .dark-blue{
-        background: blue;
-    }
-
-    .main--table{
-        margin-top: 10px;
-        background: #fff;
-        padding: 2rem;
-        border-radius: 10px;
-    }
-
-</style>
+  
+    <div class="main--content">
+      <div class="content-wrapper">
+        <div class="main--service">
+          <h3>Danh sách dịch vụ</h3>
+          <div class="service-list">
+            <div class="service-item">Wi-Fi miễn phí</div>
+            <div class="service-item">Đưa đón sân bay</div>
+            <div class="service-item">Phòng gym</div>
+            <div class="service-item">Hồ bơi ngoài trời</div>
+          </div>
+        </div>
+  
+        <div class="main--table">
+          <h3>Bảng thống kê</h3>
+          <table class="table table-bordered text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th scope="col">STT</th>
+                <th scope="col">Tên</th>
+                <th scope="col">Số điện thoại</th>
+                <th scope="col">Địa chỉ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>1</th>
+                <td>Lê Thành Y</td>
+                <td>0939 834 780</td>
+                <td>Cần Thơ</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <style>
+  /* Sửa đổi tổng thể card */
+  .card--container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card--wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  
+  .payment--card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 300px;
+    height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .payment--card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card--header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .amount {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #555;
+  }
+  
+  .amount--value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .icon {
+    color: #fff;
+    padding: 1rem;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 1.2rem;
+  }
+  
+  .light-red {
+    background: rgb(251, 233, 233);
+  }
+  
+  .light-purple {
+    background: rgb(242, 226, 254);
+  }
+  
+  .light-green {
+    background: rgb(225, 255, 235);
+  }
+  
+  .light-blue {
+    background: rgb(226, 240, 254);
+  }
+  
+  .dark-red {
+    background: red;
+  }
+  
+  .dark-purple {
+    background: purple;
+  }
+  
+  .dark-green {
+    background: green;
+  }
+  
+  .dark-blue {
+    background: blue;
+  }
+  
+  .main--content {
+    margin-top: 20px; /* Space between card section and this section */
+  }
+  
+  .content-wrapper {
+    display: flex;
+    justify-content: space-between; /* Aligns items horizontally */
+  }
+  
+  .main--service, .main--table {
+    flex: 1; /* Allows both sections to take equal space */
+    margin: 0 10px; /* Adds space between the two sections */
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .main--service h3, .main--table h3 {
+    color: rgba(113, 99, 186, 255);
+    margin-bottom: 1rem;
+  }
+  
+  .service-list {
+    display: grid; /* Use grid layout */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive columns */
+    gap: 10px; /* Space between service items */
+  }
+  
+  .service-item {
+    background: #f4f4f4; /* Background for individual services */
+    padding: 10px; /* Padding */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    text-align: center; /* Center text */
+  }
+  </style>
+  

@@ -2,7 +2,7 @@
   <div class="booking">
     <h3 class="text-center fw-bold text-dark">Quản lý đặt phòng</h3>
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button class="btn btn-success me-md-2 mb-3 shadow" type="submit"><router-link to="/bookings/order" class="text-decoration-none text-white">Đặt phòng</router-link>
+      <button class="btn btn-success me-md-2 mb-3 shadow" type="submit"><router-link to="/bookings/order" class="text-decoration-none text-white"><i class="fas fa-plus"></i> Đặt phòng</router-link>
       </button>
     </div>
     <table class="table table-bordered text-center">
@@ -35,12 +35,18 @@
               <button type="submit" class="btn btn-warning shadow"><router-link :to="{ name: 'DetailsBooking', params: { id: booking._id } }"><i class="fa-solid fa-circle-info text-white"></i></router-link></button>
             </td>
             <td>
-              <button type="submit" class="btn btn-danger shadow"><i class="fa-solid fa-xmark"></i></button>
+              <button type="submit" class="btn btn-danger shadow"@click="deleteBooking(booking._id)"><i class="fa-solid fa-xmark"></i></button>
             </td>
           </tr>
         </tbody>
       </table>
   </div>
+
+    <!-- Success Message -->
+    <div v-if="showSuccessMessage" class="success-message">
+      <span class="checkmark">✔️</span>
+      <span>{{ successMessage }}</span>
+    </div>
 
     
   </template>
@@ -54,7 +60,9 @@ export default {
   },
   data() {
     return {
-      bookings: [],          // Tất cả phòng
+      bookings: [], // Tất cả phòng
+      showSuccessMessage: false,
+      successMessage: '',
       
     };
   },
@@ -74,7 +82,27 @@ export default {
      formatDate(dateString) {
       const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
       return new Date(dateString).toLocaleDateString('vi-VN', options); // Định dạng theo kiểu VN
-    }
+    },
+    async deleteBooking(id) {
+            try {
+                const response = await api.delete(`/bookings/${id}`);
+                if (response.status === 200) { // 200 OK status
+                    await this.getAllBooking();
+                    this.successMessage = 'Xóa thành công!';
+                    this.showSuccessMessage = true;
+                    setTimeout(() => this.showSuccessMessage = false, 3000);
+                } else {
+                    this.successMessage = 'Xóa thất bại';
+                    this.showSuccessMessage = true;
+                    setTimeout(() => this.showSuccessMessage = false, 3000);
+                }
+            } catch (error) {
+                console.log('Error deleting menu:', error);
+                this.successMessage = 'Có lỗi xảy ra khi xóa';
+                this.showSuccessMessage = true;
+                setTimeout(() => this.showSuccessMessage = false, 3000);
+            }
+        },
   
   }
 };
@@ -109,6 +137,25 @@ export default {
     box-shadow: 0 4px 8px rgba(50, 205, 50, 0.3); /* Brighter shadow color */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     font-size: 14px;
+}
+
+.success-message {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #7bef83;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkmark {
+    font-size: 20px;
+    margin-right: 10px;
 }
   
 

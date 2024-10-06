@@ -35,7 +35,7 @@ const login = async (req, res) => {
         // Lưu refresh token vào cơ sở dữ liệu
         customer.refresToken = refresToken;
         await customer.save();
-        res.send({ user: { name: customer.name, email: customer.email }, token }); // Trả về thông tin user
+        res.send({ user: { id: customer._id,name: customer.name, email: customer.email }, token }); // Trả về thông tin user
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
@@ -179,6 +179,20 @@ const updateCustomer = async (req, res) => {
     }
 };
 
+const getCustomerById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const customer = await Customer.findById(id);
+        if(!customer) {
+            return res.status(400).send({ message: 'sai' });
+        }
+        res.send(customer);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+        
+    }
+}
+
 
 
 
@@ -198,5 +212,6 @@ module.exports = {
     deleteCustomerById,
     createCustomer,
     updateCustomer,
+    getCustomerById
     
 };

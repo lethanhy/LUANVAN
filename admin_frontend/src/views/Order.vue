@@ -118,14 +118,24 @@
         </div>
       </form>
     </div>
+
+     <!-- Success Message -->
+     <div v-if="showSuccessMessage" class="success-message">
+          <span class="checkmark">✔️</span>
+          <span>{{ successMessage }}</span>
+      </div>
   </template>
 
 <script>
 import api from '../api';
+import { computed, onMounted } from 'vue';
+import { useUserStore } from '../stores/userStore.js'; // Pinia store
 
 export default {
   data() {
     return {
+      showSuccessMessage: false,
+      successMessage: '',
       rooms: [],
       selectedRooms: [],
       checkin: '',
@@ -139,18 +149,54 @@ export default {
       minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
     };
   },
+
+  setup() {
+    const userStore = useUserStore();
+
+    // Restore user session when the component is mounted
+    onMounted(() => {
+      userStore.restoreUser();
+    });
+
+    // Computed properties
+    const isLoggedIn = computed(() => userStore.isLoggedIn);
+    const user = computed(() => userStore.user);
+
+    // Methods
+    const logout = () => {
+      userStore.clearUser();
+    };
+
+    // Return the properties and methods to the template
+    return {
+      isLoggedIn,
+      user,
+      logout
+    };
+  },
   async mounted() {
     await this.getRoomAvailable();
   },
   methods: {
     async getRoomAvailable() {
-      try {
-        const response = await api.get('/bookings/order');
-        this.rooms = response.data;
-      } catch (error) {
-        console.log('Failed to load room details:', error);
-      }
-    },
+  console.log('Check-in date:', this.checkin);
+  console.log('Check-out date:', this.checkout);
+  
+  if (this.checkin && this.checkout) {
+    try {
+      const response = await api.get('/bookings/order', {
+        params: {
+          checkin: this.checkin,
+          checkout: this.checkout
+        }
+      });
+      this.rooms = response.data;
+    } catch (error) {
+      console.log('Failed to load room details:', error);
+      alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
+    }
+  }
+},
     addRoom(room) {
       const exists = this.selectedRooms.find(selectedRoom => selectedRoom.roomNumber === room.roomNumber);
       if (!exists) {
@@ -175,8 +221,10 @@ export default {
               checkin: selectedRoom.checkin,
               checkout: selectedRoom.checkout,
             }));
+            // console.log()
 
             const bookingData = {
+              staff: this.user.id,
               email: this.email,
               customerName: this.customerName,
               cccd: this.cccd,
@@ -190,6 +238,9 @@ export default {
               const response = await api.post('/bookings/order', bookingData);
               console.log('Bookings created:', response.data);
               // Thông báo thành công cho người dùng
+              this.successMessage = 'Tạo phòng thành công!';
+              this.showSuccessMessage = true;
+              setTimeout(() => this.showSuccessMessage = false, 3000);
               this.resetForm();
             } catch (error) {
               console.log('Error creating bookings:', error.response.data);
@@ -210,6 +261,15 @@ export default {
       this.checkout = '';
     },
   },
+  watch: {
+    checkin() {
+        this.getRoomAvailable();
+    },
+    checkout() {
+        this.getRoomAvailable();
+    },
+},
+
 };
 </script>
 
@@ -354,6 +414,25 @@ form {
     width: 80px; /* Adjust width as needed */
     padding: 0.5rem; /* Adjust padding if needed */
     box-sizing: border-box; /* Ensure padding and border are included in width */
+}
+
+.success-message {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #7bef83;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkmark {
+    font-size: 20px;
+    margin-right: 10px;
 }
 
 

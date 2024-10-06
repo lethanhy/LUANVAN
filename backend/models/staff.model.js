@@ -7,7 +7,10 @@ const StaffSchema = mongoose.Schema(
             type: String,
             required: [true, 'Name is required'],
         },
-
+         password: {
+            type: String,
+            required: [ true, 'Password field is required'],
+        },
         role: {
             type: String,
             required: [ true, 'Role is required'],
@@ -23,6 +26,21 @@ const StaffSchema = mongoose.Schema(
         timestamps: true,
     }
 );
+
+
+// Mã hóa mật khẩu trước khi lưu
+StaffSchema.pre('save', async function(next) {
+    if(!this.isModified('password')) {
+        return next();
+    }
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (err) {
+        next(err);
+    } 
+})
 
 const Staff = mongoose.model("Staff", StaffSchema);
 

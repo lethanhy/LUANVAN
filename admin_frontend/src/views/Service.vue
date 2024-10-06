@@ -4,7 +4,7 @@
             <h1 class="text-center fw-bold">Quản lý dịch vụ</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
-                <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm sản phẩm</button>
+                <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus"></i> Thêm sản phẩm</button>
             </div>
 
             <div class="d-flex">
@@ -40,7 +40,7 @@
                         <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ menu.name }}</td>
                         <td>{{ menu.quantity }}</td>
-                        <td>{{ menu.price }}</td>
+                        <td>{{ formatCurrency(menu.price) }}</td>
                         <td>
                             <button @click="editMenuData(menu)" type="button" class="btn btn-warning">Sửa</button>
                         </td>
@@ -192,6 +192,12 @@ export default {
                 this.currentPage = page;
             }
         },
+        // Format currency to VND without leading zero
+            formatCurrency(value) {
+                // Convert to integer if the value is a number
+                const numberValue = typeof value === 'number' ? value : parseFloat(value);
+                return `${numberValue.toLocaleString('it-IT')} VND`;
+            },
         async addMenu() {
             try {
                 const response = await api.post('/menu', this.newMenu);

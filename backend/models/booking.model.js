@@ -18,6 +18,11 @@ const BookingSchema = mongoose.Schema(
             type: Number,
             default: 0
         },
+        staff: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Staff',
+            required: true
+        },
         customer: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Customer',

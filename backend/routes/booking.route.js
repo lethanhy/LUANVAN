@@ -16,12 +16,17 @@ router.get('/order', bookingController.getRoomByAvailable);
 // Endpoint to get bookings by date
 router.get('/date/:date', bookingController.getRoomDate);
 
+router.delete('/:id', bookingController.deleteBookingById);
+
 
 // Xem chi tiết một booking (yêu cầu xác thực)
 router.get('/:id', bookingController.getBookingId);
 
 // Cập nhật một booking (yêu cầu xác thực)
-router.patch('/:id', auth, bookingController.updateBooking);
+router.put('/:id', bookingController.updateBooking);
+
+// Cập nhật một booking (yêu cầu xác thực)
+router.put('/rooms/:id', bookingController.updateRoom);
 
 // Xóa một booking (yêu cầu xác thực)
 router.delete('/:id', auth, bookingController.deleteBooking);

@@ -9,6 +9,7 @@ const customerController = require('../controllers/customer.controller.js');
 router.post('/', customerController.createCustomer);
 
 router.get('/', customerController.getAllCustomer);
+router.get('/:id', customerController.getCustomerById);
 
 router.delete('/:id', customerController.deleteCustomerById);
 

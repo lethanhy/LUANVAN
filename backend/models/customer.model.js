@@ -30,15 +30,15 @@ const CustomerSchema = mongoose.Schema(
         },
         address: {
             type: String,
-            required: true
+            // required: true
         },
         cccd: {
             type: String,
-            required: true
+            // required: true
         },
         gioitinh: {
             type: String,
-            required: true
+            // required: true
         },
         nationality: {
             type: String,

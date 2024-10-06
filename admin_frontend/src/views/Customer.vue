@@ -4,7 +4,7 @@
             <h1 class="text-center fw-bold">Quản lý khách hàng</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
-                <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm Khách hàng</button>
+                <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus"></i> Thêm Khách hàng</button>
             </div>
 
             <div class="d-flex">

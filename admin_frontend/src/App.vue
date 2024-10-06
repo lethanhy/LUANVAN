@@ -5,6 +5,7 @@ import TheWelcome from './components/TheWelcome.vue'
 
 <template>
   <div id="app">
+    <div  v-if="isLoggedIn">
     <div class="body">
     <div class="sidebar">
         <div class="logo"></div>
@@ -34,7 +35,7 @@ import TheWelcome from './components/TheWelcome.vue'
                     </router-link>
                 </li>
                 <li>
-                    <router-link to="/" class="menu-item">
+                    <router-link to="/bill" class="menu-item">
                         <i class="fa-solid fa-file-invoice-dollar"></i>
                         <span>Hóa đơn</span>
                     </router-link>
@@ -89,15 +90,15 @@ import TheWelcome from './components/TheWelcome.vue'
                   <div class="dropdown">
                     <a class="nav-link dropdown-toggle d-flex" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       <img src="./assets/logo.jpg" alt="">
-                      <p>Thành Y</p>
+                      <p>{{ user.name }}</p>
                     </a>
 
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                      <li><a class="dropdown-item" href="#">Tài khoản</a></li>
+                      <li><a class="dropdown-item" href="#"><router-link :to="{ name: 'Profile', params: { id: user.id } }" class="menu-item text-dark">Tài khoản</router-link></a></li>
                       <li><a class="dropdown-item" href="#">Lịch sử</a></li>
                       <li><a class="dropdown-item" href="#">Something else here</a></li>
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="#">Separated link</a></li>
+                      <li><a class="dropdown-item"  @click="logout" href="#">Đăng xuất</a></li>
                     </ul>
                   </div>
 
@@ -108,39 +109,91 @@ import TheWelcome from './components/TheWelcome.vue'
             <router-view></router-view>
           </main>
       </div>
+      </div>
+ </div>
 
-    
+ <div v-else class="login-container">
+  <div class="login">
+    <form @submit.prevent="login">
+      <h2>Đăng Nhập</h2>
+      
+      <div class="mb-3">
+        <label for="name" class="form-label">Nhập tên</label>
+        <input type="name" v-model="name" class="form-control" id="name" required />
+      </div>
 
-        
-    
+      <div class="mb-3">
+        <label for="password" class="form-label">Nhập mật khẩu</label>
+        <input type="password" v-model="password" class="form-control" id="password" required />
+      </div>
 
-    
-    
-
-   
+      <button type="submit" class="btn btn-primary">Login</button>
+    </form>
   </div>
 </div>
+
+
+
+</div>
 </template>
-
 <script>
+import api from './api'; // Assuming you have an API setup
+import { computed, onMounted } from 'vue';
+import { useUserStore } from './stores/userStore'; // Pinia store
 
+export default {
+  data() {
+    return {
+      name: '',
+      password: ''
+    };
+  },
+  setup() {
+    const userStore = useUserStore();
 
+    // Restore user session when the component is mounted
+    onMounted(() => {
+      userStore.restoreUser();
+    });
 
-// import { computed } from 'vue';
-// import { useUserStore } from './stores/userStore';
+    // Computed properties
+    const isLoggedIn = computed(() => userStore.isLoggedIn);
+    const user = computed(() => userStore.user);
 
-// // Use the store
-// const userStore = useUserStore();
+    // Methods
+    const logout = () => {
+      userStore.clearUser();
+    };
 
-// // Computed properties
-// const isLoggedIn = computed(() => userStore.isLoggedIn);
-// const user = computed(() => userStore.user);
+    // Return the properties and methods to the template
+    return {
+      isLoggedIn,
+      user,
+      logout
+    };
+  },
+  methods: {
+    async login() {
+      try {
+        const response = await api.post('/staff/login', { name: this.name, password: this.password });
 
-// // Methods
-// const logout = () => {
-//   userStore.clearUser();
-// };
+        // Save the token in localStorage
+        localStorage.setItem('authToken', response.data.token);
+
+        // Save user info in the Pinia store
+        const userStore = useUserStore();
+        userStore.setUser(response.data.user);
+
+        // Redirect to the homepage after successful login
+        this.$router.push('/');
+      } catch (error) {
+        console.log('Login failed:', error);
+      }
+    }
+  }
+};
 </script>
+
 <style>
 
 
@@ -229,11 +282,11 @@ import TheWelcome from './components/TheWelcome.vue'
 }
 
 /* Hover effect for the link */
-.menu-item:hover, .active {
+/* .menu-item:hover, .active {
     background: #e0e0e058;
     border-radius: 8px;
     transition: all 0.5s ease-in-out;
-}
+} */
 
 .logout{
     position: absolute;
@@ -337,6 +390,51 @@ import TheWelcome from './components/TheWelcome.vue'
 .dropdown-item:hover {
   background-color: rgb(113,99,186,255);
   color: #fff;
+}
+.login {
+  background: #ffffff; /* Màu nền của form */
+  padding: 2rem;
+  border-radius: 10px;
+  width: 500px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative; /* Đảm bảo form nằm trên lớp nền mờ */
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Chiều cao toàn màn hình */
+  background-image: url(https://cdn5.f-cdn.com/contestentries/1578585/21468461/5d62b49ac544b_thumb900.jpg);
+  background-size: cover; /* Đảm bảo hình nền bao phủ toàn bộ màn hình */
+  background-position: center; /* Đặt hình nền ở giữa */
+  background-repeat: no-repeat;
+}
+/* Làm mờ phần nền nếu muốn */
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Thêm lớp phủ đen với độ trong suốt */
+  z-index: -1; /* Đảm bảo rằng lớp phủ nằm dưới form */
+}
+
+.login h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login .mb-3 {
+  width: 100%; /* Full width for form controls */
+}
+
+.login .btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 16px;
 }
 
 
