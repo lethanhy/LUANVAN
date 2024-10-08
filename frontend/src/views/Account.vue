@@ -61,17 +61,17 @@
               <label for="gender" class="form-label">Giới tính:</label>
             </div>
             <div class="col-8">
-              <input type="text" id="gender" class="form-control" v-model="customers.gender" placeholder="Nam/Nữ">
+              <input type="text" id="gender" class="form-control" v-model="customers.gioitinh" placeholder="Nam/Nữ">
             </div>
           </div>
 
-          <!-- Nationality -->
+          <!-- Cccd -->
           <div class="row g-3 align-items-center mt-3">
             <div class="col-4 text-end">
-              <label for="nationality" class="form-label">Quốc tịch:</label>
+              <label for="nationality" class="form-label">Căn cước công dân:</label>
             </div>
             <div class="col-8">
-              <input type="text" id="nationality" class="form-control" v-model="customers.nationality" placeholder="Việt Nam">
+              <input type="text" id="cccd" class="form-control" v-model="customers.cccd" placeholder="Việt Nam">
             </div>
           </div>
 

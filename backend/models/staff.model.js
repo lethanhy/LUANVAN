@@ -21,6 +21,16 @@ const StaffSchema = mongoose.Schema(
             require: [true, 'Phone is required'],
            
         },
+        address: {
+            type: String,
+           
+        },
+        email: {
+            type: String,
+          
+           
+        },
+        
     },
     {
         timestamps: true,

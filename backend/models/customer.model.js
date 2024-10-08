@@ -9,10 +9,10 @@ const CustomerSchema = mongoose.Schema(
             // unique: true,
         },
 
-        // password: {
-        //     type: String,
-        //     required: [ true, 'Password field is required'],
-        // },
+        password: {
+            type: String,
+            required: [ true, 'Password field is required'],
+        },
         email: {
             type: String,
             require: [true, 'Email field is required'],

@@ -50,17 +50,19 @@
     <div class="main--content">
       <div class="content-wrapper">
         <div class="main--service">
-          <h3>Danh sách dịch vụ</h3>
+          <!-- <h3>Danh sách dịch vụ</h3>
           <div class="service-list">
             <div class="service-item">Wi-Fi miễn phí</div>
             <div class="service-item">Đưa đón sân bay</div>
             <div class="service-item">Phòng gym</div>
             <div class="service-item">Hồ bơi ngoài trời</div>
-          </div>
+          </div> -->
+
+          <BarChart :chartData="data" :chartOptions="options" />
         </div>
   
         <div class="main--table">
-          <h3>Bảng thống kê</h3>
+          <!-- <h3>Bảng thống kê</h3>
           <table class="table table-bordered text-center">
             <thead class="table-secondary">
               <tr>
@@ -78,11 +80,26 @@
                 <td>Cần Thơ</td>
               </tr>
             </tbody>
-          </table>
+          </table> -->
+         <PieChart :chartData="data" :chartOptions="options"/>
         </div>
       </div>
     </div>
   </template>
+
+<script>
+import { defineComponent, ref } from 'vue';
+import BarChart from '../components/Barchart.vue';
+import PieChart from '@/components/PieChart.vue';
+
+export default defineComponent({
+  name: 'Dashboard',
+  components: {
+    BarChart,
+    PieChart
+  },
+});
+</script>
   
   <style>
   /* Sửa đổi tổng thể card */

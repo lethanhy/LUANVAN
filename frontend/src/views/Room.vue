@@ -1,6 +1,6 @@
 <template>
   <div class="container room--details">
-    <div class="row">
+    <div class="row" v-if="rooms">
       <!-- Room Image Section -->
       <div class="col-lg-6">
         <img src="../assets/9+ Bold Wall Painting Ideas for a Dramatic Bedroom Look • 333k+ Inspiring Lifestyle Ideas.jpg" alt="Room Image" class="img-fluid">
@@ -9,9 +9,8 @@
       <!-- Room Details Section -->
       <div class="col-lg-6">
         <h1 class="fw-bold fst-italic">Double Deluxe with Ocean View</h1>
-       <p class="text-danger text-start">500.000 VND/Đêm</p>
-        <p class="text-start">Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-          when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+        <p class="text-danger text-start">{{ rooms.price }} VND/Đêm</p>
+        <p class="text-start">{{ rooms.description }}</p>
         
         <!-- Features Section -->
         <div class="d-flex justify-content-around pt-2">
@@ -43,7 +42,7 @@
             </button>
           </div>
           <div>
-            <button class="btn btn-success"><router-link to="/order" class="text-decoration-none text-white">Đặt phòng ngay</router-link></button>
+            <button class="btn btn-success"><router-link :to="{ name: 'Order', params: { id: rooms._id }}" class="text-decoration-none text-white">Đặt phòng ngay</router-link></button>
           </div>
         </div>
       </div>
@@ -64,6 +63,59 @@
 
 
 </template>
+
+<script>
+import api from '../api';
+export default {
+  data() {
+    return {
+      rooms: null,
+      newProfileImage: null,
+    };
+  },
+  methods: {
+    async getRoom() {
+      try {
+        const roomId = this.$route.params.id;
+        const response = await api.get(`/rooms/${roomId}`);
+        this.rooms = response.data;
+      } catch (error) {
+        console.log('Failed to fetch room:', error);
+      }
+    },
+    handleImageUpload(event) {
+      this.newProfileImage = event.target.files[0];
+    },
+    async updateProfileImage() {
+      if (!this.newProfileImage) {
+        alert('Please select an image first!');
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append('image', this.newProfileImage);
+        const response = await api.put(`/customers/${this.customers._id}/upload-image`, formData);
+        this.customers.image = response.data.imageUrl;
+      } catch (error) {
+        console.log('Failed to update image:', error);
+      }
+    },
+    async saveChanges() {
+      try {
+        await api.put(`/customers/${this.customers._id}`, this.customers);
+        alert('Customer details updated successfully');
+      } catch (error) {
+        console.log('Failed to save changes:', error);
+        alert('Failed to update customer details');
+      }
+    },
+  },
+  mounted() {
+    this.getRoom();
+   
+  },
+};
+</script>
 
 <style scoped>
 .room--details {

@@ -96,7 +96,6 @@ import TheWelcome from './components/TheWelcome.vue'
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                       <li><a class="dropdown-item" href="#"><router-link :to="{ name: 'Profile', params: { id: user.id } }" class="menu-item text-dark">Tài khoản</router-link></a></li>
                       <li><a class="dropdown-item" href="#">Lịch sử</a></li>
-                      <li><a class="dropdown-item" href="#">Something else here</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item"  @click="logout" href="#">Đăng xuất</a></li>
                     </ul>

@@ -75,16 +75,17 @@
           <div class="DetailRoom--status bg-white">
             <div class="col-md-12 mb-3">
               <label for="status" class="form-label">Cập nhật tình trạng phòng</label>
-              <select v-model="room.status" class="form-select" id="status" required>
+              <select  v-model="roomStatus" class="form-select" id="status" required>
                 <option value="đã đặt">Phòng đã đặt</option>
                 <option value="đã nhận">Phòng đã nhận</option>
                 <option value="trống">Phòng trống</option>
               </select>
             </div>
+
   
             <div class="col-md-12">
               <label for="cleanStatus" class="form-label">Cập nhật tình trạng dọn dẹp</label>
-              <select v-model="room.trangthai" class="form-select" id="cleanStatus" required>
+              <select v-model="room.trangthai" class="form-select" id="cleanStatus" @change="updateCleaningStatus" required>
                 <option value="Đã dọn dẹp">Đã dọn dẹp</option>
                 <option value="Chưa dọn dẹp">Chưa dọn dẹp</option>
               </select>
@@ -165,6 +166,19 @@ export default {
     };
   },
   computed: {
+    roomStatus: {
+    get() {
+      return this.room.bookings.length === 0 ? 'trống' : this.room.bookings[0].status;
+    },
+    set(newStatus) {
+      if (this.room.bookings.length > 0) {
+        this.room.bookings[0].status = newStatus;
+      } else if (newStatus !== 'trống') {
+        // Nếu phòng đang trống và người dùng cập nhật thành "đã đặt" hoặc "đã nhận"
+        this.room.bookings.push({ status: newStatus });
+      }
+    }
+  },
     // formattedDate() {
     //   const date = new Date();
     //   return date.toLocaleString(); // Formats the current date as 11/01/2024 12:00:00 AM
@@ -274,55 +288,56 @@ export default {
 
         // Hàm gửi đơn hàng đã chọn
         async addMenu() {
-    if (this.selectedItems.length === 0) {
-        alert('Vui lòng chọn ít nhất một món ăn!');
-        return;
-    }
+          if (this.selectedItems.length === 0) {
+              alert('Vui lòng chọn ít nhất một món ăn!');
+              return;
+          }
 
-    // Prepare order data based on room and booking details
-    const orderData = {
-        bookingId: this.room.bookings[0]?.bookingId, // Ensure the booking ID exists
-        // roomId: this.room._id, // Include room ID for tracking
-        items: this.selectedItems.map(item => ({
-            id: item._id,
-            itemName: item.name,  // Item name
-            quantity: 1,          // Default quantity to 1 (can be modified as needed)
-            price: item.price     // Item price
-        }))
-    };
+          // Prepare order data based on room and booking details
+          const orderData = {
+              bookingId: this.room.bookings[0]?.bookingId, // Ensure the booking ID exists
+              // roomId: this.room._id, // Include room ID for tracking
+              items: this.selectedItems.map(item => ({
+                  id: item._id,
+                  itemName: item.name,  // Item name
+                  quantity: 1,          // Default quantity to 1 (can be modified as needed)
+                  price: item.price     // Item price
+              }))
+          };
 
-    // Log order data for debugging
-    console.log('Order Data:', orderData);
+          // Log order data for debugging
+          console.log('Order Data:', orderData);
 
-    try {
-        // Make the API call to create the order
-        const response = await api.post('/orders', orderData);
-        alert('Đơn hàng đã được tạo thành công!');
+          try {
+              // Make the API call to create the order
+              const response = await api.post('/orders', orderData);
+              alert('Đơn hàng đã được tạo thành công!');
 
-        // Reset modal and selection
-        this.showModal = false;
-        this.selectedItems = [];
-    } catch (error) {
-        console.log('Lỗi khi tạo đơn hàng:', error);
-        if (error.response) {
-            console.log('Error Response:', error.response.data);
-            alert('Có lỗi xảy ra khi tạo đơn hàng: ' + error.response.data.message);
-        } else {
-            alert('Có lỗi xảy ra, vui lòng thử lại sau.');
-        }
-    }
-},
+              // Reset modal and selection
+              this.showModal = false;
+              this.selectedItems = [];
+          } catch (error) {
+              console.log('Lỗi khi tạo đơn hàng:', error);
+              if (error.response) {
+                  console.log('Error Response:', error.response.data);
+                  alert('Có lỗi xảy ra khi tạo đơn hàng: ' + error.response.data.message);
+              } else {
+                  alert('Có lỗi xảy ra, vui lòng thử lại sau.');
+              }
+          }
+      },
 
-      // async getOrder() {
-      //     try {
-      //       const roomId = this.$route.params.id; // Get the room ID from the route
-      //       const orderResponse = await api.get(`/orders/${roomId}`);
-      //       console.log('Order Response:', orderResponse.data);
-      //       this.orders = orderResponse.data || []; // Store the orders
-      //     } catch (error) {
-      //       console.log('Failed to load orders:', error);
-      //     }
-      //   },
+      async updateCleaningStatus() {
+          try {
+            const updateData = { trangthai: this.room.trangthai };
+            await api.put(`/rooms/${this.room._id}`, updateData);
+            alert('Cập nhật tình trạng dọn dẹp thành công!');
+          } catch (error) {
+            console.log('Failed to update cleaning status:', error);
+          }
+      }
+
+     
 
 
 

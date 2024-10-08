@@ -16,8 +16,8 @@ const routes = [
   { path: '/customers/login', name: 'Login', component: Login },
   { path: '/customers/register', name: 'Register', component: Register },
   { path: '/customers/:id', name: 'Customers', component: Customers },
-  { path: '/room', name: 'Room', component: Room },
-  { path: '/order', name: 'Order', component: Order },
+  { path: '/rooms/:id', name: 'Room', component: Room },
+  { path: '/order/:id', name: 'Order', component: Order },
   { path: '/history', name: 'History', component: History }
   
   

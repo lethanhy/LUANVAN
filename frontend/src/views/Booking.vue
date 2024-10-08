@@ -110,7 +110,7 @@
               
             </div>
           
-            <button><router-link to="/room">Xem thêm</router-link></button>
+            <button><router-link :to="{ name: 'Room', params: { id: room._id }, query: { checkin: checkin, checkout: checkout } }">Xem thêm</router-link></button>
             <!-- <p>New York City, USA</p> -->
           </div>
       </div>
@@ -214,6 +214,11 @@ export default {
   mounted() {
     // this.getRooms();
     this.getRoomAvailable();
+
+    const checkinDate = this.$route.query.checkin;
+  const checkoutDate = this.$route.query.checkout;
+  console.log('Checkin Date:', checkinDate);
+  console.log('Checkout Date:', checkoutDate);
   },
   watch: {
     checkin() {

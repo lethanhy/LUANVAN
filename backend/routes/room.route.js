@@ -25,9 +25,11 @@ router.post("/manager",upload.single('image'), roomController.createRoom); // L�
 router.put("/manager/:id", roomController.updateRooms);
 router.delete("/manager/:id", roomController.deleteRoomById);
 
+router.get("/:id", roomController.getRoomByUserId);
 
 
 
+router.put("/:id", roomController.updateRooms);
 router.get("/:id", roomController.getRoomById); // Lấy danh sách tất cả phòng
 router.put("/:id", roomController.updateRoom); // Cập nhật thông tin của một phòng
 router.delete("/:id", roomController.deleteRoom); // Xóa một phòng

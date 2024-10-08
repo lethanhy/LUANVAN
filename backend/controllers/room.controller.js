@@ -337,40 +337,21 @@ const getRoomById = async (req, res) => {
 };
 
 
-// const getRoomById = async (req, res) => {
-//     try {
-//         const roomId = req.params.id;
+const getRoomByUserId = async (req, res) => {
+    try {
+        const roomId = req.params.id;
 
-//         // Fetch the room by its ID
-//         const room = await Room.findById(roomId);
+        // Fetch the room by its ID
+        const room = await Room.findById(roomId);
 
-//         if (!room) {
-//             return res.status(404).json({ message: 'Room not found' });
-//         }
-
-//         // Fetch bookings for the room
-//         const bookings = await Booking.find({ room: roomId }).populate('customer');
-
-//         // Send room and booking information
-//         res.status(200).json({
-//             room,
-//             bookings: bookings.map(booking => ({
-//                 _id: booking._id,
-//                 checkin: booking.checkin,
-//                 checkout: booking.checkout,
-//                 amount: booking.amount,
-//                 guests: booking.guests,
-//                 customer: booking.customer ? {
-//                     name: booking.customer.name,
-//                     email: booking.customer.email,
-//                     phone: booking.customer.phone
-//                 } : null
-//             }))
-//         });
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
+        if (!room) {
+            return res.status(404).json({ message: 'Room not found' });
+        }
+        res.status(201).send(room);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 
 
@@ -385,5 +366,6 @@ module.exports = {
    createRoom,
    updateRooms,
    deleteRoomById,
+   getRoomByUserId
 //    getoneRoom,
 };

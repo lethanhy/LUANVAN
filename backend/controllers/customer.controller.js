@@ -35,7 +35,7 @@ const login = async (req, res) => {
         // Lưu refresh token vào cơ sở dữ liệu
         customer.refresToken = refresToken;
         await customer.save();
-        res.send({ user: { id: customer._id,name: customer.name, email: customer.email }, token }); // Trả về thông tin user
+        res.send({ user: { id: customer._id,name: customer.name, email: customer.email, cccd:customer.cccd,phone:customer.phone, gioitinh:customer.gioitinh, address:customer.address }, token }); // Trả về thông tin user
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
