@@ -22,10 +22,10 @@ router.get("/", roomController.getRooms);
 router.get("/", roomController.getAllRooms);
 router.get("/date/:date", roomController.getRooms);
 router.post("/manager",upload.single('image'), roomController.createRoom); // Lấy danh sách tất cả phòng // Lấy danh sách tất cả phòng
-router.put("/manager/:id", roomController.updateRooms);
+router.put("/manager/:id",upload.single('image'), roomController.updateRooms);
 router.delete("/manager/:id", roomController.deleteRoomById);
 
-router.get("/:id", roomController.getRoomByUserId);
+router.get("/user/:id", roomController.getRoomByUserId);
 
 
 

@@ -63,6 +63,11 @@
                 </tr>
               </thead>
               <tbody>
+                <tr v-if="rooms.length === 0">
+                  <td colspan="3" class="text-center text-danger">Vui lòng chọn ngày</td>
+                </tr>
+              </tbody>
+              <tbody>
                 <tr v-for="room in rooms" :key="room.id">
                   <td>{{ room.roomNumber }}</td>
                   <td>{{ room.type }}</td>
@@ -87,6 +92,12 @@
                         <th scope="col">Xóa</th>
                     </tr>
                 </thead>
+                <tbody>
+                <tr v-if="selectedRooms.length === 0">
+                  <td colspan="5" class="text-center text-danger">Chưa chọn phòng nào</td>
+                </tr>
+              </tbody>
+                
               <tbody>
                 <tr v-for="(selectedRoom, index) in selectedRooms" :key="index">
                   <td>{{ selectedRoom.roomNumber }}</td>
@@ -113,7 +124,7 @@
         <div class="order--footer pt-3">
             <div class="d-grid gap-2 d-md-flex justify-content-center">
                 <button type="submit" class="btn btn-success">Lưu</button>
-                <button type="button" class="btn btn-light" @click="resetForm">Hủy</button>
+                <button type="button" class="btn btn-light" @click="resetForm"><router-link to="/bookings" class="text-decoration-none">Hủy</router-link></button>
             </div>  
         </div>
       </form>

@@ -8,11 +8,11 @@ const config = require('../config/config.js');
 
 const createRoom = async (req, res) => {
     try {
-        const { roomNumber, type, price, status, trangthai, maxGuests, } = req.body;
+        const { roomNumber, type, price, status, trangthai, maxGuests,description } = req.body;
         const image = req.file.filename; // Giả sử bạn sử dụng multer để upload hình ảnh
 
         // Xác nhận dữ liệu đầu vào
-        if (!roomNumber || !type || !price || !status || !trangthai || !maxGuests) {
+        if (!roomNumber || !type || !price || !status || !trangthai || !maxGuests || !description) {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết' });
         }
 
@@ -28,6 +28,7 @@ const createRoom = async (req, res) => {
             status,
             trangthai,
             maxGuests,
+            description,
             image,  // Lưu URL ảnh
            
             
@@ -59,6 +60,12 @@ const updateRooms = async (req, res) => {
         // Ensure that update data is present
         if (!updateData || Object.keys(updateData).length === 0) {
             return res.status(400).json({ message: 'No update data provided' });
+        }
+
+        // Check if there's an image in the request
+        if (req.file) {
+            // If you are using multer or any file upload middleware
+            updateData.image = req.file.filename; // Assuming you're storing only the filename
         }
 
         // Update room data

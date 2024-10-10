@@ -21,7 +21,7 @@ import TheWelcome from './components/TheWelcome.vue'
             <li class="link"><a href="#"><router-link to="/">Home</router-link></a></li>
             <li class="link"><a href="#"><router-link to="/rooms">Room</router-link></a></li>
             <li class="link"><a href="#">Blog</a></li>
-            <li class="link"><a href="#">Contact Us</a></li>
+            <li class="link"><a href="#"><router-link to="/contact">Contact Us</router-link></a></li>
           </ul>
 
      
@@ -52,7 +52,7 @@ import TheWelcome from './components/TheWelcome.vue'
     <footer class="footer">
       <div class="section__container footer__container">
         <div class="footer__col">
-          <h3>Ocen Breeze Hotel</h3>
+          <h3 class="text-primary">Ocen Breeze Hotel</h3>
           <p>
             Ocen Breeze Hotel is a premier hotel booking website that offers a seamless and
             convenient way to find and book accommodations worldwide.

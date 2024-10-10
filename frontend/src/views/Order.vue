@@ -155,7 +155,7 @@ export default {
     const getRoom = async () => {
       try {
         const roomId = window.location.pathname.split('/').pop(); // Extract room ID from the URL
-        const response = await api.get(`/rooms/${roomId}`);
+        const response = await api.get(`/rooms/user/${roomId}`);
         rooms.value = response.data;
       } catch (error) {
         console.log('Failed to fetch room:', error);

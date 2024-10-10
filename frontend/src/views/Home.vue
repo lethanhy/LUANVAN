@@ -4,24 +4,24 @@
       <div class="header__image__container">
         <div class="header__content">
           <h1>Enjoy Your Dream Vacation</h1>
-          <p>Book Hotels, Flights and stay packages at lowest price.</p>
+          <p>Book Hotels and stay packages at lowest price.</p>
         </div>
         <div class="booking__container">
           <form action="">
             <div class="form__group">
               <div class="input__group">
-                <input type="text">
-                <label for="">Check In Date</label>
+                <input type="date">
+                <!-- <label for="">Check In Date</label> -->
               </div>
-              <p>Add date</p>
+              <p>Check In Date</p>
             </div>
 
             <div class="form__group">
               <div class="input__group">
-                <input type="text">
-                <label for="">Check Out Date</label>
+                <input type="date">
+                <!-- <label for="">Check Out Date</label> -->
               </div>
-              <p>Add date</p>
+              <p>Check Out Date</p>
             </div>
 
             <div class="form__group">
@@ -151,6 +151,33 @@
         </div>
       </div>
     </div>
+
+    <div class="about-us container mt-5">
+  <h1 class="fw-bold text-center">About Us</h1>
+  <div class="row align-items-center mt-4">
+    <div class="col-md-6 col-12 mb-4">
+      <img src="../assets/Villa Chinka by Astor Garden Hotel.jpg" alt="Ocean Breeze Hotel" class="about-us__image img-fluid rounded shadow-lg">
+    </div>
+    <div class="col-md-6 col-12">
+      <h2 class="fw-bold">Về Chúng Tôi</h2>
+      <p>
+        Chào mừng đến với khách sạn <strong>Ocean Breeze</strong>, thiên đường của sự sang trọng và yên bình.
+        Ẩn mình dọc theo bờ biển thanh bình, khách sạn chúng tôi là điểm đến lý tưởng cho một kỳ nghỉ thư giãn
+        hoàn hảo. Cho dù bạn đang tìm kiếm một nơi nghỉ ngơi thư giãn, một chuyến du lịch lãng mạn hay một kỳ nghỉ
+        gia đình, Ocean Breeze mang đến sự kết hợp hoàn hảo giữa thoải mái và sang trọng để khiến kỳ nghỉ của bạn
+        trở nên khó quên.
+      </p>
+      <h2 class="fw-bold">Câu Chuyện Của Chúng Tôi</h2>
+      <p>
+        Được thành lập dựa trên nguyên tắc hiếu khách và xuất sắc, khách sạn Ocean Breeze đã cung cấp dịch vụ hàng đầu
+        cho du khách trong hơn một thập kỷ. Chúng tôi luôn mong muốn tạo ra một không gian ấm áp và đầy cảm hứng, nơi
+        mà mỗi du khách đều cảm thấy được trân trọng và chăm sóc. Mọi chi tiết, từ kiến trúc đến các tiện nghi,
+        đều được thiết kế để mang lại trải nghiệm liền mạch và tuyệt vời.
+      </p>
+    </div>
+  </div>
+</div>
+
 
     
 
@@ -411,4 +438,25 @@ export default {
 .popular__content button:hover{
   background-color: rgb(150, 240, 234);
 }
+
+.about-us {
+  padding: 2rem 0;
+}
+
+.about-us__image {
+  border-radius: 0.5rem;
+}
+
+.about-us p {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.about-us h2 {
+  margin-top: 1.5rem;
+  color: #007bff;
+}
+
+
 </style>

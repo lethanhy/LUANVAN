@@ -8,6 +8,7 @@ import Register from '../views/Register.vue';
 import Room from '../views/Room.vue';
 import Order from '../views/Order.vue';
 import History from '../views/History.vue';
+import Contact from '../views/Contact.vue';
 
 
 const routes = [
@@ -18,7 +19,8 @@ const routes = [
   { path: '/customers/:id', name: 'Customers', component: Customers },
   { path: '/rooms/:id', name: 'Room', component: Room },
   { path: '/order/:id', name: 'Order', component: Order },
-  { path: '/history', name: 'History', component: History }
+  { path: '/history', name: 'History', component: History },
+  { path: '/contact', name: 'Contact', component: Contact }
   
   
 ];

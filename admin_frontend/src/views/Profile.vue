@@ -14,19 +14,19 @@
               <h3 class="text-info fw-bold">Thông tin</h3>
               <div class="pt-3">
                 <div class="mb-3">
-                  <label class="form-label">Tên nhân viên</label>
+                  <label class="form-label fw-bold">Tên nhân viên</label>
                   <input type="text" v-model="staff.name" class="form-control" />
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Tên email</label>
+                  <label class="form-label fw-bold ">Tên email</label>
                   <input type="email" v-model="staff.email" class="form-control"/>
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Địa chỉ</label>
+                  <label class="form-label fw-bold">Địa chỉ</label>
                   <input type="text" v-model="staff.address" class="form-control" />
                 </div>
                 <div class="mb-3">
-                  <label class="form-label">Số điện thoại</label>
+                  <label class="form-label fw-bold">Số điện thoại</label>
                   <input type="text" v-model="staff.phone" class="form-control" />
                 </div>
               </div>
@@ -100,5 +100,6 @@
   .text-center {
     text-align: center;
   }
+  
   </style>
   

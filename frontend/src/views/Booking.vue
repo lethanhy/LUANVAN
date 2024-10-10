@@ -81,7 +81,8 @@
       </div>
       <div class="card__room">
         <div v-for="room in rooms" :key="room.id" class="popular__room">
-          <img src="../assets/Hotel Ristorante Grotta Palazzese.jpg" alt="popular hotel">
+          <img v-if="room.image" :src="`http://localhost:3000/uploads/${room.image}`" alt="popular hotel">
+          <span v-else>Không có ảnh</span>
           <div class="room__content">
             <div class="room__card__header">
               <h4>{{ room.roomNumber }}</h4>
@@ -216,9 +217,9 @@ export default {
     this.getRoomAvailable();
 
     const checkinDate = this.$route.query.checkin;
-  const checkoutDate = this.$route.query.checkout;
-  console.log('Checkin Date:', checkinDate);
-  console.log('Checkout Date:', checkoutDate);
+    const checkoutDate = this.$route.query.checkout;
+    console.log('Checkin Date:', checkinDate);
+    console.log('Checkout Date:', checkoutDate);
   },
   watch: {
     checkin() {

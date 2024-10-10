@@ -11,7 +11,7 @@ const CustomerSchema = mongoose.Schema(
 
         password: {
             type: String,
-            required: [ true, 'Password field is required'],
+            // required: [ true, 'Password field is required'],
         },
         email: {
             type: String,
