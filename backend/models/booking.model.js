@@ -21,7 +21,7 @@ const BookingSchema = mongoose.Schema(
         staff: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Staff',
-            required: true
+            // required: true
         },
         customer: {
             type: mongoose.Schema.Types.ObjectId,

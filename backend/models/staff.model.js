@@ -13,8 +13,9 @@ const StaffSchema = mongoose.Schema(
         },
         role: {
             type: String,
-            required: [ true, 'Role is required'],
-            enum: ["Manager", "Receptionist", "Housekeeping", "Maintenance", "Chef"] // Quản lý, Nhân viên, Lễ tân, Bảo trì, Đầu bếp ...
+            // required: [ true, 'Role is required'],
+            enum: ["Manager", "Receptionist", "Housekeeping", "Maintenance", "Chef"], // Quản lý, Nhân viên, Lễ tân, Bảo trì, Đầu bếp ...
+            default: "Manager",
         },
         phone: {
             type: String,

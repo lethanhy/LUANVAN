@@ -58,7 +58,7 @@
             <div class="service-item">Hồ bơi ngoài trời</div>
           </div> -->
 
-          <BarChart :chartData="data" :chartOptions="options" />
+          <BarChart />
         </div>
   
         <div class="main--table">
@@ -81,7 +81,7 @@
               </tr>
             </tbody>
           </table> -->
-         <PieChart :chartData="data" :chartOptions="options"/>
+         <PieChart/>
         </div>
       </div>
     </div>
@@ -89,7 +89,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue';
-import BarChart from '../components/Barchart.vue';
+import BarChart from '@/components/BarChart.vue';
 import PieChart from '@/components/PieChart.vue';
 
 export default defineComponent({

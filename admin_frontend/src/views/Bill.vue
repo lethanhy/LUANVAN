@@ -1,56 +1,83 @@
 <template>
-    <div class="billManager">
-        <div class="billManager--body">
-            <h1 class="text-center fw-bold">Quản lý hóa đơn</h1>
+    <div class="customer">
+        <div class="customer--body">
+            <h1 class="text-center fw-bold">Quản lý nhân viên</h1>
 
-            <!-- <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
-                <button @click="showModal = true" class="btn btn-success me-md-2" type="button">Thêm sản phẩm</button>
-            </div> -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+                <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus"></i> Thêm Nhân Viên</button>
+            </div>
 
             <div class="d-flex">
+
                 <!-- Search Bar -->
                 <div class="search-bar">
                     <input 
                         type="text" 
                         v-model="searchQuery" 
-                        placeholder="Tìm kiếm theo tên" 
+                        placeholder="Tìm theo tên" 
+                        class="form-control mb-3" 
+                    />
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="customerPhoneQuery" 
+                        placeholder="Tìm số điện thoại" 
                         class="form-control mb-3" 
                     />
                 </div>
 
-               
+                
+
+                <!-- <div class="search-bar">
+                    <input 
+                        type="text" 
+                        v-model="customerCccd" 
+                        placeholder="Tìm kiếm theo cccd" 
+                        class="form-control mb-3" 
+                    />
+                </div> -->
 
                 
 
             </div>
 
-            <table class="table table-bordered text-center">
-                <thead class="table-secondary">
+            <table class="table table-striped table-hover text-center table-borderless">
+                <thead class="">
                     <tr>
                         <th scope="col">STT</th>
-                        <th scope="col">Ngày lập</th>
-                        <th scope="col">Tên nhân viên</th>
-                        <th scope="col">Chi tiết</th>
+                        <th scope="col">Họ và tên</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Số điện thoại</th>
+                        <th scope="col">Địa chỉ</th>
+                        <th scope="col">Sửa</th>
+                        <th scope="col">Xóa</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(menu, index) in paginatedMenu" :key="menu._id">
+                    <tr v-for="(staff, index) in paginatedStaffs" :key="staff._id">
                         <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
-                        <td>{{ menu.name }}</td>
-                        <td>{{ formatCurrency(menu.price) }}</td>
+                        <td>{{ staff.name }}</td>
+                        <td>{{ staff.email }}</td>
+                        <td>{{ staff.phone }}</td>
+                        <td>{{ staff.address }}</td>                      
                         <td>
-                            <button @click="editMenuData(menu)" type="button" class="btn btn-warning">Sửa</button>
+                            <button @click="editStaffData(staff)" type="button" class="btn btn-warning shadow"><i class="fa-solid fa-pen-to-square text-white"></i></button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger shadow" @click="deleteStaff(staff._id)"><i class="fa-solid fa-xmark"></i></button>
                         </td>
                     </tr>
-                    <tr v-if="!filteredMenus.length">
-                        <td colspan="6">Không tìm thấy sản phẩm</td>
+                    <tr v-if="!filteredStaffs.length">
+                        <td colspan="6">Không tìm thấy nhân viên</td>
                     </tr>
                 </tbody>
             </table>
 
-
-                <!-- Pagination Controls -->
-                <nav aria-label="Page navigation">
+            <!-- Pagination Controls -->
+            <nav aria-label="Page navigation">
                     <ul class="pagination">
                         <li class="page-item" :class="{ 'disabled': currentPage === 1 }">
                             <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
@@ -70,24 +97,63 @@
                 <span>{{ successMessage }}</span>
             </div>
 
-            <!-- Edit Room Modal -->
+            <!-- Add Customer Modal -->
+            <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+                <div class="modal-content">
+                    <h2 class="modal-title">Thêm Nhân Viên</h2>
+                    <form @submit.prevent="addStaff">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Họ và tên</label>
+                            <input type="text" id="name" v-model="newStaff.name" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="text" id="email" v-model="newStaff.email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" id="password" v-model="newStaff.password" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Số điện thoại</label>
+                            <input type="text" id="phone" v-model="newStaff.phone" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <input type="text" id="address" v-model="newStaff.address" class="form-control" required>
+                        </div>
+                        
+                        
+                        <button type="submit" class="btn btn-primary">Thêm</button>
+                        <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Sửa Phòng</h2>
-                    <form @submit.prevent="updateMenu">
+                    <h2 class="modal-title">Sửa Nhân Viên</h2>
+                    <form @submit.prevent="updateStaff">
                         <div class="mb-3">
-                            <label for="editName" class="form-label">Tên</label>
-                            <input type="text" id="editName" v-model="editMenu.name" class="form-control" required>
+                            <label for="editName" class="form-label">Họ và tên</label>
+                            <input type="text" id="editName" v-model="editStaff.name" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editQuantity" class="form-label">Số lượng</label>
-                            <input type="text" id="editQuantity" v-model="editMenu.quantity" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPrice" class="form-label">Giá sản phẩm</label>
-                            <input type="text" id="editPrice" v-model="editMenu.price" class="form-control">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="text" id="editEmail" v-model="editStaff.email" class="form-control" required>
                         </div>
                        
+                        <div class="mb-3">
+                            <label for="editPhone" class="form-label">Số điện thoại</label>
+                            <input type="text" id="editPhone" v-model="editStaff.phone" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAddress" class="form-label">Địa chỉ</label>
+                            <input type="text" id="editAddress" v-model="editStaff.address" class="form-control" required>
+                        </div>
+                        
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <button type="button" class="btn btn-secondary ms-2" @click="showModalEdit = false">Hủy</button>
                     </form>
@@ -99,7 +165,6 @@
 
 <script>
 import api from '../api';
-
 export default {
     data() {
         return {
@@ -107,147 +172,150 @@ export default {
             successMessage: '',
             showModal: false,
             showModalEdit: false,
-            newMenu: {
+            newStaff: {
                 name: '',
-                price: '',
-                quantity: '',
+                email: '',
+                phone: '',
+                address: '',
+                password:'',
             },
-            editMenu: {
+            editStaff: {
                 _id: '',
                 name: '',
-                price: '',
-                quantity: '',
+                email: '',
+                phone: '',
+                address: '',
+             
             },
-            menuitems: [],// Array to hold rooms data
+            staffs: [], // Array to hold customers data
             currentPage: 1, // Current active page
             itemsPerPage: 5, // Number of items to show per page
             totalItems: 0 ,// Total number of items (rooms)
             searchQuery: '', // Holds the search input for filtering by room number
-            menuPriceQuery: '',    // For room type search
-            menuQuantity: '', 
+            customerPhoneQuery: '',    // For room type search
+           
         };
     },
     computed: {
         // Filter rooms based on the search query for both room number and room type
-        filteredMenus() {
-            return this.menuitems.filter(menu => {
-                const matchesName = menu.name.toString().includes(this.searchQuery);
-                return matchesName; // Match both room number and room type
-            });
-        },
-        paginatedMenu() {
+        filteredStaffs() {
+        return this.staffs.filter(staff => {
+            const matchesCustomerName = staff.name?.toString().includes(this.searchQuery);
+            const matchesCustomerPhone = (staff.phone || '').toLowerCase().includes(this.customerPhoneQuery.toLowerCase());
+            return matchesCustomerName && matchesCustomerPhone;
+        });
+    },
+        paginatedStaffs() {
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            return this.filteredMenus.slice(start, end); // Paginate only the filtered rooms
+            return this.filteredStaffs.slice(start, end); // Paginate only the filtered rooms
         },
         // Update total pages based on filtered rooms
-    totalPages() {
-        return Math.ceil(this.filteredMenus.length / this.itemsPerPage); // Calculate total pages from filtered rooms
-    }
+        totalPages() {
+            return Math.ceil(this.filteredStaffs.length / this.itemsPerPage); // Calculate total pages from filtered rooms
+        }
 
     },
     methods: {
-        async getAllMenu() {
+        async getAllStaff() {
             try {
-                const response = await api.get('/menu');
-                this.menuitems = response.data; // Set rooms data
-                this.totalItems = this.menuitems.length; // Set total number of rooms for pagination
-            } catch (error) {
-                console.log('Error fetching rooms:', error);
-            }
+        const response = await api.get('/staff');
+        console.log(response.data); // Log data to check if it's correct
+        this.staffs = response.data; // Set customers data
+        this.totalItems = this.staffs.length; // Set total number of customers
+    } catch (error) {
+        console.error('Error fetching customers:', error);
+    }
         },
          // ... existing methods
-        changePage(page) {
+         changePage(page) {
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
             }
         },
-        // Format currency to VND without leading zero
-            formatCurrency(value) {
-                // Convert to integer if the value is a number
-                const numberValue = typeof value === 'number' ? value : parseFloat(value);
-                return `${numberValue.toLocaleString('it-IT')} VND`;
-            },
-        async addMenu() {
+        async addStaff() {
             try {
-                const response = await api.post('/menu', this.newMenu);
+                const response = await api.post('/staff', this.newStaff);
                 if (response.status === 201) { // 201 Created status
-                    this.newMenu = {
+                    this.newStaff = {
                         name: '',
-                        quantity: '',
-                        price: '',
+                        email: '',
+                        phone: '',
+                        address: '',
+                        password:'',
+                       
                     };
                     this.showModal = false;
-                    await this.getAllMenu();
-                    this.successMessage = 'Thêm sản phẩm thành công!';
+                    await this.getAllStaff();
+                    this.successMessage = 'Thêm nhân viên thành công!';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
-                    this.successMessage = 'Thêm sản phẩm thất bại';
+                    this.successMessage = 'Thêm nhân viên thất bại';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
             } catch (error) {
-                console.log('Error adding room:', error);
-                this.successMessage = 'Có lỗi xảy ra khi thêm sp';
+                console.log('Error adding customer:', error);
+                this.successMessage = 'Có lỗi xảy ra khi thêm nhân viên';
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
-        async deleteMenu(id) {
+        async deleteStaff(id) {
             try {
-                const response = await api.delete(`/menu/${id}`);
+                const response = await api.delete(`/staff/${id}`);
                 if (response.status === 200) { // 200 OK status
-                    await this.getAllMenu();
-                    this.successMessage = 'Xóa sản phẩm thành công!';
+                    await this.getAllStaff();
+                    this.successMessage = 'Xóa khách nhân viên công!';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
-                    this.successMessage = 'Xóa sản phẩm thất bại';
+                    this.successMessage = 'Xóa nhân viên thất bại';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
             } catch (error) {
-                console.log('Error deleting menu:', error);
-                this.successMessage = 'Có lỗi xảy ra khi xóa sản phẩm';
+                console.log('Error deleting customer:', error);
+                this.successMessage = 'Có lỗi xảy ra khi xóa nhân viên';
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
-        async updateMenu() {
+        async updateStaff() {
             try {
-                const response = await api.put(`/menu/${this.editMenu._id}`, this.editMenu);
+                const response = await api.put(`/staff/${this.editStaff._id}`, this.editStaff);
                 if (response.status === 200) { // 200 OK status
                     this.showModalEdit = false;
-                    await this.getAllMenu();
-                    this.successMessage = 'Cập nhật sản phẩm thành công!';
+                    await this.getAllStaff();
+                    this.successMessage = 'Cập nhật nhân viên thành công!';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
-                    this.successMessage = 'Cập nhật sản phẩm thất bại';
+                    this.successMessage = 'Cập nhật nhân viên thất bại';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
             } catch (error) {
-                console.log('Error updating room:', error);
-                this.successMessage = 'Có lỗi xảy ra khi cập nhật phòng';
+                console.log('Error updating customer:', error);
+                this.successMessage = 'Có lỗi xảy ra khi cập nhật nhân viên';
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
-        editMenuData(menu) {
-            this.editMenu = { ...menu };
+        editStaffData(staff) {
+            this.editStaff = { ...staff };
             this.showModalEdit = true;
         }
     },
     created() {
-        this.getAllMenu();
+        this.getAllStaff();
     }
 }
 </script>
 
 <style scoped>
-.billManager {
+.customer {
     background: #fff;
     padding: 2rem;
     border-radius: 10px;
@@ -311,7 +379,7 @@ export default {
     position: fixed;
     top: 10px;
     right: 10px;
-    background: #7bef83;
+    background: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
     border-radius: 5px;
@@ -326,10 +394,6 @@ export default {
     margin-right: 10px;
 }
 .search-bar{
-    margin-right: 10px;
-}
-.search-bar input {
-    max-width: 300px;
-    margin-bottom: 15px;
+    margin-left: 10px;
 }
 </style>

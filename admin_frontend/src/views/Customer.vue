@@ -44,8 +44,8 @@
 
             </div>
 
-            <table class="table table-bordered text-center">
-                <thead class="table-secondary">
+            <table class="table table-striped table-hover text-center table-borderless">
+                <thead class="">
                     <tr>
                         <th scope="col">STT</th>
                         <th scope="col">Họ và tên</th>
@@ -68,10 +68,10 @@
                         <td>{{ customer.gioitinh }}</td>
                         <td>{{ customer.nationality }}</td>
                         <td>
-                            <button @click="editCustomerData(customer)" type="button" class="btn btn-warning shadow">Sửa</button>
+                            <button @click="editCustomerData(customer)" type="button" class="btn btn-warning shadow"><i class="fa-solid fa-pen-to-square text-white"></i></button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger shadow" @click="deleteCustomer(customer._id)">Xóa</button>
+                            <button type="button" class="btn btn-danger shadow" @click="deleteCustomer(customer._id)"><i class="fa-solid fa-xmark"></i></button>
                         </td>
                     </tr>
                     <tr v-if="!filteredCustomers.length">

@@ -32,7 +32,7 @@ import TheWelcome from './components/TheWelcome.vue'
               <button class="dropbtn">Welcome, {{ user.name }}</button>
               <div class="dropdown-content">
                 <a href="#"><router-link :to="{ name: 'Customers', params: { id: user.id } }">Tài khoản</router-link></a>
-                <a href="#"><router-link to="/history">Lịch sử</router-link></a>
+                <a href="#"><router-link :to="{ name: 'History', params: { id: user.id } }">Lịch sử</router-link></a>
                 <a href="" @click="logout">Đăng xuất</a>
               </div>
               <!-- <p>Welcome, {{ user.name }}</p> -->

@@ -1,7 +1,5 @@
 <template>
-
-
-  <div class="container order--room ">
+  <div class="container order--room">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
@@ -16,16 +14,16 @@
           <div v-if="rooms" class="d-flex align-items-start mb-4 border border-secondary rounded-3 p-3">
             <div class="col-lg-3 col-sm-4">
               <img
-                src="../assets/9+ Bold Wall Painting Ideas for a Dramatic Bedroom Look • 333k+ Inspiring Lifestyle Ideas.jpg"
+                :src="`http://localhost:3000/uploads/${rooms.image}`"
                 alt="Room Image"
                 class="img-fluid border rounded-3 shadow-sm"
                 style="height: 150px; width: 200px;"
               />
             </div>
             <div class="col-lg-9 ms-3 text-start">
-              <p class="mb-1 fw-bold fs-5">Phòng {{rooms.roomNumber}}</p>
+              <p class="mb-1 fw-bold fs-5">Phòng {{ rooms.roomNumber }}</p>
               <p class="mb-1 text-muted"><i class="fas fa-user"></i> {{ rooms.maxGuests }} khách</p>
-              <p class="mb-1 text-success">{{ rooms.price }} VND/Đêm</p>
+              <p class="mb-1 text-success">{{ formatCurrency(rooms.price) }} VND/Đêm</p>
               <div class="room-features d-flex justify-content-start flex-wrap pt-3">
                 <div class="me-4 mb-2"><i class="fa-solid fa-bed me-1"></i> King Size Bed</div>
                 <div class="me-4 mb-2"><i class="fa-solid fa-water me-1"></i> Ocean View</div>
@@ -40,43 +38,37 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label for="name" class="form-label">Tên</label>
-                <input type="text" class="form-control rounded-3" id="name" v-model="user.name">
+                <input type="text" class="form-control rounded-3" id="name" v-model="user.name" required>
               </div>
               <div class="col-md-6">
                 <label for="address" class="form-label">Địa chỉ</label>
-                <input type="text" class="form-control rounded-3" id="address" v-model="user.address">
+                <input type="text" class="form-control rounded-3" id="address" v-model="user.address" required>
               </div>
             </div>
             <div class="row g-3 mt-3">
               <div class="col-md-6">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control rounded-3" id="email"v-model="user.email">
+                <input type="email" class="form-control rounded-3" id="email" v-model="user.email" required>
               </div>
               <div class="col-md-6">
                 <label for="phone" class="form-label">Số điện thoại</label>
-                <input type="tel" class="form-control rounded-3" id="phone" v-model="user.phone">
+                <input type="tel" class="form-control rounded-3" id="phone" v-model="user.phone" required>
               </div>
             </div>
             <div class="row g-3 mt-3">
               <div class="col-md-6">
                 <label for="cccd" class="form-label">Căn cước công dân</label>
-                <input type="text" class="form-control rounded-3" id="cccd" v-model="user.cccd">
+                <input type="text" class="form-control rounded-3" id="cccd" v-model="user.cccd" required>
               </div>
               <div class="col-md-6">
-                <label for="phone" class="form-label">Giới tính</label>
-                <select class="form-select" v-model="user.gioitinh" aria-label="Default select example">
-                    <option selected>Giới tính</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
+                <label for="gender" class="form-label">Giới tính</label>
+                <select class="form-select" v-model="user.gioitinh" id="gender" required>
+                  <option disabled value="">Chọn giới tính</option>
+                  <option value="Nam">Nam</option>
+                  <option value="Nữ">Nữ</option>
                 </select>
               </div>
             </div>
-
-            <!-- Special Requests -->
-            <!-- <div class="mt-4">
-              <label for="specialRequests" class="form-label">Yêu cầu đặc biệt</label>
-              <textarea class="form-control rounded-3" id="specialRequests" rows="3" placeholder="Nhập yêu cầu của bạn..."></textarea>
-            </div> -->
           </div>
         </div>
 
@@ -88,11 +80,11 @@
           <div class="date d-flex justify-content-around border border-secondary rounded-3 p-3 mb-3 shadow-sm bg-white">
             <div>
               <p class="text-start fw-bold">Check-in</p>
-              <p class="fs-6">Sun, 22 May 2022</p>
+              <p class="fs-6">{{ checkin }}</p>
             </div>
             <div>
               <p class="text-start fw-bold">Check-out</p>
-              <p class="fs-6">Wed, 25 May 2022</p>
+              <p class="fs-6">{{ checkout }}</p>
             </div>
           </div>
 
@@ -101,24 +93,23 @@
             <h3 class="mb-3">Tóm tắt giá của bạn</h3>
             <div class="d-flex justify-content-between my-2">
               <p>Phòng và các dịch vụ khác:</p>
-              <p class="fw-bold text-success">500.000 VND</p>
+              <p class="fw-bold text-success"></p>
             </div>
             <div class="d-flex justify-content-between my-2">
               <p>Thời gian:</p>
-              <p class="fw-bold">4 Ngày</p>
+              <p class="fw-bold">{{ calculateDays() }} ngày</p>
             </div>
-           
             <div class="d-flex justify-content-between my-2">
               <p>0% VAT:</p>
               <p>0 VND</p>
             </div>
-            <div class="d-flex justify-content-between fw-bold my-3">
+            <div class="d-flex justify-content-between fw-bold my-3" v-if="rooms">
               <p>Tổng tiền:</p>
-              <p class="text-danger">2.000.000 VND</p>
+              <p class="text-danger">{{ formatCurrency(rooms.price * calculateDays()) }}</p>
             </div>
 
             <!-- Payment Button -->
-            <button class="btn btn-success w-100 rounded-3">Thanh toán</button>
+            <button class="btn btn-success w-100 rounded-3" @click.prevent="createBooking">Thanh toán</button>
           </div>
         </div>
       </form>
@@ -128,6 +119,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import api from '../api';
 import { useUserStore } from '../stores/userStore';
 
@@ -135,44 +127,88 @@ export default {
   name: 'OrderRoom',
 
   setup() {
-    // Use the store
     const userStore = useUserStore();
+    const route = useRoute();
 
-    // Reactive properties
     const rooms = ref(null);
+    const checkin = ref('');
+    const checkout = ref('');
 
-    // Restore user state on mounted
+    // Khôi phục user và lấy thông tin phòng khi component mount
     onMounted(() => {
       userStore.restoreUser();
-      getRoom(); // Fetch the room details on component mount
+      getRoom();
+      formatDates();
     });
 
-    // Computed properties
-    const isLoggedIn = computed(() => userStore.isLoggedIn);
-    const user = computed(() => userStore.user);
+    const formatDates = () => {
+      const checkinQuery = route.query.checkin;
+      const checkoutQuery = route.query.checkout;
 
-    // Methods
-    const getRoom = async () => {
-      try {
-        const roomId = window.location.pathname.split('/').pop(); // Extract room ID from the URL
-        const response = await api.get(`/rooms/user/${roomId}`);
-        rooms.value = response.data;
-      } catch (error) {
-        console.log('Failed to fetch room:', error);
+      if (checkinQuery && checkoutQuery) {
+        checkin.value = new Date(checkinQuery).toLocaleDateString('vi-VN');
+        checkout.value = new Date(checkoutQuery).toLocaleDateString('vi-VN');
+      } else {
+        console.error('Check-in hoặc Check-out không hợp lệ.');
       }
     };
 
-    const logout = () => {
-      userStore.clearUser();
+    const calculateDays = () => {
+      const checkinDate = new Date(route.query.checkin);
+      const checkoutDate = new Date(route.query.checkout);
+
+      if (isNaN(checkinDate) || isNaN(checkoutDate)) {
+        console.error('Ngày không hợp lệ:', checkin.value, checkout.value);
+        return 0;
+      }
+
+      const timeDiff = checkoutDate - checkinDate;
+      const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+      return days > 0 ? days : 0;
     };
 
-    // Return the properties and methods to the template
+    const formatCurrency = (amount) => `${amount.toLocaleString('vi-VN')} VND`;
+
+    const getRoom = async () => {
+      try {
+        const roomId = route.params.id;
+        const response = await api.get(`/rooms/user/${roomId}`);
+        rooms.value = response.data;
+      } catch (error) {
+        console.error('Failed to fetch room:', error);
+      }
+    };
+
+    const createBooking = async () => {
+      if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
+        alert('Vui lòng điền đầy đủ thông tin!');
+        return;
+      }
+
+      const bookingData = {
+        checkin: new Date(route.query.checkin).toISOString(),
+        checkout: new Date(route.query.checkout).toISOString(),
+        room: rooms.value._id,
+        customer: userStore.user.id,
+      };
+
+      try {
+        await api.post('/bookings/order/user', bookingData);
+        alert('Đặt phòng thành công!');
+      } catch (error) {
+        console.error('Failed to create booking:', error);
+        alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
+      }
+    };
+
     return {
+      user: userStore.user,
       rooms,
-      isLoggedIn,
-      user,
-      getRoom,
-      logout,
+      checkin,
+      checkout,
+      formatCurrency,
+      calculateDays,
+      createBooking,
     };
   },
 };

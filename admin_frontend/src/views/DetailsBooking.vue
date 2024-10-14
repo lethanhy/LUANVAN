@@ -55,7 +55,7 @@
   
         <!-- Ordered Products Section (Below the two top sections) -->
         <div class="user--body p-3 bg-light border rounded-3">
-          <h4 class="section-title">Sản phẩm đã đặt</h4>
+          <h4 class="section-title">Dịch vụ đã đặt</h4>
           <div v-if="bookings && bookings.orders.length">
             <div
               v-for="(order, orderIndex) in bookings.orders"
@@ -76,14 +76,22 @@
               <h4 class="section-title">Tổng tiền</h4>
               <p class="total-text">Tổng tiền: {{ calculateTotal() }}</p>
             </div>
-            <div class="text-center" v-if="bookings">
+            <div class="text-center" v-if="bookings" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
               <button 
-                :class="{ 'btn-success': !bookings.paid, 'btn-danger': bookings.paid }" 
+                 v-if="bookings.paid"
                 @click="handlePayment" 
-                class="btn"
+                class="btn text-white"
               >
-                {{ bookings.paid ? 'Đã thanh toán' : 'Thanh toán' }}
+                Xem hóa đơn
               </button>
+              <button 
+                 v-if="!bookings.paid"
+                @click="handlePayment" 
+                class="btn text-white"
+              >
+                Chưa thanh toán
+              </button>
+              
             </div>
       </div>
 
@@ -108,7 +116,8 @@
                                 <p class="mb-1">{{ bookings.customer.name }}</p>
                                 <p class="mb-1">Ngày tạo: {{ currentDate }}</p>
                                 <p class="mb-1">Số hóa đơn: 2</p>
-                                <p class="mb-1">Nhân viên: {{ bookings.staff.name }}</p>
+                                <p class="mb-1">Nhân viên: <span v-if="bookings.staff">{{ bookings.staff.name }}</span>
+                                  <span v-else>Đặt phòng online</span></p>
                             </div>
                             <div>
                                 <p class="mb-1">Số người: {{ bookings.adults }}</p>
@@ -474,7 +483,7 @@
 .total-text {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #28a745; /* Màu xanh cho giá trị */
+  color: #2c86f4; /* Màu xanh cho giá trị */
 }
 .heart-icon {
   color: red;

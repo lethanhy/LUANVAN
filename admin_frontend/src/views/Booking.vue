@@ -40,8 +40,8 @@
       </div>
     </div>
 
-    <table class="table table-bordered text-center">
-      <thead class="table-secondary">
+    <table class="table table-striped table-hover text-center table-borderless">
+      <thead class="">
         <tr>
           <th scope="col">STT</th>
           <th scope="col">Tên khách hàng</th>

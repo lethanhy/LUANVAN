@@ -8,7 +8,7 @@ import TheWelcome from './components/TheWelcome.vue'
     <div  v-if="isLoggedIn">
     <div class="body">
     <div class="sidebar">
-        <div class="logo"></div>
+        <div class="logo">OCEAN BREEZE</div>
             <ul class="menu">
                 <li class="active">
                     <a href="#" >
@@ -30,14 +30,14 @@ import TheWelcome from './components/TheWelcome.vue'
                 </li>
                 <li>
                     <router-link to="/bookings" class="menu-item">
-                      <i class="fa-regular fa-clipboard"></i>
+                      <i class="fa-solid fa-file-invoice-dollar"></i>
                         <span>Đặt phòng</span>
                     </router-link>
                 </li>
                 <li>
                     <router-link to="/bill" class="menu-item">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                        <span>Hóa đơn</span>
+                        <i class="fa-regular fa-clipboard"></i>
+                        <span>Nhân viên</span>
                     </router-link>
                 </li>
                 <li>
@@ -232,6 +232,7 @@ export default {
 .logo{
     height: 80px;
     padding: 16px;
+    font-weight: normal;
 }
 .menu{
     height: 88%;

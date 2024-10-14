@@ -19,7 +19,7 @@ const routes = [
   { path: '/customers/:id', name: 'Customers', component: Customers },
   { path: '/rooms/:id', name: 'Room', component: Room },
   { path: '/order/:id', name: 'Order', component: Order },
-  { path: '/history', name: 'History', component: History },
+  { path: '/history/:id', name: 'History', component: History },
   { path: '/contact', name: 'Contact', component: Contact }
   
   

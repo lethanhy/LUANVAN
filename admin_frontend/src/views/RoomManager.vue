@@ -41,9 +41,9 @@
 
             </div>
 
-            <table class="table table-bordered text-center">
-                <thead class="table-secondary">
-                    <tr>
+            <table class="table table-striped table-hover text-center table-borderless">
+                <thead class="">
+                    <tr class=" text-center">
                         <th scope="col">STT</th>
                         <th scope="col">Số phòng</th>
                         <th scope="col">Ảnh</th>
@@ -54,7 +54,7 @@
                         <th scope="col">Xóa</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                     <tr v-for="(room, index) in paginatedRooms" :key="room._id">
                         <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ room.roomNumber }}</td>
@@ -66,10 +66,10 @@
                         <td>{{ formatCurrency(room.price) }}</td>
                         <td>{{ room.type }}</td>
                         <td>
-                            <button @click="editRoomData(room)" type="button" class="btn btn-warning">Sửa</button>
+                            <button @click="editRoomData(room)" type="button" class="btn btn-warning"><i class="fa-solid fa-pen-to-square text-white"></i></button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger" @click="deleteRoom(room._id)">Xóa</button>
+                            <button type="button" class="btn btn-danger" @click="deleteRoom(room._id)"><i class="fa-solid fa-xmark"></i></button>
                         </td>
                     </tr>
                     <tr v-if="!filteredRooms.length">
@@ -185,6 +185,8 @@
                                     <option value="family">Phòng gia đình</option>
                                 </select>
                             </div>
+
+                            
                         </div>
 
                       
@@ -193,6 +195,7 @@
                                 <label for="editPrice" class="form-label">Giá phòng</label>
                                 <input type="text" id="editPrice" v-model="editRoom.price" class="form-control" required>
                             </div>
+                            
                             <div class="mb-3">
                                 <label for="editStatus" class="form-label">Trạng thái phòng trống</label>
                                 <input type="text" id="editStatus" v-model="editRoom.status" class="form-control" required>
@@ -528,5 +531,7 @@ export default {
     height: 80px; /* Reduced image height */
     object-fit: cover;
 }
+
+
 
 </style>

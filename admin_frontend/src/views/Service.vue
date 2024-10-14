@@ -24,8 +24,8 @@
 
             </div>
 
-            <table class="table table-bordered text-center">
-                <thead class="table-secondary">
+            <table class="table table-striped table-hover text-center table-borderless">
+                <thead class="">
                     <tr>
                         <th scope="col">STT</th>
                         <th scope="col">Tên</th>
@@ -42,10 +42,10 @@
                         <td>{{ menu.quantity }}</td>
                         <td>{{ formatCurrency(menu.price) }}</td>
                         <td>
-                            <button @click="editMenuData(menu)" type="button" class="btn btn-warning">Sửa</button>
+                            <button @click="editMenuData(menu)" type="button" class="btn btn-warning"><i class="fa-solid fa-pen-to-square text-white"></i></button>
                         </td>
                         <td>
-                            <button type="button" class="btn btn-danger" @click="deleteMenu(menu._id)">Xóa</button>
+                            <button type="button" class="btn btn-danger" @click="deleteMenu(menu._id)"><i class="fa-solid fa-xmark"></i></button>
                         </td>
                     </tr>
                     <tr v-if="!filteredMenus.length">

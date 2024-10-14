@@ -81,6 +81,32 @@ const createBooking = async (req, res) => {
     }
 };
 
+const createBookingUser = async (req, res) => {
+    const { checkin, checkout, customer, room} = req.body;
+     // Validation
+            if (!checkin || !checkout || !customer || !room) {
+                return res.status(400).json({ message: 'All fields are required' });
+            }
+
+            const newBooking = new Booking({
+                checkin,
+                checkout,
+                paid: false,
+                customer,
+                room,
+                status:"đã đặt"
+            });
+
+            
+            try {
+                const savedBooking = await newBooking.save();
+                return res.status(201).json(savedBooking);
+            } catch (error) {
+                console.error('Error creating booking:', error);
+                return res.status(500).json({ message: 'Server error' });
+            }
+}
+
   
 
   
@@ -103,6 +129,25 @@ const getBookingId = async (req, res) => {
     }
 };
 
+const getBookingUserId = async (req, res) => {
+    try {
+        const customerId = req.params.id; // Lấy customer ID từ tham số route
+    
+        // Tìm tất cả các booking có customer là customerId
+        const bookings = await Booking.find({ customer: customerId })
+          .populate('room') // Populated thông tin phòng
+          .populate('customer') // Populated thông tin khách hàng
+          .populate('staff'); // Nếu bạn cần thông tin về nhân viên (staff)
+    
+        if (bookings.length === 0) {
+          return res.status(404).json({ message: 'Không tìm thấy booking nào cho khách hàng này.' });
+        }
+    
+        res.status(200).json(bookings); // Trả về danh sách booking
+      } catch (error) {
+        res.status(500).json({ message: 'Lỗi máy chủ', error });
+      }
+};
 const checkoutAndPay = async (req, res) => {
     try {
         const { bookingId } = req.body;
@@ -472,6 +517,8 @@ module.exports = {
     getRoomDate,
     deleteBookingById,
     updateRoom,
+    createBookingUser,
+    getBookingUserId
 
 
 };

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import api from '../api';
+import api from '../api'; // Import hàm API
 import RoomType from '../components/RoomType.vue'; // Import RoomType component
 
 export default {
@@ -31,82 +31,39 @@ export default {
   },
   data() {
     return {
-      searchDate: this.getCurrentDate(), // Lưu trữ ngày tìm kiếm, mặc định là ngày hiện tại
-      rooms: [],      // Tất cả phòng (dùng để lưu trữ ban đầu trước khi lọc)
-      singleRooms: [],  // Phòng đơn (trống và đã đặt)
-      doubleRooms: [],  // Phòng đôi (trống và đã đặt)
-      familyRooms: []   // Phòng gia đình (trống và đã đặt)
+      searchDate: this.getCurrentDate(), // Lưu ngày tìm kiếm (mặc định là ngày hiện tại)
+      rooms: [], // Tất cả phòng
+      singleRooms: [], // Phòng đơn
+      doubleRooms: [], // Phòng đôi
+      familyRooms: [] // Phòng gia đình
     };
   },
   async created() {
-    await this.getAllRooms();
     await this.fetchBookings(); // Lấy bookings cho ngày hiện tại
   },
   methods: {
-    // Lấy ngày hiện tại dưới dạng chuỗi 'YYYY-MM-DD'
+    // Hàm lấy ngày hiện tại (YYYY-MM-DD)
     getCurrentDate() {
       const today = new Date();
       const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0
+      const mm = String(today.getMonth() + 1).padStart(2, '0'); 
       const dd = String(today.getDate()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd}`;
     },
 
-    // Lấy toàn bộ danh sách phòng
-    async getAllRooms() {
+    // Hàm lấy bookings từ API và phân loại phòng
+    async fetchBookings() {
       try {
-        const response = await api.get('/rooms');
-        this.rooms = response.data;
-        this.categorizeRooms(); // Phân loại phòng khi tải về
+        const response = await api.get(`/rooms?date=${this.searchDate}`); // Gọi API với ngày đã chọn
+        const rooms = response.data; // Lấy dữ liệu từ API
+
+        // Phân loại phòng dựa trên loại
+        this.singleRooms = rooms.filter(room => room.type === 'single');
+        this.doubleRooms = rooms.filter(room => room.type === 'Double');
+        this.familyRooms = rooms.filter(room => room.type === 'family');
       } catch (error) {
         console.error('Lỗi khi lấy danh sách phòng:', error);
       }
-    },
-
-    // Phân loại phòng theo từng loại phòng (đơn, đôi, gia đình)
-    categorizeRooms() {
-      this.singleRooms = this.rooms.filter(room => room.type === 'single');
-      this.doubleRooms = this.rooms.filter(room => room.type === 'Double');
-      this.familyRooms = this.rooms.filter(room => room.type === 'family');
-    },
-
-    // Lấy danh sách booking cho một ngày cụ thể và cập nhật trạng thái phòng
-    async fetchBookings() {
-      if (!this.searchDate) {
-        // Nếu chưa chọn ngày, hiển thị tất cả phòng với trạng thái trống
-        this.categorizeRooms();
-        this.singleRooms = this.singleRooms.map(room => ({ ...room, status: 'trống', bookings: [] }));
-        this.doubleRooms = this.doubleRooms.map(room => ({ ...room, status: 'trống', bookings: [] }));
-        this.familyRooms = this.familyRooms.map(room => ({ ...room, status: 'trống', bookings: [] }));
-        return;
-      }
-
-      try {
-        const response = await api.get(`/rooms?date=${this.searchDate}`);
-        const bookedRooms = response.data.filter(room => room.status === 'đã đặt' || room.status === 'đã nhận'); // Lấy các phòng đã đặt hoặc đã nhận
-
-        // Cập nhật từng loại phòng để bao gồm trạng thái
-        this.singleRooms = this.rooms.filter(room => room.type === 'single').map(room => this.mapRoomStatus(room, bookedRooms));
-        this.doubleRooms = this.rooms.filter(room => room.type === 'Double').map(room => this.mapRoomStatus(room, bookedRooms));
-        this.familyRooms = this.rooms.filter(room => room.type === 'family').map(room => this.mapRoomStatus(room, bookedRooms));
-      } catch (error) {
-        console.error('Lỗi khi lấy danh sách phòng đã đặt:', error);
-      }
-     
-    },
-
-    mapRoomStatus(room, bookedRooms) {
-      // Tìm booking cho phòng này từ danh sách bookings
-      const bookingForRoom = bookedRooms.find(bookedRoom => bookedRoom._id === room._id);
-
-      // Nếu có booking, kiểm tra trạng thái của booking
-      const isReceived = bookingForRoom && bookingForRoom.status === 'đã nhận'; // Kiểm tra trạng thái là "đã nhận"
-
-      return {
-        ...room,
-        status: bookingForRoom ? (isReceived ? 'đã nhận' : 'đã đặt') : 'trống', // Cập nhật trạng thái
-        bookings: bookingForRoom ? [bookingForRoom] : [] // Gán bookings nếu có
-      };
     }
   }
 };
