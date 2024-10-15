@@ -1,11 +1,11 @@
 <template>
     <div class="DetailRoom" v-if="room">
-      <h1 class="mb-3">{{ room.roomNumber }}</h1>
+      <h1 class="mb-3 text-center">Phòng {{ room.roomNumber }}</h1>
       
       <!-- Room Status Display -->
       <div class="DetailRoom--main">
         <!-- Show icon only if the room is available -->
-        <div v-if=" room.bookings.length === 0 " class="DetailRoom--header">
+        <div v-if="room && Object.keys(room.booking).length === 0" class="DetailRoom--header">
           <div class="d-flex">
             <i class="fa-solid fa-bed"></i>
             <p>Phòng trống</p>
@@ -16,15 +16,15 @@
         <div v-else class="DetailRoom--header">
           <div class="d-flex">
             <i class="fa-solid fa-user"></i>
-            <p>{{ room.bookings[0]?.customerName || 'Chưa có thông tin' }}</p>
+            <p>{{ room.booking?.customerName || 'Chưa có thông tin' }}</p>
           </div>
           <div class="d-flex">
             <i class="fa-regular fa-calendar-days"></i>
-            <p>Checkin: {{ formatDate(room.bookings[0]?.checkin) || 'Chưa có thông tin' }} 14:00:00</p>
+            <p>Checkin: {{ formatDate(room.booking?.checkin) || 'Chưa có thông tin' }} 14:00:00</p>
           </div>
           <div class="d-flex">
             <i class="fa-solid fa-calendar-day"></i>
-            <p>Checkout:  {{ formatDate(room.bookings[0]?.checkout) || 'Chưa có thông tin' }} 12:00:00</p>
+            <p>Checkout:  {{ formatDate(room.booking?.checkout) || 'Chưa có thông tin' }} 12:00:00</p>
           </div>
           <div class="d-flex">
             <i class="fa-solid fa-user"></i>
@@ -37,18 +37,15 @@
 
           <div class="DetailRoom--service bg-white">
                  <div>
-                     <h3>Dịch vụ đã đặt</h3>
-                    <!-- Display the ordered services -->
-                    <ul >
-                      <li v-for="(order, index) in room.bookings" :key="index">
-                        <ul>
-                          <li v-for="(item, itemIndex) in order.orders" :key="itemIndex">
-                            {{ item.itemName }} - {{ item.price }} VND - Số lượng: {{ item.quantity }}
-                          </li>
-                        </ul>
-                      </li>
-                      
-                    </ul>
+                      <!-- Kiểm tra nếu có đơn hàng dịch vụ trong booking -->
+                      <ul v-if="room.booking.orders && room.booking.orders.length > 0">
+                        <li v-for="(order, index) in room.booking.orders" :key="index">
+                          {{ order.itemName }} - {{ order.price }} VND - Số lượng: {{ order.quantity }}
+                        </li>
+                      </ul>
+
+                      <!-- Nếu không có dịch vụ nào được đặt -->
+                      <p v-else>Chưa có dịch vụ nào được đặt.</p>
                     
 
                     <!-- <p v-else>Chưa có dịch vụ nào được đặt.</p> -->
@@ -97,10 +94,10 @@
       <!-- Room Actions -->
           <div class="DetailRoom--button">
             <!-- Check if bookings[0] exists before accessing its status -->
-            <button v-if="room.bookings.length > 0 && room.bookings[0].status === 'đã đặt'" type="submit" @click.prevent="checkInRoom">
+            <button v-if="room.booking?.status === 'đã đặt'" type="submit" @click.prevent="checkInRoom">
               Nhận Phòng
             </button>
-            <button type="submit" @click.prevent="saveChanges">Lưu</button>
+            <button type="submit" @click.prevent="updateDelete">Hủy</button>
             <router-link to="/rooms">
               <button class="btn text-white text-decoration-none">Thoát</button>
             </router-link>
@@ -132,7 +129,7 @@
                         <h3>Menu đã chọn</h3>
                         <ul>
                             <li v-for="(item, index) in selectedItems" :key="index">
-                                {{ item.name }} - {{ formatCurrency(item.price) }}
+                                {{ item.name }} - {{ formatCurrency(item.price) }} - {{ item.quantity }}
                                 <button type="button" class="btn btn-danger" @click="removeItem(index)">Bỏ</button>
                             </li>
                         </ul>
@@ -168,14 +165,14 @@ export default {
   computed: {
     roomStatus: {
     get() {
-      return this.room.bookings.length === 0 ? 'trống' : this.room.bookings[0].status;
+      return this.room.booking.length === 0 ? 'trống' : this.room.booking.status;
     },
     set(newStatus) {
-      if (this.room.bookings.length > 0) {
-        this.room.bookings[0].status = newStatus;
+      if (this.room.booking.length > 0) {
+        this.room.booking.status = newStatus;
       } else if (newStatus !== 'trống') {
         // Nếu phòng đang trống và người dùng cập nhật thành "đã đặt" hoặc "đã nhận"
-        this.room.bookings.push({ status: newStatus });
+        this.room.booking.push({ status: newStatus });
       }
     }
   },
@@ -186,25 +183,27 @@ export default {
     
   },
   async created() {
-    try {
-      const roomId = this.$route.params.id; // Get the room ID from the route
-      const response = await api.get(`/rooms/${roomId}`); // Make the API call with the room ID
-      this.room = response.data; // Store the response data in the `room` object
-      console.log('Room ID:', roomId);
+  try {
+    const roomId = this.$route.params.id; // Get the room ID from the route
+    const searchDate = this.$route.query.date; // Get the date from query parameters
+    const response = await api.get(`/rooms/datebooking/${roomId}?date=${searchDate}`); // Make the API call with the room ID
+    this.room = response.data; // Store the response data in the `room` object
+    console.log('Room ID:', roomId);
 
-       // Fetch the orders after getting the room details
+    // Fetch the orders after getting the room details
     // await this.getOrder(); // Call getOrder here to fetch orders
 
-    } catch (error) {
-      console.log('Failed to load room details:', error);
-    }
+  } catch (error) {
+    console.log('Failed to load room details:', error);
+  }
 },
+
 
   methods: {
     async checkInRoom() {
         try {
             // Kiểm tra xem có booking ID hợp lệ không
-            const bookingId = this.room.bookings[0]?.bookingId;
+            const bookingId = this.room.booking?.bookingId;
             if (!bookingId) {
                 alert('Không tìm thấy ID đặt phòng.');
                 return;
@@ -224,7 +223,7 @@ export default {
             console.log('Nhận phòng thành công:', response.data);
 
             // Cập nhật trạng thái phòng trong giao diện người dùng
-            this.room.bookings[0].status = 'đã nhận';
+            this.room.booking.status = 'đã nhận';
 
             // Hiển thị thông báo thành công cho người dùng
             alert('Nhận phòng thành công!');
@@ -274,17 +273,23 @@ export default {
         // Hàm thêm món vào danh sách đã chọn
         selectItem(item) {
             const exists = this.selectedItems.find(selectedItem => selectedItem._id === item._id);
-            if (!exists) {
-              this.selectedItems.push(item); // Chỉ thêm nếu món chưa có trong danh sách đã chọn
+            if (exists) {
+                exists.quantity += 1;
+            } else {
+                this.selectedItems.push({ ...item, quantity: 1 });
             }
-          },
+        },
 
 
         // Hàm xóa món khỏi danh sách đã chọn
         removeItem(index) {
-          this.selectedItems.splice(index, 1); // Xóa món tại vị trí được chọn
-        },
-
+      const item = this.selectedItems[index];
+      if (item.quantity > 1) {
+        item.quantity -= 1;
+      } else {
+        this.selectedItems.splice(index, 1);
+      }
+    },
 
         // Hàm gửi đơn hàng đã chọn
         async addMenu() {
@@ -295,12 +300,12 @@ export default {
 
           // Prepare order data based on room and booking details
           const orderData = {
-              bookingId: this.room.bookings[0]?.bookingId, // Ensure the booking ID exists
+              bookingId: this.room.booking.bookingId, // Ensure the booking ID exists
               // roomId: this.room._id, // Include room ID for tracking
               items: this.selectedItems.map(item => ({
                   id: item._id,
                   itemName: item.name,  // Item name
-                  quantity: 1,          // Default quantity to 1 (can be modified as needed)
+                  quantity: item.quantity,          // Default quantity to 1 (can be modified as needed)
                   price: item.price     // Item price
               }))
           };
@@ -316,6 +321,7 @@ export default {
               // Reset modal and selection
               this.showModal = false;
               this.selectedItems = [];
+              window.location.reload(); // Reload trang sau khi thêm thành công
           } catch (error) {
               console.log('Lỗi khi tạo đơn hàng:', error);
               if (error.response) {
@@ -335,7 +341,18 @@ export default {
           } catch (error) {
             console.log('Failed to update cleaning status:', error);
           }
-      }
+      },
+
+      // async updateDelete() {
+      //   try {
+      //     const updateData = { trangthai: this.room.trangthai };
+      //     await api.put(`/rooms/booking/${this.room._id}`, updateData);
+      //     alert('Cập nhật tình trạng dọn dẹp thành công!');
+      //   } catch (error) {
+      //     console.log('Failed to update cleaning status:', error);
+      //   }
+      // }
+
 
      
 

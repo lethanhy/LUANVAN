@@ -25,7 +25,7 @@
           </div>
 
           <router-link 
-            :to="{ name: 'roomDetails', params: { id: room._id } }" 
+            :to="{ name: 'roomDetails', params: { id: room._id}, query: { date: searchDate } }" 
             tag="p" 
             class="text-dark no-underline"
           >
@@ -73,7 +73,8 @@
 export default {
   props: {
     roomType: String,
-    rooms: Array
+    rooms: Array,
+    searchDate: String, // Thêm searchDate vào props
   },
   methods: {
     // Function to calculate days between two dates
@@ -125,6 +126,7 @@ export default {
 
 .room-booked {
   background: #f8d7da;
+  
 }
 
 .room-available {
@@ -200,6 +202,9 @@ export default {
     display: flex;
     align-items: center;
 }
+.footer--room--type p {
+   font-size:14px ;
+}
 
 .footer--room--type i {
     margin-right: 5px;
@@ -210,6 +215,6 @@ export default {
 }
 
 .trangthai2 {
-  background: #f7ed60;
+  background:#ffff9f;
 }
 </style>

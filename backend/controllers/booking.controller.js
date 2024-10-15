@@ -310,6 +310,8 @@ const getRoomByAvailable = async (req, res) => {
         const overlappingBookings = await Booking.find({
             $or: [
                 { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Overlaps with the requested period
+                { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
+                { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checki
             ],
         }).select('room'); // Only select the room field
 
@@ -498,6 +500,34 @@ const updateRoom = async (req, res) => {
     }
 };
 
+const updateDeleteRoom = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        // Tìm phòng theo ID
+        const booking = await Booking.findById(id);
+
+        if (!booking) {
+            return res.status(404).send({ message: "Không tìm thấy phòng" });
+        }
+
+        // Cập nhật các trường khác trong phòng
+        Object.assign(booking, updateData);
+
+        // Đặt trạng thái thành 'đã nhận'
+        booking.status = 'đã hủy';
+
+        // Lưu phòng đã cập nhật
+        await booking.save();
+
+        res.send(booking);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+
 
 
 
@@ -518,7 +548,8 @@ module.exports = {
     deleteBookingById,
     updateRoom,
     createBookingUser,
-    getBookingUserId
+    getBookingUserId,
+    updateDeleteRoom
 
 
 };

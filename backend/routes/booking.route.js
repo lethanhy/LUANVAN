@@ -32,6 +32,8 @@ router.put('/:id', bookingController.updateBooking);
 // Cập nhật một booking (yêu cầu xác thực)
 router.put('/rooms/:id', bookingController.updateRoom);
 
+router.put('/rooms/booking/:id', bookingController.updateDeleteRoom);
+
 // Xóa một booking (yêu cầu xác thực)
 router.delete('/:id', auth, bookingController.deleteBooking);
 

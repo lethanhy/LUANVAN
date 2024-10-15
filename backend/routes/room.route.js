@@ -31,6 +31,10 @@ router.get("/user/:id", roomController.getRoomByUserId);
 
 router.put("/:id", roomController.updateRooms);
 router.get("/:id", roomController.getRoomById); // Lấy danh sách tất cả phòng
+
+router.get("/datebooking/:id", roomController.getRoomByIdAndDate); // Lấy danh sách tất cả phòng
+
+
 router.put("/:id", roomController.updateRoom); // Cập nhật thông tin của một phòng
 router.delete("/:id", roomController.deleteRoom); // Xóa một phòng
 

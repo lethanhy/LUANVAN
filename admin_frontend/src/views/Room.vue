@@ -11,13 +11,13 @@
     </div>
 
     <!-- Phòng đơn -->
-    <RoomType :roomType="'Phòng đơn'" :rooms="singleRooms" />
+    <RoomType :roomType="'Phòng đơn'" :rooms="singleRooms" :searchDate="searchDate" />
 
     <!-- Phòng đôi -->
-    <RoomType :roomType="'Phòng đôi'" :rooms="doubleRooms" />
+    <RoomType :roomType="'Phòng đôi'" :rooms="doubleRooms" :searchDate="searchDate" />
 
     <!-- Phòng gia đình -->
-    <RoomType :roomType="'Phòng gia đình'" :rooms="familyRooms" />
+    <RoomType :roomType="'Phòng gia đình'" :rooms="familyRooms" :searchDate="searchDate" />
   </div>
 </template>
 
@@ -35,8 +35,17 @@ export default {
       rooms: [], // Tất cả phòng
       singleRooms: [], // Phòng đơn
       doubleRooms: [], // Phòng đôi
-      familyRooms: [] // Phòng gia đình
+      familyRooms: [], // Phòng gia đình
+    
+
     };
+  },
+  mounted() {
+    const selectedDate = this.$route.query.date; // Lấy ngày từ query
+    if (selectedDate) {
+      this.searchDate = selectedDate; // Cập nhật searchDate nếu có trong query
+      this.fetchBookings(); // Gọi lại hàm fetchBookings để cập nhật phòng
+    }
   },
   async created() {
     await this.fetchBookings(); // Lấy bookings cho ngày hiện tại
