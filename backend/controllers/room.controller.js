@@ -215,7 +215,7 @@ const getRooms = async (req, res) => {
         const rooms = await Room.find(); // Lấy tất cả các phòng
 
         // Lấy tất cả bookings để kiểm tra
-        const bookings = await Booking.find({paid: false}).populate('customer'); // Giả định bạn có một mô hình Booking
+        const bookings = await Booking.find({paid: false,  status: { $ne: 'đã hủy' } }).populate('customer'); // Giả định bạn có một mô hình Booking
 
         const filteredRooms = rooms.map((room) => {
             // Tìm các booking liên quan đến phòng này
@@ -379,6 +379,7 @@ const getRoomByIdAndDate = async (req, res) => {
         const bookingForDate = await Booking.findOne({
             room: id,
             paid: false,
+            status: { $ne: 'đã hủy' }, // Exclude canceled bookings
             checkin: { $lte: selectedDate }, // Selected date must be on or after check-in
             checkout: { $gte: selectedDate }  // Selected date must be on or before check-out
         })

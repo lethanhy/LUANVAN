@@ -438,7 +438,8 @@ const getRoomDate = async (req, res) => {
             $or: [
                 { checkin: { $lte: date }, checkout: { $gte: date } }, // Includes the date within check-in and check-out range
             ],
-            paid: false // Ensure that only unpaid bookings are included
+            paid: false, // Ensure that only unpaid bookings are included
+            // status: { $ne: 'đã hủy' }
         })
         .populate('customer')
         .populate('room');

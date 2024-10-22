@@ -1,172 +1,158 @@
-// src/views/Register.vue
-<!-- <template>
-  <div>
-    <h1>Register</h1>
-    <form @submit.prevent="Register">
-        <input v-model="name" type="text" placeholder="Name" required />
-      <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="password" type="password" placeholder="Password" required />
-      <input v-model="phone" type="text" placeholder="Phone" required />
-      <input v-model="address" type="text" placeholder="Address" required />
-      <button type="submit">Register</button>
-    </form>
-  </div>
-</template> -->
-
 <template>
-  <!-- <div>
-    <h1>Login</h1>
-    <form @submit.prevent="login">
-      <input v-model="email" type="email" placeholder="Email" required />
-      <input v-model="password" type="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-  </div> -->
-
- 
-    <div class="body">
-      <div class="wrapper">
-        <h1>Sign Up</h1>
-        <form action=""  @submit.prevent="Register" class="form">
-          <input v-model="name" type="text" placeholder="Username">
-          <input v-model="password" type="password" placeholder="Password">
-          <input v-model="email" type="email" placeholder="Email">
-          <input v-model="address" type="text" placeholder="Address">
-          <input v-model="phone" type="text" placeholder="Phone">
-
-
-          <div class="terms">
-          <input type="checkbox" id="checkbox">
-          <label for="checkbox">I agree to these <a href="#">Terms & Conditions</a></label>
+  <div class="container signup">
+    <div class="row shadow rounded">
+      <div class="col-lg-6 bg-light d-flex align-items-center justify-content-center">
+          <img 
+            src="../assets/Hotel Reservations _ Book Hotel Rooms Online.jpg" 
+            alt="Hotel Reservations" 
+            class="login-image img-fluid"
+          />
         </div>
-        <button class="button__signup" type="submit">Sign Up</button>
+      <div class="col-lg-6 bg-white d-flex align-items-center justify-content-center">
+        <div class="signup--body">
+          <h3 class="signup--title">Sign up for an account</h3>
+          <p>Book rooms and stay conveniently</p>
 
-        </form>
+          <div class="social-media">
+            <div class=" border">
+              <div class="d-flex align-items-center m-2">
+                <img src="../assets/google.png" alt="Google" class="social-icon" />
+                <p class="ms-2 mb-0">Sign Up with Google</p>
+              </div>
+              
+            </div>
+            <div class="border">
+              <div class="d-flex align-items-center m-2">
+                <img src="../assets/cfef5ce601689564e0a39b4773f20815.png" alt="Apple" class="social-icon" />
+                <p class="ms-2 mb-0">Sign Up with Apple</p>
+              </div>
+              
+            </div>
+          </div>
 
-        
-        <div class="member">
-          Not a member? <router-link to="/customers/login"> Login Here</router-link>
-          
+
+          <form @submit.prevent="Register" class="mt-4">
+            <input v-model="name" type="text" class="form-control mb-3" placeholder="Username" required />
+            <input v-model="password" type="password" class="form-control mb-3" placeholder="Password" required />
+            <input v-model="email" type="email" class="form-control mb-3" placeholder="Email" required />
+            <input v-model="address" type="text" class="form-control mb-3" placeholder="Address" required />
+            <input v-model="phone" type="text" class="form-control mb-3" placeholder="Phone" required />
+
+            <div class="form-check">
+              <input v-model="agreedToTerms" type="checkbox" class="form-check-input" id="terms" />
+              <label class="form-check-label" for="terms">
+                I agree to the <a href="#">Terms & Conditions</a>
+              </label>
+            </div>
+
+            <button class="btn btn-primary w-100 mt-3" type="submit" :disabled="isSubmitting || !agreedToTerms">
+              <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+              Sign Up
+            </button>
+          </form>
+
+          <div class="member mt-3">
+            Already have an account? <router-link to="/customers/login">Sign In</router-link>
+          </div>
+          <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script>
-import api from '../api';
-// import { mapActions } from 'vuex';
-import { useUserStore } from '@/stores/userStore';
+import api from "../api";
+import { useUserStore } from "@/stores/userStore";
 
 export default {
   data() {
     return {
-        name:'',
-      email: '',
-      password: '',
-      phone:'',
-      address:''
+      name: "",
+      email: "",
+      password: "",
+      phone: "",
+      address: "",
+      agreedToTerms: false,
+      isSubmitting: false,
+      errorMessage: null,
     };
   },
   methods: {
-    // ...mapActions(['login']),
     async Register() {
+      this.isSubmitting = true;
+      this.errorMessage = null;
+
       try {
-        const response = await api.post('/customers/register', { name: this.name, email: this.email, password: this.password, phone: this.phone, address: this.address });
+        const response = await api.post("/customers/register", {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          phone: this.phone,
+          address: this.address,
+        });
 
-        // Lưu token vào localStorage
-        localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem("authToken", response.data.token);
 
-        //Lưu thông tin người dùng vào Pinia store
         const userStore = useUserStore();
         userStore.setUser(response.data.user);
 
-        // Điều hướng đến trang chủ sau khi đăng nhập thành công
-        this.$router.push('/customers/login');
+        this.$router.push("/customers/login");
       } catch (error) {
-        console.log('Login failed:', error);
+        this.errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+        console.error("Registration failed:", error);
+      } finally {
+        this.isSubmitting = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style>
+.signup {
+  max-width: 1000px;
+  margin-top: 7rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
 
-* {
+.signup--body {
+  margin: 50px 50px;
+}
+
+.signup--title {
+  color: #123f92;
+  font-weight: bold;
+}
+
+.social-media {
+  display: flex;
+  /* flex-direction: column; */
+  gap: 1rem;
+  margin: 1rem 1rem;
+  font-size: 10px;
+}
+
+
+.social-icon {
+  width: 24px; /* Adjust size here */
+  height: 24px;
+}
+
+/* p {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  
-}
-
-.body{
-  background: #dfe9f5;
-}
-
-.wrapper{
-  width: 330px;
-  padding: 2rem 1rem;
-  margin: 100px auto;
-  background-color: #fff;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-h1{
-  font-size: 2rem;
-  color: #07001f;
-  margin-bottom: 1.2rem;
-}
-.form input{
-  width: 92%;
-  outline: none;
-  border: 5px solid #fff;
-  padding: 12px;
-  background: #e4e4e4;
-  border-radius: 20px;
-}
-.button__signup{
   font-size: 1rem;
-  margin-top: 1.8rem;
-  padding: 10px 0;
-  border-radius: 20px;
-  outline: none;
-  border: none;
-  width: 90%;
-  color: #fff;
-  cursor: pointer;
-  background: rgb(17, 107, 143);
+} */
 
+
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
 }
-.button__signup:hover{
-  background: rgba(17, 107, 143, 0.877);
-}
-input:focus{
-  border: 1px solid rgb(192, 192, 192);
-}
-.terms{
-  margin-top: 0.2rem;
-}
-.terms input{
-  height: 1em;
-  width: 1em;
-  vertical-align: middle;
-  cursor: pointer;
-}
-.terms label{
-  font-size: 0.7rem;
-}
-.terms a{
-  color: rgb(17, 107, 143);
-  text-decoration: none ;
-}
-.member{
-  font-size: 0.8rem;
-  margin-top: 1.4rem;
-  color: #636363;
-}
-.member a{
-  color: rgb(17, 107, 143);
+
+.alert {
+  font-size: 0.9rem;
 }
 </style>
-

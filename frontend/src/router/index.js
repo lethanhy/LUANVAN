@@ -9,6 +9,7 @@ import Room from '../views/Room.vue';
 import Order from '../views/Order.vue';
 import History from '../views/History.vue';
 import Contact from '../views/Contact.vue';
+import Review from '../views/Review.vue';
 
 
 const routes = [
@@ -20,7 +21,8 @@ const routes = [
   { path: '/rooms/:id', name: 'Room', component: Room },
   { path: '/order/:id', name: 'Order', component: Order },
   { path: '/history/:id', name: 'History', component: History },
-  { path: '/contact', name: 'Contact', component: Contact }
+  { path: '/contact', name: 'Contact', component: Contact },
+  { path: '/review', name: 'Review', component: Review },
   
   
 ];

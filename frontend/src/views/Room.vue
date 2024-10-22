@@ -223,6 +223,7 @@ export default {
 .room--details {
   margin-top: 7rem;
   margin-bottom: 2rem;
+  max-width: 900px;
 }
 .room--details img {
   width: 100%;

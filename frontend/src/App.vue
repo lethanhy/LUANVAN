@@ -20,7 +20,7 @@ import TheWelcome from './components/TheWelcome.vue'
           <ul class="nav__links">
             <li class="link"><a href="#"><router-link to="/">Home</router-link></a></li>
             <li class="link"><a href="#"><router-link to="/rooms">Room</router-link></a></li>
-            <li class="link"><a href="#">Blog</a></li>
+            <li class="link"><a href="#"><router-link to="/review">Review</router-link></a></li>
             <li class="link"><a href="#"><router-link to="/contact">Contact Us</router-link></a></li>
           </ul>
 

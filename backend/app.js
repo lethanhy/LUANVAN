@@ -7,6 +7,7 @@ const cartRoutes = require('./routes/cart.route.js');
 const staffRoutes = require('./routes/staff.route.js');
 const menuRoutes = require('./routes/menu.route.js');
 const orderRoutes = require('./routes/order.route.js');
+const reviewRoutes = require('./routes/review.route.js');
 const cors = require('cors');
 const multer = require('multer');
 const app = express();
@@ -31,6 +32,7 @@ app.use("/cart", cartRoutes);
 app.use("/staff", staffRoutes);
 app.use("/menu", menuRoutes);
 app.use("/orders", orderRoutes);
+app.use("/review", reviewRoutes);
 
 // Cấu hình thư mục chứa ảnh được phép truy cập công khai
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

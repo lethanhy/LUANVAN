@@ -39,7 +39,7 @@ const BookingSchema = mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ["đã đặt", "đã nhận", "thanh toán"], // Trạng thái đặt phòng: đang hoạt động, đã hoàn thành, hoặc đã huỷ
+            enum: ["đã đặt", "đã nhận", "thanh toán", "đã hủy"], // Trạng thái đặt phòng: đang hoạt động, đã hoàn thành, hoặc đã huỷ
             default: "đã đặt"
         },
         orders: [

@@ -13,6 +13,7 @@ import Service from '@/views/Service.vue';
 import DetailsBooking from '@/views/DetailsBooking.vue';
 import Profile from '@/views/Profile.vue';
 import Bill from '@/views/Bill.vue';
+import Review from '@/views/Review.vue';
 
 
 const routes = [
@@ -29,6 +30,7 @@ const routes = [
   { path: '/menu', name: 'Service', component: Service },
   { path: '/profile/:id', name: 'Profile', component: Profile },
   { path: '/bill', name: 'Bill', component: Bill },
+  { path: '/review', name: 'Review', component: Review },
   
 ];
 

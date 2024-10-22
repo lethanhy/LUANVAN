@@ -60,10 +60,10 @@ import TheWelcome from './components/TheWelcome.vue'
                     </router-link>
                 </li>
                 <li>
-                    <a href="">
+                      <router-link to="/review" class="menu-item">
                         <i class="fas fa-question-circle"></i>
-                        <span>FAQ</span>
-                    </a>
+                        <span>Đánh giá</span>
+                      </router-link>
                 </li>
                 
                 <!-- <li class="logout">

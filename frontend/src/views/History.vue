@@ -21,6 +21,7 @@
             <img 
               :src="getImageUrl(booking.room?.image)" 
               alt="Room Image"
+              class="img-fluid"
             />
           </div>
           <div class="col-lg-8 text-start">
@@ -37,12 +38,43 @@
                 {{ formatCurrency(booking.room?.price * calculateDays(booking.checkin, booking.checkout)) }}
               </p>
               <div class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
-                <button class="btn btn-warning">Đánh Giá</button>
+                <button @click="openReviewModal(booking)" class="btn btn-warning">Đánh Giá</button>
                 <button class="btn btn-primary">Hoàn Thành</button>
               </div>
             </div>
           </div>
         </div>
+
+         <!-- Add Room Modal -->
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+        <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+          <h2 id="modal-title" class="modal-title text-center text-info fw-bold">Đánh Giá</h2>
+          <form @submit.prevent="addReview">
+
+            <label class="text-dark m-2" for="review-content">Trải nghiệm của bạn như thế nào?</label>
+            <div class="form-floating">
+              <textarea class="form-control bg-light" v-model="newReview.noidung" placeholder="Leave a comment here" id="review-content" style="height: 100px" required></textarea>
+              <label for="review-content">Nội dung</label>
+            </div>
+            <label class="m-2 text-dark " for="rating-buttons">Đánh giá trải nghiệm của bạn với khách sạn của chúng tôi</label>
+            <div class="button-group mb-4" id="rating-buttons">
+              <button 
+                v-for="n in 5" 
+                :key="n" 
+                :value="n" 
+                class="btn border me-2" 
+                :class="{ 'button-active': newReview.rating === n }" 
+                @click.prevent="newReview.rating = n">
+                {{ n }}
+              </button>
+              <i class="fa-solid fa-star text-warning"></i> Stars
+            </div>
+
+            <button type="submit" class="btn btn-primary" :disabled="!newReview.rating">Đánh giá</button>
+            <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+          </form>
+        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -56,6 +88,13 @@ export default {
   data() {
     return {
       bookings: null, // Stores bookings data
+      showModal: false,
+      newReview: {
+        noidung: '',
+        rating: '',
+      },
+      currentBookingId: null, // Track the ID of the current booking
+      currentCustomerId: null, // Track the ID of the current customer
     };
   },
   methods: {
@@ -66,8 +105,44 @@ export default {
         const response = await api.get(`/bookings/user/${id}`);
         this.bookings = response.data;
       } catch (error) {
-        console.error('Failed to fetch customer:', error);
+        console.error('Failed to fetch bookings:', error);
         this.bookings = []; // Set to empty array on error
+      }
+    },
+
+    // Open the review modal and set the current booking information
+    openReviewModal(booking) {
+      this.currentBookingId = booking._id; // Store the current booking ID
+      this.currentCustomerId = booking.customer ? booking.customer._id : null; // Store customer ID if it exists
+      this.newReview = { noidung: '', rating: '' }; // Reset review data
+      this.showModal = true; // Show the modal
+    },
+
+    async addReview() {
+      if (!this.currentBookingId) {
+        alert('Không có thông tin đặt phòng hiện tại!'); // Alert for no booking
+        return;
+      }
+
+      try {
+        const reviewData = {
+          booking: this.currentBookingId, // Use the ID of the current booking
+          customer: this.currentCustomerId, // Use customer ID if exists
+          noidung: this.newReview.noidung,
+          rating: this.newReview.rating,
+        };
+
+        const response = await api.post('/review', reviewData);
+
+        // Handle the response
+        if (response.status === 201) {
+          alert('Thêm đánh giá thành công!');
+          this.newReview = { noidung: '', rating: '' };
+          this.showModal = false;
+        }
+      } catch (error) {
+        console.error('Error adding review:', error);
+        alert('Có lỗi xảy ra khi thêm đánh giá. Vui lòng thử lại sau.'); // User-friendly error message
       }
     },
 
@@ -103,7 +178,6 @@ export default {
     this.getBookingId(); // Fetch bookings when component mounts
   },
 };
-
 </script>
 
 <style>
@@ -140,13 +214,36 @@ export default {
 }
 
 .history--order img {
-  width: 80%;
+  width: 100%;
   height: auto;
   object-fit: cover;
   border-radius: 8px;
   border: 1px solid #ddd;
-  margin: 0 auto;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6); /* Slightly darker overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 1.5rem; /* Reduced padding for better fit */
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  max-width: 500px; /* Added max width */
+  width: 100%; /* Responsive width */
+}
+.button-active {
+  background-color: #ffc107; /* Màu nền khi button được nhấn */
+  color: #fff; /* Màu chữ khi button được nhấn */
+}
 
 </style>
