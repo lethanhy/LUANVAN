@@ -1,7 +1,7 @@
 <template>
     <div class="customer">
         <div class="customer--body">
-            <h1 class="text-center fw-bold">Quản lý nhân viên</h1>
+            <h1 class="text-center text-info fw-bold">Quản lý nhân viên</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus"></i> Thêm Nhân Viên</button>
