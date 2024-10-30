@@ -18,10 +18,10 @@ import TheWelcome from './components/TheWelcome.vue'
 
       <div class="nav__menu">
           <ul class="nav__links">
-            <li class="link"><a href="#"><router-link to="/">Home</router-link></a></li>
-            <li class="link"><a href="#"><router-link to="/rooms">Room</router-link></a></li>
-            <li class="link"><a href="#"><router-link to="/review">Review</router-link></a></li>
-            <li class="link"><a href="#"><router-link to="/contact">Contact Us</router-link></a></li>
+            <li class="link"><a href="#"><router-link to="/">Trang Chủ</router-link></a></li>
+            <li class="link"><a href="#"><router-link to="/rooms">Phòng</router-link></a></li>
+            <li class="link"><a href="#"><router-link to="/review">Đánh Giá</router-link></a></li>
+            <li class="link"><a href="#"><router-link to="/contact">Liên Hệ</router-link></a></li>
           </ul>
 
      
@@ -54,45 +54,40 @@ import TheWelcome from './components/TheWelcome.vue'
         <div class="footer__col">
           <h3 class="text-primary">Ocen Breeze Hotel</h3>
           <p>
-            Ocen Breeze Hotel is a premier hotel booking website that offers a seamless and
-            convenient way to find and book accommodations worldwide.
+            Ocen Breeze Hotel là trang web đặt phòng khách sạn hàng
+             đầu cung cấp một cách liền mạch và thuận tiện để tìm và đặt chỗ ở trên toàn thế giới.
           </p>
           <p>
-            With a user-friendly interface and a vast aelection of hotels,
-            Ocen Breeze Hotel aims to provide a stress-free experience for travelers
-            seeking the perfect stay.
+            Với giao diện thân thiện với người dùng và nhiều lựa chọn khách sạn, Ocen Breeze Hotel
+             mong muốn mang lại trải nghiệm thoải mái cho du khách đang tìm kiếm kỳ nghỉ hoàn hảo.
           </p>
         </div>
         <div class="footer__col">
-          <h4>Company</h4>
-          <p>About Us</p>
-          <p>Our Team</p>
-          <p>Blog</p>
-          <p>Book</p>
-          <p>Contact Us</p>
+          <h4  class="text-primary">Menu</h4>
+          <p>Trang chủ</p>
+          <p>Phòng</p>
+          <p>Đánh giá</p>
+          <p>Liên hệ</p>
         </div>
 
         <div class="footer__col">
-          <h4>Legal</h4>
+          <h4  class="text-primary">Legal</h4>
           <p>FAQs</p>
           <p>Terms & Conditions</p>
           <p>Privacy Policy</p>
         </div>
 
         <div class="footer__col">
-          <h4>Resources</h4>
-          <p>Social Media</p>
-          <p>Our Team</p>
-          <p>Help Center</p>
-          <p>Partnerships</p>
-        </div>
-
-        
+          <h4  class="text-primary">Địa chỉ</h4>
+          <p>28 Đường Thi Sách, Phường Thắng Tám, TP Vũng Tàu, BR-VT</p>
+          <p>📞 Hotline: +840939834780</p>
+          <p>✉️ Email: lethanhy107@gmail.com</p>
+        </div>  
       </div>
 
-      <!-- <div class="footer__bar">
-        Copyright @ 2024 Thanh Y.
-      </div> -->
+      <div class="footer__bar">
+        <p>© 2024 Hotel Deluxe. All Rights Reserved.</p>
+      </div>
 
     </footer>
   </div>
@@ -131,7 +126,8 @@ const logout = () => {
   --max-width: 1200px;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  /* font-family: Avenir, Helvetica, Arial, sans-serif; */
+  font-family: "Afacad Flux", sans-serif;
   text-align: center;
   color: #2c3e50;
   margin: 0;
@@ -337,7 +333,7 @@ img{
 .footer__bar::before{
   position: absolute;
   content: " ";
-  top: 50%;
+  top: 30%;
   right: 28rem;
   transform: translateY(-50%);
   width: 20rem;

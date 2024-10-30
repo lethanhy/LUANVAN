@@ -109,7 +109,10 @@
             </div>
 
             <!-- Payment Button -->
-            <button class="btn btn-success w-100 rounded-3" @click.prevent="createBooking">Thanh toán</button>
+            <!-- <button class="btn btn-success w-100 rounded-3" @click.prevent="createBooking" >Thanh toán</button> -->
+            <button class="btn btn-success w-100 rounded-3" @click.prevent="handlePayment">
+              Thanh toán
+            </button>
           </div>
         </div>
       </form>
@@ -179,27 +182,83 @@ export default {
       }
     };
 
-    const createBooking = async () => {
-      if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
-        alert('Vui lòng điền đầy đủ thông tin!');
-        return;
-      }
+    const handlePayment = async () => {
+  try {
+    const bookingId = await createBooking(); // Tạo booking và lấy ID
+    console.log('Booking ID:', bookingId); // Kiểm tra giá trị bookingId
+    if (bookingId) {
+      await createPayment(bookingId); // Thanh toán với booking ID
+    }
+  } catch (error) {
+    console.error('Có lỗi xảy ra:', error);
+    alert('Thanh toán thất bại. Vui lòng thử lại!');
+  }
+};
 
-      const bookingData = {
-        checkin: new Date(route.query.checkin).toISOString(),
-        checkout: new Date(route.query.checkout).toISOString(),
-        room: rooms.value._id,
-        customer: userStore.user.id,
-      };
 
-      try {
-        await api.post('/bookings/order/user', bookingData);
-        alert('Đặt phòng thành công!');
-      } catch (error) {
-        console.error('Failed to create booking:', error);
-        alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
-      }
-    };
+
+const createBooking = async () => {
+  if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
+    alert('Vui lòng điền đầy đủ thông tin!');
+    return;
+  }
+
+  const bookingData = {
+    checkin: new Date(route.query.checkin).toISOString(),
+    checkout: new Date(route.query.checkout).toISOString(),
+    room: rooms.value._id,
+    customer: userStore.user.id,
+  };
+
+  try {
+    const response = await api.post('/bookings/order/user', bookingData);
+    console.log('API response:', response.data); // Thêm dòng này để xem phản hồi
+    const bookingId = response.data.bookingId; // Lấy ID booking từ phản hồi
+    alert('Đặt phòng thành công!');
+    return bookingId; // Trả về bookingId để dùng trong thanh toán
+  } catch (error) {
+    console.error('Lỗi khi tạo booking:', error);
+    alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
+    throw error; // Ném lỗi để xử lý ngoài hàm nếu cần
+  }
+};
+
+
+const createPayment = async (bookingId) => {
+  try {
+    const TotalPrice = rooms.value.price * calculateDays(); // Tính tổng tiền
+    console.log('Total Price:', TotalPrice); // Kiểm tra tổng tiền
+    console.log('Booking ID:', bookingId); // Kiểm tra booking ID
+
+    const response = await api.post('/payment/vnpay/create_payment_url', {
+      BookingID: bookingId, // Sử dụng bookingId cho thanh toán
+      TotalPrice,
+    });
+
+    console.log('Payment API response:', response.data); // Thêm dòng này để xem phản hồi
+    const paymentUrl = response.data?.data?.url;
+    if (paymentUrl) {
+      window.location.href = paymentUrl; // Redirect đến URL thanh toán
+    } else {
+      console.error('Payment URL not found in the response:', response.data);
+      alert('Không tìm thấy URL thanh toán. Vui lòng thử lại.');
+    }
+  } catch (error) {
+    console.error('Error during VNPay payment creation:', error);
+    alert(`Có lỗi xảy ra: ${error.response?.data?.msg || 'Yêu cầu không hợp lệ'}`);
+  }
+};
+
+
+
+
+
+
+
+
+
+   
+
 
     return {
       user: userStore.user,
@@ -209,6 +268,9 @@ export default {
       formatCurrency,
       calculateDays,
       createBooking,
+      createPayment,
+      handlePayment
+      
     };
   },
 };

@@ -1,107 +1,153 @@
 <template>
-    <div class="card--container">
-      <div class="card--wrapper">
-        <div class="payment--card light-red">
-          <div class="card--header">
-            <div class="amount">
-              <span class="title">Phòng</span>
-              <span class="amount--value">25</span>
-            </div>
-            <i class="fa-solid fa-calendar-days icon dark-red"></i>
+  <div class="card--container">
+    <div class="card--wrapper">
+      <div class="payment--card light-red">
+        <div class="card--header">
+          <div class="amount">
+            <span class="title">Phòng</span>
+            <span class="amount--value">{{ totalRooms }}</span> <!-- Dynamic Value -->
           </div>
-          <span class="card--detail">Tổng số phòng</span>
+          <i class="fa-solid fa-calendar-days icon dark-red"></i>
         </div>
-  
-        <div class="payment--card light-purple">
-          <div class="card--header">
-            <div class="amount">
-              <span class="title">Đặt phòng</span>
-              <span class="amount--value">15</span>
-            </div>
-            <i class="fa-regular fa-clipboard icon dark-purple"></i>
-          </div>
-          <span class="card--detail">Đơn đặt phòng hôm nay</span>
-        </div>
-  
-        <div class="payment--card light-green">
-          <div class="card--header">
-            <div class="amount">
-              <span class="title">Khách Hàng</span>
-              <span class="amount--value">35</span>
-            </div>
-            <i class="fa-regular fa-address-book icon dark-green"></i>
-          </div>
-          <span class="card--detail">Khách hàng hiện tại</span>
-        </div>
-  
-        <div class="payment--card light-blue">
-          <div class="card--header">
-            <div class="amount">
-              <span class="title">Liên Hệ</span>
-              <span class="amount--value">5</span>
-            </div>
-            <i class="fas fa-question-circle icon dark-blue"></i>
-          </div>
-          <span class="card--detail">Yêu cầu liên hệ</span>
-        </div>
+        <span class="card--detail">Tổng số phòng</span>
       </div>
-    </div>
-  
-    <div class="main--content">
-      <div class="content-wrapper">
-        <div class="main--service">
-          <!-- <h3>Danh sách dịch vụ</h3>
-          <div class="service-list">
-            <div class="service-item">Wi-Fi miễn phí</div>
-            <div class="service-item">Đưa đón sân bay</div>
-            <div class="service-item">Phòng gym</div>
-            <div class="service-item">Hồ bơi ngoài trời</div>
-          </div> -->
 
-          <BarChart />
+      <div class="payment--card light-purple">
+        <div class="card--header">
+          <div class="amount">
+            <span class="title">Đặt phòng</span>
+            <span class="amount--value">{{ bookingRooms }}</span>
+          </div>
+          <i class="fa-regular fa-clipboard icon dark-purple"></i>
         </div>
-  
-        <div class="main--table">
-          <!-- <h3>Bảng thống kê</h3>
-          <table class="table table-bordered text-center">
-            <thead class="table-secondary">
-              <tr>
-                <th scope="col">STT</th>
-                <th scope="col">Tên</th>
-                <th scope="col">Số điện thoại</th>
-                <th scope="col">Địa chỉ</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>1</th>
-                <td>Lê Thành Y</td>
-                <td>0939 834 780</td>
-                <td>Cần Thơ</td>
-              </tr>
-            </tbody>
-          </table> -->
-         <PieChart/>
+        <span class="card--detail">Đơn đặt phòng hôm nay</span>
+      </div>
+
+      <div class="payment--card light-green">
+        <div class="card--header">
+          <div class="amount">
+            <span class="title">Khách Hàng</span>
+            <span class="amount--value">{{ totalCustomer }}</span>
+          </div>
+          <i class="fa-regular fa-address-book icon dark-green"></i>
         </div>
+        <span class="card--detail">Khách hàng hiện tại</span>
+      </div>
+
+      <div class="payment--card light-blue">
+        <div class="card--header">
+          <div class="amount">
+            <span class="title">Liên Hệ</span>
+            <span class="amount--value">5</span>
+          </div>
+          <i class="fas fa-question-circle icon dark-blue"></i>
+        </div>
+        <span class="card--detail">Yêu cầu liên hệ</span>
       </div>
     </div>
-  </template>
+  </div>
+
+  <div class="main--content">
+    <div class="content-wrapper">
+      <div class="main--service">
+        <BarChart />
+      </div>
+
+      <div class="main--table">
+        <PieChart />
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import BarChart from '@/components/BarChart.vue';
 import PieChart from '@/components/PieChart.vue';
+import api from '../api'; // Ensure this points to your axios instance
+import { Filler } from 'chart.js';
 
 export default defineComponent({
   name: 'Dashboard',
-  components: {
-    BarChart,
-    PieChart
+  components: { BarChart, PieChart },
+
+  setup() {
+    const totalRooms = ref(0); // Reactive state for room count
+    const bookingRooms = ref(0); // Reactive state for today's bookings
+    const totalCustomer = ref(0);
+    const customers = ref(0);
+
+    // Fetch all rooms
+    const getAllRooms = async () => {
+      try {
+        const response = await api.get('/rooms');
+        totalRooms.value = response.data.length; // Update totalRooms count
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+      }
+    };
+
+    // Get current date in YYYY-MM-DD format
+    const getCurrentDate = () => {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+
+    // Fetch bookings for today
+    const getBookingRoomsToday = async () => {
+      try {
+        const date = getCurrentDate();
+        const response = await api.get(`/bookings/date/${date}`);
+        bookingRooms.value = response.data.length; // Update today's bookings count
+      } catch (error) {
+        console.error('Error fetching today', error);
+      }
+    };
+
+    const getAllCustomer = async () => {
+      try {
+        const date = getCurrentDate(); // Get current date in 'YYYY-MM-DD' format
+        const response = await api.get('/customers');
+        
+        customers.value = response.data;
+
+        // Filter customers whose createdAt matches the current date (YYYY-MM-DD)
+        const filteredCustomers = customers.value.filter(customer => {
+          const createdDate = customer.createdAt.split('T')[0]; // Extract date part
+          return createdDate === date;
+        });
+
+        totalCustomer.value = filteredCustomers.length; // Store the count of today's customers
+
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    };
+
+
+    // Call API methods when the component is mounted
+    onMounted(() => {
+      getAllRooms();
+      getBookingRoomsToday();
+      getAllCustomer();
+    });
+
+    return { totalRooms, bookingRooms, totalCustomer };
   },
 });
 </script>
+
   
   <style>
+
+  body {
+  
+  font-family: "Afacad Flux", sans-serif;
+ 
+  }
   /* Sửa đổi tổng thể card */
   .card--container {
     background: #fff;

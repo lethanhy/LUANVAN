@@ -75,7 +75,7 @@
                         </td>
                     </tr>
                     <tr v-if="!filteredCustomers.length">
-                        <td colspan="6">Không tìm thấy khách hàng</td>
+                        <td colspan="9">Không tìm thấy khách hàng</td>
                     </tr>
                 </tbody>
             </table>

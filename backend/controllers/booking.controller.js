@@ -23,7 +23,7 @@ const getBooking = async (req, res) => {
 
 
 const createBooking = async (req, res) => {
-    const { customerName,staff, cccd, gioitinh, email, phone, address, rooms } = req.body;
+    const { customerName,staff, cccd, gioitinh, email, phone, address, rooms} = req.body;
   
     if (!rooms || rooms.length === 0) {
         return res.status(400).json({ message: 'No rooms selected' });
@@ -82,7 +82,7 @@ const createBooking = async (req, res) => {
 };
 
 const createBookingUser = async (req, res) => {
-    const { checkin, checkout, customer, room} = req.body;
+    const { checkin, checkout, customer, room,payment} = req.body;
      // Validation
             if (!checkin || !checkout || !customer || !room) {
                 return res.status(400).json({ message: 'All fields are required' });
@@ -94,13 +94,14 @@ const createBookingUser = async (req, res) => {
                 paid: false,
                 customer,
                 room,
-                status:"đã đặt"
+                status:"chờ xác nhận",
+                payment
             });
 
             
             try {
                 const savedBooking = await newBooking.save();
-                return res.status(201).json(savedBooking);
+                return res.status(201).json({ bookingId: savedBooking._id });
             } catch (error) {
                 console.error('Error creating booking:', error);
                 return res.status(500).json({ message: 'Server error' });
@@ -244,6 +245,7 @@ const updateBooking = async (req, res) => {
 
         // Cập nhật trạng thái 'paid' thành true cho booking
         booking.paid = true;
+        booking.status = 'hoàn thành';
 
         // Tìm phòng liên quan đến booking và cập nhật trạng thái phòng
         const room = await Room.findById(booking.room);
@@ -275,17 +277,17 @@ const deleteBooking = async (req, res) => {
             return res.status(404).json({ message: 'Booking not found' });
         }
 
-        // Kiểm tra xem booking có thuộc về người dùng hiện tại không
-        if (booking.customer.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Access denied' });
-        }
+        // // Kiểm tra xem booking có thuộc về người dùng hiện tại không
+        // if (booking.customer.toString() !== req.user._id.toString()) {
+        //     return res.status(403).json({ message: 'Access denied' });
+        // }
 
-        // Cập nhật trạng thái phòng
-        const room = await Room.findById(booking.room);
-        if (room) {
-            room.available = true; // Đánh dấu phòng là có sẵn
-            await room.save();
-        }
+        // // Cập nhật trạng thái phòng
+        // const room = await Room.findById(booking.room);
+        // if (room) {
+        //     room.available = true; // Đánh dấu phòng là có sẵn
+        //     await room.save();
+        // }
 
         res.status(200).json({ message: 'Booking deleted successfully' });
     } catch (error) {
@@ -529,6 +531,117 @@ const updateDeleteRoom = async (req, res) => {
 };
 
 
+const confirmation = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        // Tìm phòng theo ID
+        const booking = await Booking.findById(id);
+
+        if (!booking) {
+            return res.status(404).send({ message: "Không tìm thấy phòng" });
+        }
+
+        // Cập nhật các trường khác trong phòng
+        Object.assign(booking, updateData);
+
+        // Đặt trạng thái thành 'đã nhận'
+        booking.status = 'đã đặt';
+
+        // Lưu phòng đã cập nhật
+        await booking.save();
+
+        res.send(booking);
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+const earlyCheckout = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { checkoutDate } = req.body;
+
+        const booking = await Booking.findById(id);
+
+        if (!booking) {
+            return res.status(404).send({ message: 'Không tìm thấy đặt phòng' });
+        }
+
+        const checkoutTime = new Date(checkoutDate).getTime();
+        const originalCheckoutTime = new Date(booking.checkout).getTime();
+        const checkinTime = new Date(booking.checkin).getTime();
+
+        // Kiểm tra nếu ngày trả phòng lớn hơn ngày checkout ban đầu
+        if (checkoutTime > originalCheckoutTime) {
+            return res.status(400).send({ message: 'Ngày trả phòng không thể sau ngày đặt ban đầu' });
+        }
+
+        // Kiểm tra nếu ngày trả phòng trùng với ngày check-in
+        if (checkoutTime === checkinTime) {
+            return res.status(400).json({ message: 'Ngày trả phòng không thể bằng ngày đặt phòng ban đầu' });
+        }
+
+        // Cập nhật ngày checkout và trạng thái
+        booking.checkout = new Date(checkoutDate);
+        // booking.status = 'hoàn thành'; // Nếu cần cập nhật trạng thái
+
+        booking.updatedAt = new Date(); // Cập nhật timestamp
+        await booking.save();
+
+        res.send({ message: 'Cập nhật trả phòng thành công!', booking });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+};
+
+const getWeeklyBookings = async (req, res) => {
+    try {
+        // Lấy ngày hiện tại
+        const currentDate = new Date();
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Lấy ngày đầu tuần (chủ nhật)
+        startOfWeek.setHours(0, 0, 0, 0); // Đặt thời gian đầu ngày
+
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);// Lấy ngày cuối tuần (Thứ Bảy)
+        endOfWeek.setHours(23, 59, 59, 99) // Đặt thời gian cuối ngày
+
+            // Truy vấn các đơn đặt phòng có ngày check-in trong khoảng từ đầu tuần đến cuối tuần
+            const bookings = await Booking.find({
+                checkin: {
+                $gte: startOfWeek, // Ngày check-in >= ngày đầu tuần
+                $lte: endOfWeek,   // Ngày check-in <= ngày cuối tuần
+                },
+            });
+
+            // Khởi tạo mảng chứa số lượng đặt phòng cho mỗi ngày trong tuần (Chủ Nhật đến Thứ Bảy)
+            const weeklyData = Array(7).fill(0); // [0, 0, 0, 0, 0, 0, 0]
+
+            // Duyệt qua danh sách các đơn đặt phòng và đếm số lượng đặt phòng cho từng ngày
+            bookings.forEach(booking => {
+                const day = new Date(booking.checkin).getDay(); // Lấy chỉ số ngày trong tuần (0 = CN, 1 = Thứ 2, ...)
+                weeklyData[day] += 1; // Tăng số lượng đặt phòng cho ngày tương ứng
+            });
+
+             // Trả về dữ liệu thống kê theo tuần
+            res.status(200).json({
+                message: 'Weekly bookings retrieved successfully',
+                data: weeklyData, // [Số đơn CN, Thứ 2, Thứ 3, ..., Thứ 7]
+            });
+        
+    } catch (error) {
+        console.error('Error fetching weekly bookings:', error);
+        res.status(500).json({
+          message: 'Error fetching weekly bookings',
+          error: error.message,
+        });
+      }
+}
+
+
+
 
 
 
@@ -550,7 +663,10 @@ module.exports = {
     updateRoom,
     createBookingUser,
     getBookingUserId,
-    updateDeleteRoom
+    updateDeleteRoom,
+    confirmation,
+    earlyCheckout,
+    getWeeklyBookings,
 
 
 };

@@ -3,64 +3,69 @@
 <header class="section__container header__container">
       <div class="header__image__container">
         <div class="header__content">
-          <h1>Enjoy Your Dream Vacation</h1>
-          <p>Book Hotels and stay packages at lowest price.</p>
+          <h1>Tận hưởng kỳ nghỉ mơ ước của bạn</h1>
+          <p>Đặt khách sạn và các gói lưu trú với giá thấp nhất.</p>
         </div>
         <div class="booking__container">
-          <form action="">
+          <form @submit.prevent="handleSubmit" action="" >
             <div class="form__group">
               <div class="input__group">
-                <input type="date">
+                <input type="date" v-model="checkin" :min="minDate">
                 <!-- <label for="">Check In Date</label> -->
               </div>
-              <p>Check In Date</p>
+              <p>Ngày nhận phòng</p>
             </div>
 
             <div class="form__group">
               <div class="input__group">
-                <input type="date">
+                <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate">
                 <!-- <label for="">Check Out Date</label> -->
               </div>
-              <p>Check Out Date</p>
+              <p>Ngày trả phòng</p>
             </div>
 
             <div class="form__group">
               <div class="input__group">
-                <input type="text">
-                <label for="">Adults</label>
+                <input type="number" placeholder="2 người" min="1">
+                <!-- <label for="">Adults</label> -->
               </div>
-              <p>Add adults</p>
+              <p>Người lớn</p>
             </div>
 
             <div class="form__group">
               <div class="input__group">
-                <input type="text">
-                <label for="">Children</label>
+                <input type="number" placeholder="0 người" min="0">
+                <!-- <label for="">Children</label> -->
               </div>
-              <p>Add children</p>
+              <p>Trẻ em</p>
             </div>
+            <div class="">
+              <button type="submit" class="btn"><i class="ri-search-line text-white"></i></button>
+            </div>
+
+            
           </form>
 
-          <button class="btn"><i class="ri-search-line"></i></button>
+          
         </div>
       </div>
 
     </header>
 
   <section class="section__container popular__container">
-    <h2 class="section__header">Popular Hotels </h2>
-    <div class="popular__grid">
-      <div class="popular__card">
-        <img src="../assets/Hotel Ristorante Grotta Palazzese.jpg" alt="popular hotel">
+    <!-- <h2 class="section__header">Popular Hotels </h2> -->
+    <!-- <div class="popular__grid">
+      <div v-for="room in limitedRooms" :key="room.id" class="popular__card">
+        <img v-if="room.image" :src="`http://localhost:3000/uploads/${room.image}`" alt="popular hotel">
         <div class="popular__content">
           <div class="popular__card__header">
-            <h4>The Plaza Hotel</h4>
-            <h4>500.000 VND/Night</h4>
+            <h4>{{ room.roomNumber }}</h4>
+            <h4>{{ formatCurrency(room.price) }}/đêm</h4>
           </div>
           
           <div class="popular__card__main">
             <p>Max occupancy:</p>
-            <p>4 adults</p>
+            <p>{{ room.maxGuests }} adults</p>
           </div>
           <div class="popular__card__icon">
             <i class="fa-solid fa-wifi"></i>
@@ -74,109 +79,76 @@
           </div>
          
           <button>Xem thêm</button>
-          <!-- <p>New York City, USA</p> -->
         </div>
       </div>
+    </div> -->
 
-      <div class="popular__card">
-        <img src="../assets/Auberge Du Soleil _ Napa Valley California.jpg" alt="popular hotel">
-        <div class="popular__content">
-          <div class="popular__card__header">
-            <h4>The Plaza Hotel</h4>
-            <h4>$499</h4>
-          </div>
-          <div class="popular__card__main">
-            <p>Max occupancy:</p>
-            <p>2 adults</p>
-          </div>
-          <div class="popular__card__icon">
-            <i class="fa-solid fa-wifi"></i>
-            <i class="fa-solid fa-utensils"></i>
-            <i class="fa-solid fa-mug-hot"></i>
-            <i class="fa-solid fa-tv"></i>
-          </div>
-          <div class="popular__card__note">
-            <i class="fa-solid fa-check"></i>
-             <p>Pay at hotel or pay today</p>
-          </div>
-          <button>Xem thêm</button>
-        </div>
+    <!-- <div class="text-end mt-3 fs-5">
+      Xem thêm <i class="fa-solid fa-arrow-right"></i>
+    </div> -->
+
+    <div class="best--offer text-start mt-3">
+      <h3 class="fw-bold">Ưu đãi tốt nhất trong tháng này</h3>
+      <div class="d-flex justify-content-between mb-3">
+        <p>This can be detaled description or just a short text.</p>
+        <div class="btn btn-info text-white">Xem Tất Cả</div>
       </div>
 
-      <div class="popular__card">
-        <img src="../assets/Auberge Du Soleil _ Napa Valley California.jpg" alt="popular hotel">
-        <div class="popular__content">
-          <div class="popular__card__header">
-            <h4>The Plaza Hotel</h4>
-            <h4>$499</h4>
+      <div class="offer">
+        <div class=" offer--body bg-light rounded-3">
+          <div class="offer--img " >
+            <img src="../assets/Auberge Du Soleil _ Napa Valley California.jpg" alt="">
           </div>
-          <div class="popular__card__main">
-            <p>Max occupancy:</p>
-            <p>5 adults</p>
+          
+          <div class="text-center">
+            <h2 class="fw-bold text-danger">50% Off</h2>
+            <p>This can be detaled description or just a short text.</p>
+            <div class="btn btn-info text-white">Book Now</div>
           </div>
-          <div class="popular__card__icon">
-            <i class="fa-solid fa-wifi"></i>
-            <i class="fa-solid fa-utensils"></i>
-            <i class="fa-solid fa-mug-hot"></i>
-            <i class="fa-solid fa-tv"></i>
-          </div>
-          <div class="popular__card__note">
-            <i class="fa-solid fa-check"></i>
-             <p>Pay at hotel or pay today</p>
-          </div>
-          <button>Xem thêm</button>
         </div>
-      </div>
 
-      <div class="popular__card">
-        <img src="../assets/Hotel Review_ An Ocean View Room at the Grand Wailea, Maui - The Points Guy.jpg" alt="popular hotel">
-        <div class="popular__content">
-          <div class="popular__card__header">
-            <h4>The Plaza Hotel</h4>
-            <h4>$499</h4>
+        <div class=" offer--body bg-light rounded-3">
+          <div class="offer--img " >
+            <img src="../assets/Hotel Reservations _ Book Hotel Rooms Online.jpg" alt="">
           </div>
-
-          <button>Xem thêm</button>
-        </div>
-      </div>
-
-      <div class="popular__card">
-        <img src="../assets/Auberge Du Soleil _ Napa Valley California.jpg" alt="popular hotel">
-        <div class="popular__content">
-          <div class="popular__card__header">
-            <h4>The Plaza Hotel</h4>
-            <h4>$499</h4>
+          
+          <div class="text-center">
+            <h2 class="fw-bold text-danger">50% Off</h2>
+            <p>This can be detaled description or just a short text.</p>
+            <div class="btn btn-info  text-white">Book Now</div>
           </div>
-          <p>New York City, USA</p>
         </div>
       </div>
     </div>
 
-    <div class="about-us container mt-5">
-  <h1 class="fw-bold text-center">About Us</h1>
-  <div class="row align-items-center mt-4">
-    <div class="col-md-6 col-12 mb-4">
-      <img src="../assets/Villa Chinka by Astor Garden Hotel.jpg" alt="Ocean Breeze Hotel" class="about-us__image img-fluid rounded shadow-lg">
-    </div>
-    <div class="col-md-6 col-12">
-      <h2 class="fw-bold">Về Chúng Tôi</h2>
-      <p>
-        Chào mừng đến với khách sạn <strong>Ocean Breeze</strong>, thiên đường của sự sang trọng và yên bình.
-        Ẩn mình dọc theo bờ biển thanh bình, khách sạn chúng tôi là điểm đến lý tưởng cho một kỳ nghỉ thư giãn
-        hoàn hảo. Cho dù bạn đang tìm kiếm một nơi nghỉ ngơi thư giãn, một chuyến du lịch lãng mạn hay một kỳ nghỉ
-        gia đình, Ocean Breeze mang đến sự kết hợp hoàn hảo giữa thoải mái và sang trọng để khiến kỳ nghỉ của bạn
-        trở nên khó quên.
-      </p>
-      <h2 class="fw-bold">Câu Chuyện Của Chúng Tôi</h2>
-      <p>
-        Được thành lập dựa trên nguyên tắc hiếu khách và xuất sắc, khách sạn Ocean Breeze đã cung cấp dịch vụ hàng đầu
-        cho du khách trong hơn một thập kỷ. Chúng tôi luôn mong muốn tạo ra một không gian ấm áp và đầy cảm hứng, nơi
-        mà mỗi du khách đều cảm thấy được trân trọng và chăm sóc. Mọi chi tiết, từ kiến trúc đến các tiện nghi,
-        đều được thiết kế để mang lại trải nghiệm liền mạch và tuyệt vời.
-      </p>
-    </div>
-  </div>
-</div>
+
+
+
+    <div class="about-us container mt-3">
+        <h1 class="fw-bold text-center">About Us</h1>
+        <div class="row align-items-center mt-4">
+          <div class="col-md-6 col-12 mb-4 about" >
+            <img src="../assets/Villa Chinka by Astor Garden Hotel.jpg" alt="Ocean Breeze Hotel" class="about-us__image img-fluid shadow-lg">
+          </div>
+          <div class="col-md-6 col-12">
+            <h2 class="fw-bold">Về Chúng Tôi</h2>
+            <p>
+              Chào mừng đến với khách sạn <strong>Ocean Breeze</strong>, thiên đường của sự sang trọng và yên bình.
+              Ẩn mình dọc theo bờ biển thanh bình, khách sạn chúng tôi là điểm đến lý tưởng cho một kỳ nghỉ thư giãn
+              hoàn hảo. Cho dù bạn đang tìm kiếm một nơi nghỉ ngơi thư giãn, một chuyến du lịch lãng mạn hay một kỳ nghỉ
+              gia đình, Ocean Breeze mang đến sự kết hợp hoàn hảo giữa thoải mái và sang trọng để khiến kỳ nghỉ của bạn
+              trở nên khó quên.
+            </p>
+            <h2 class="fw-bold">Câu Chuyện Của Chúng Tôi</h2>
+            <p>
+              Được thành lập dựa trên nguyên tắc hiếu khách và xuất sắc, khách sạn Ocean Breeze đã cung cấp dịch vụ hàng đầu
+              cho du khách trong hơn một thập kỷ. Chúng tôi luôn mong muốn tạo ra một không gian ấm áp và đầy cảm hứng, nơi
+              mà mỗi du khách đều cảm thấy được trân trọng và chăm sóc. Mọi chi tiết, từ kiến trúc đến các tiện nghi,
+              đều được thiết kế để mang lại trải nghiệm liền mạch và tuyệt vời.
+            </p>
+          </div>
+        </div>
+      </div>
 
 
     
@@ -186,58 +158,53 @@
 
 </template>
 
-
-
-<!-- <template>
-  <div>
-    <h1>Welcome to Our Hotel <span v-if="isLoggedIn">Logged in as {{ user.name }}</span></h1>
-    <div v-if="rooms.length">
-      <h2>Available Rooms</h2>
-      <div v-for="room in rooms" :key="room._id">
-        <h3>{{ room.roomNumber }}</h3>
-        <p>Type: {{ room.type }}</p>
-        <p>Price: {{ room.price }} USD/night</p>
-        <p>Available: {{ room.available }}</p>
-        <p>Max Guests: {{ room.maxGuests }}</p>
-      </div>
-    </div>
-  </div>
-
-  <div>
-    <button type="submit" >Đăng xuất</button>
-  </div>
-</template>
-
 <script>
 import api from '../api';
-import { useUserStore } from '../stores/userStore';
-
 export default {
+
   data() {
     return {
-      rooms: []
+     minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
+     checkin:'',
+     checkout:'',
     };
-  },
-  async created() {
-    try {
-      const response = await api.get('/rooms');
-      this.rooms = response.data;
-    } catch (error) {
-      console.log('Failed to load rooms:', error);
-    }
+
   },
   computed: {
-    user() {
-      const userStore = useUserStore();
-      console.log(userStore.user); // Kiểm tra xem user có chứa thông tin đúng không
-      return userStore.user;
-    },
-    isLoggedIn() {
-      return !!this.user;
+
+  },
+  methods: {
+
+    handleSubmit() {
+      // Check if checkout date is after checkin date
+      if (this.checkout <= this.checkin) {
+        alert('Vui lòng nhập ngày nhận phòng và ngày trả phòng');
+        return;
+      }
+
+      this.$router.push({ 
+        name: 'Booking', 
+        query: { checkin: this.checkin, checkout: this.checkout, adults: this.adults, children: this.children } 
+      });
     }
-  }
+
+  
+  },
+  mounted() {
+   
+    const checkinDate = this.$route.query.checkin;
+    const checkoutDate = this.$route.query.checkout;
+    this.checkin = checkinDate || this.checkin;
+    this.checkout = checkoutDate || this.checkout;
+  },
+  watch: {
+   
+  },
+  mounted() {
+   
+  },
 };
-</script> -->
+</script>
 
 <style>
 
@@ -299,7 +266,7 @@ export default {
   width: 100%;
   flex: 1;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 1fr 1fr 1fr 0.5fr; /* Four equal columns and one half-width column */
   gap: 1rem;
 }
 
@@ -443,8 +410,8 @@ export default {
   padding: 2rem 0;
 }
 
-.about-us__image {
-  border-radius: 0.5rem;
+.about img {
+  border-radius: 60% 60% 0% 0%;
 }
 
 .about-us p {
@@ -456,6 +423,23 @@ export default {
 .about-us h2 {
   margin-top: 1.5rem;
   color: #007bff;
+}
+.offer--img {
+  width: 250px;
+}
+.offer--img img {
+  border-radius: 25% 10%;
+}
+.offer {
+  display: flex;
+  gap: 20px;
+}
+.offer--body {
+  display: flex;
+  gap: 10px;
+  padding: 1rem;
+  border-radius: 40% ;
+  
 }
 
 

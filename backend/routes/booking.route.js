@@ -14,6 +14,8 @@ router.post('/order/cart', bookingController.addCart);
 // router.get('/order/cart', bookingController.getCart);
 router.get('/order', bookingController.getRoomByAvailable);
 
+router.get('/weekly', bookingController.getWeeklyBookings);
+
 // Endpoint to get bookings by date
 router.get('/date/:date', bookingController.getRoomDate);
 
@@ -29,13 +31,20 @@ router.get('/user/:id', bookingController.getBookingUserId);
 // Cập nhật một booking (yêu cầu xác thực)
 router.put('/:id', bookingController.updateBooking);
 
+//xác nhập phòng khách đặt online
+router.put('/status/:id', bookingController.confirmation);
+
+
+// cập nhật trả phòng sớm
+router.put('/checkout/:id', bookingController.earlyCheckout);
+
 // Cập nhật một booking (yêu cầu xác thực)
 router.put('/rooms/:id', bookingController.updateRoom);
 
 router.put('/rooms/booking/:id', bookingController.updateDeleteRoom);
 
 // Xóa một booking (yêu cầu xác thực)
-router.delete('/:id', auth, bookingController.deleteBooking);
+router.delete('/:id', bookingController.deleteBooking);
 
 router.delete('/order/:roomId', bookingController.deleteCart);
 

@@ -213,13 +213,23 @@ export default {
 
   },
   mounted() {
-    // this.getRooms();
-    this.getRoomAvailable();
+   // Lấy checkin và checkout từ query nếu có
+  const checkinDate = this.$route.query.checkin;
+  const checkoutDate = this.$route.query.checkout;
 
-    const checkinDate = this.$route.query.checkin;
-    const checkoutDate = this.$route.query.checkout;
-    console.log('Checkin Date:', checkinDate);
-    console.log('Checkout Date:', checkoutDate);
+  // Kiểm tra và gán giá trị
+  if (checkinDate) {
+    this.checkin = checkinDate;
+  }
+  if (checkoutDate) {
+    this.checkout = checkoutDate;
+  }
+
+  console.log('Checkin Date:', this.checkin);
+  console.log('Checkout Date:', this.checkout);
+
+  // Gọi hàm để lấy phòng có sẵn
+  this.getRoomAvailable();
   },
   watch: {
     checkin() {

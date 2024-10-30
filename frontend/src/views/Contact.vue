@@ -3,10 +3,9 @@
         <div class="row shadow rounded-3">
             <div class="col-lg-6 bg-light">
                 <div class="m-4 text-start">
-                    <h2 class="contact--title fw-bold">Get in touch</h2>
-                    <p>Lorem Ipsum has been the industry's
-                        standard dummy text ever since the 
-                        1500s, when an unknown printer took
+                    <h2 class="contact--title fw-bold">Hãy liên lạc</h2>
+                    <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Nếu có bất kỳ câu hỏi hoặc yêu cầu nào, 
+                        đừng ngần ngại liên hệ với chúng tôi qua thông tin bên dưới:
                         
                     </p>
                     <div class="contact--body">
@@ -72,7 +71,7 @@
             <div class="col-lg-6 d-flex align-items-center justify-content-center">
                 <div class="contact--send">
 
-                    <h2 class="contact--title">Send us a message</h2>
+                    <h2 class="contact--title">Gửi tin nhắn cho chúng tôi</h2>
                     <form action="" class="row g-3">
                         <div class="col-md-6">
                             <!-- <label for="name" class="form-label">Tên</label> -->

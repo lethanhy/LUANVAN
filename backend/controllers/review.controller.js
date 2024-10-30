@@ -52,6 +52,21 @@ const getReviewByCustomer = async (req, res) => {
     }
 }
 
+// const getReviewByBooking = async (req, res) => {
+//     try {
+//         const { bookingId } = req.params;
+//         const review = await Review.find({ booking: bookingId });
+//         res.status(200).json(review);
+//     } catch (error) {
+//         console.error("Error creating review:", error.message || error);
+//         res.status(500).json({
+//             message: "Failed to create review",
+//             error: error.message || error,
+//         });
+        
+//     }
+// }
+
 const getReviewById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -119,5 +134,6 @@ module.exports = {
   getAllReview,
   getReviewById,
   feedbackCustomer,
-  deleteById
+  deleteById,
+  getReviewByBooking
 };

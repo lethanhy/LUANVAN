@@ -37,9 +37,14 @@ const BookingSchema = mongoose.Schema(
             type: Boolean,
             default: false // Đơn đặt phòng chưa thanh toán
         },
+        payment: {
+            type: String,
+            enum: ["Thanh toán ngân hàng","Thanh toán tiền mặt"], // Trạng thái thanh toán: ngân hàng, tiền mặt  
+        },
+
         status: {
             type: String,
-            enum: ["đã đặt", "đã nhận", "thanh toán", "đã hủy"], // Trạng thái đặt phòng: đang hoạt động, đã hoàn thành, hoặc đã huỷ
+            enum: ["đã đặt", "đã nhận", "thanh toán","hoàn thành", "đã hủy", "chờ xác nhận"], // Trạng thái đặt phòng: đang hoạt động, đã hoàn thành, hoặc đã huỷ
             default: "đã đặt"
         },
         orders: [

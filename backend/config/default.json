@@ -1,0 +1,6 @@
+{
+    "vnp_TmnCode": "LODCTSP3",
+    "vnp_HashSecret": "CBIBO6MRUNMC32ZV1UWGS0HQE6KAUOAG",
+    "vnp_ReturnUrl": "http://localhost:3001/payment/vnpay/return",
+    "vnp_Url": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+}

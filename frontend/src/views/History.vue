@@ -3,11 +3,11 @@
     <div class="history--body">
       <h1 class="text-start fw-bold text-primary">Lịch sử đặt phòng</h1>
 
-      <div v-if="!bookings">
+      <div v-if="loading">
         <p>Loading...</p> <!-- Loading indicator -->
       </div>
 
-      <div v-else-if="bookings.length === 0">
+      <div v-else-if="!bookings || bookings.length === 0">
         <p class="text-danger">Không có lịch sử đặt phòng nào!</p> <!-- No bookings message -->
       </div>
 
@@ -37,44 +37,60 @@
                 Tổng tiền thanh toán: 
                 {{ formatCurrency(booking.room?.price * calculateDays(booking.checkin, booking.checkout)) }}
               </p>
-              <div class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
-                <button @click="openReviewModal(booking)" class="btn btn-warning">Đánh Giá</button>
+
+              <div v-if=" booking.status === 'chờ xác nhận' " class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
+                <button class="btn btn-warning text-white">Chờ xác nhận</button>
+                <button class="btn btn-danger" @click="deleteBooking(booking._id)">Hủy đặt phòng</button>
+              </div>
+              
+              <div v-else class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
+                <button @click="openReviewModal(booking)" v-if="!hasReview(booking._id)" class="btn btn-warning">Đánh Giá</button>
                 <button class="btn btn-primary">Hoàn Thành</button>
               </div>
             </div>
           </div>
         </div>
 
-         <!-- Add Room Modal -->
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
-        <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
-          <h2 id="modal-title" class="modal-title text-center text-info fw-bold">Đánh Giá</h2>
-          <form @submit.prevent="addReview">
-
-            <label class="text-dark m-2" for="review-content">Trải nghiệm của bạn như thế nào?</label>
-            <div class="form-floating">
-              <textarea class="form-control bg-light" v-model="newReview.noidung" placeholder="Leave a comment here" id="review-content" style="height: 100px" required></textarea>
-              <label for="review-content">Nội dung</label>
-            </div>
-            <label class="m-2 text-dark " for="rating-buttons">Đánh giá trải nghiệm của bạn với khách sạn của chúng tôi</label>
-            <div class="button-group mb-4" id="rating-buttons">
+        <!-- Add Room Modal -->
+        <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+          <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+            <h2 id="modal-title" class="modal-title text-center text-info fw-bold ">Đánh Giá</h2>
+            <form @submit.prevent="addReview">
+              <label class="text-dark m-2" for="review-content">Trải nghiệm của bạn như thế nào?</label>
+              <div class="form-floating">
+                <textarea 
+                  class="form-control bg-light" 
+                  v-model="newReview.noidung" 
+                  placeholder="Leave a comment here" 
+                  id="review-content" 
+                  style="height: 100px" 
+                  required
+                ></textarea>
+                <label for="review-content">Nội dung</label>
+              </div>
+              <label class="m-2 text-dark" for="rating-buttons">Đánh giá trải nghiệm của bạn với khách sạn của chúng tôi</label>
+              <div class="button-group mb-4" id="rating-buttons">
+                <button 
+                  v-for="n in 5" 
+                  :key="n" 
+                  :value="n" 
+                  class="btn border me-2" 
+                  :class="{ 'button-active': newReview.rating === n }" 
+                  @click.prevent="newReview.rating = n"
+                >
+                  {{ n }}
+                </button>
+                <i class="fa-solid fa-star text-warning"></i> Stars
+              </div>
               <button 
-                v-for="n in 5" 
-                :key="n" 
-                :value="n" 
-                class="btn border me-2" 
-                :class="{ 'button-active': newReview.rating === n }" 
-                @click.prevent="newReview.rating = n">
-                {{ n }}
-              </button>
-              <i class="fa-solid fa-star text-warning"></i> Stars
-            </div>
-
-            <button type="submit" class="btn btn-primary" :disabled="!newReview.rating">Đánh giá</button>
-            <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
-          </form>
+                type="submit" 
+                class="btn btn-primary" 
+                :disabled="!newReview.rating" 
+              >Đánh giá</button>
+              <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+            </form>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   </div>
@@ -89,6 +105,8 @@ export default {
     return {
       bookings: null, // Stores bookings data
       showModal: false,
+      loading: true, // Add loading state
+      reviews: [],
       newReview: {
         noidung: '',
         rating: '',
@@ -107,6 +125,23 @@ export default {
       } catch (error) {
         console.error('Failed to fetch bookings:', error);
         this.bookings = []; // Set to empty array on error
+      } finally {
+        this.loading = false; // Stop loading regardless of success or error
+      }
+    },
+
+    // Kiểm tra xem đã có đánh giá cho đặt phòng hay chưa
+    hasReview(bookingId) {
+      return this.reviews.some(review => review.booking === bookingId);
+    },
+
+    async getReviews() {
+      try {
+        const customerId = this.$route.params.id;
+        const response = await api.get(`/review/${customerId}`);
+        this.reviews = response.data;
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
       }
     },
 
@@ -146,6 +181,13 @@ export default {
       }
     },
 
+     async deleteBooking(id) {
+      const response = await api.delete(`/bookings/${id}`);
+      alert('Xóa thành công!');
+      this.getReviews();
+      
+     },
+
     // Calculate the number of days between check-in and check-out
     calculateDays(checkin, checkout) {
       const checkinDate = new Date(checkin);
@@ -176,6 +218,7 @@ export default {
   },
   mounted() {
     this.getBookingId(); // Fetch bookings when component mounts
+    this.getReviews();
   },
 };
 </script>
@@ -245,5 +288,4 @@ export default {
   background-color: #ffc107; /* Màu nền khi button được nhấn */
   color: #fff; /* Màu chữ khi button được nhấn */
 }
-
 </style>

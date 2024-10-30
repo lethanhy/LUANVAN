@@ -50,7 +50,7 @@
 
                     <!-- <p v-else>Chưa có dịch vụ nào được đặt.</p> -->
 
-                    <button @click="showModal = true" class="btn btn-success">Thêm dịch vụ</button>
+                    <button @click="showModal = true" v-if="room.booking.status === 'đã đặt'" class="btn btn-success">Thêm dịch vụ</button>
                   </div>
                 </div>
                 <!-- <div class="DetailRoom--service bg-white">
@@ -97,7 +97,8 @@
             <button v-if="room.booking?.status === 'đã đặt'" type="submit" @click.prevent="checkInRoom">
               Nhận Phòng
             </button>
-            <button type="submit" @click.prevent="updateDelete">Hủy</button>
+            <button v-if="room.booking?.status === 'đã đặt'" type="submit" @click.prevent="updateDelete">Hủy</button>
+            <button v-if="room.booking?.status ==='đã nhận'" class="" @click="earlyCheckout()">Trả phòng</button>
             <router-link to="/rooms">
               <button class="btn text-white text-decoration-none">Thoát</button>
             </router-link>
@@ -236,6 +237,26 @@ export default {
         }
     },
 
+            async updateDelete() {
+            try {
+                const confirmed = confirm('Bạn có chắc chắn muốn hủy phòng này?');
+                if (!confirmed) return;
+
+                const bookingId = this.room.booking?.bookingId;
+                console.log(bookingId);
+
+                const updateData = { status: 'đã hủy' };
+
+                await api.put(`bookings/rooms/booking/${bookingId}`, updateData);
+                this.room.booking.status = 'đã hủy';
+                alert('Hủy phòng thành công!');
+            } catch (error) {
+                console.log('Lỗi khi hủy phòng:', error);
+            }
+        },
+
+
+
         // Format currency to VND without leading zero
         formatCurrency(value) {
               // Convert to integer if the value is a number
@@ -343,16 +364,34 @@ export default {
           }
       },
 
-      // async updateDelete() {
-      //   try {
-      //     const updateData = { trangthai: this.room.trangthai };
-      //     await api.put(`/rooms/booking/${this.room._id}`, updateData);
-      //     alert('Cập nhật tình trạng dọn dẹp thành công!');
-      //   } catch (error) {
-      //     console.log('Failed to update cleaning status:', error);
-      //   }
-      // }
+      async earlyCheckout() {
+        try {
+            // const newCheckoutDate = prompt('Nhập ngày trả phòng mới (YYYY-MM-DD):');
+            const id = this.room.booking?.bookingId;
 
+            // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
+            const currentDate = new Date().toISOString().slice(0, 10); 
+
+              const response = await api.put(`/bookings/checkout/${id}`, {
+                checkoutDate: currentDate,
+              });
+
+              alert('Trả phòng thành công')
+
+              // this.showSuccessMessage = true;
+              // this.successMessage = response.data.message;
+              // setTimeout(() => this.showSuccessMessage = false, 3000);
+
+              window.location.reload(); // Reload trang sau khi thêm thành công
+        } catch (error) {
+          console.error('Failed to update checkout:', error);
+          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+      }
+
+
+
+      
 
      
 

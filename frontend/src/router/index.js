@@ -10,6 +10,7 @@ import Order from '../views/Order.vue';
 import History from '../views/History.vue';
 import Contact from '../views/Contact.vue';
 import Review from '../views/Review.vue';
+import PaymentReturn from '../components/PaymentReturn.vue';
 
 
 const routes = [
@@ -23,6 +24,7 @@ const routes = [
   { path: '/history/:id', name: 'History', component: History },
   { path: '/contact', name: 'Contact', component: Contact },
   { path: '/review', name: 'Review', component: Review },
+  { path: '/payment/vnpay/return', component: PaymentReturn, },
   
   
 ];

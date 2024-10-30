@@ -48,6 +48,7 @@
           <th scope="col">Ngày lập phiếu</th>
           <th scope="col">Tên nhân viên</th>
           <th scope="col">Hóa đơn</th>
+          <th scope="col">Trạng thái</th>
           <th scope="col">Chi tiết</th>
           <th scope="col">Xóa</th>
         </tr>
@@ -66,6 +67,15 @@
               {{ booking.paid ? 'Đã thanh toán' : 'Chưa thanh toán' }}
             </button>
           </td>
+          <td>
+            <select @change="updateStatus(booking)"  v-model="booking.status" class="form-select small-select">
+              <option value="đã đặt">Đã Đặt</option>
+              <option value="đã nhận">Đã Nhận</option>
+              <option value="chờ xác nhận">Chờ Xác Nhận</option>
+              <option value="hoàn thành">Hoàn thành</option>
+            </select>
+          </td>
+
           <td>
             <button type="submit" class="btn btn-warning shadow">
               <router-link :to="{ name: 'DetailsBooking', params: { id: booking._id } }">
@@ -159,9 +169,24 @@ export default {
         console.error('Failed to fetch bookings:', error);
       }
     },
+
+    async updateStatus(booking) {
+      try {
+        const response = await api.put(`/bookings/status/${booking._id}`, {
+          status: booking.status
+        });
+        this.showSuccessMessage = true;
+        this.successMessage = 'Cập nhật trạng thái thành công!';
+        setTimeout(() => this.showSuccessMessage = false, 3000);
+      } catch (error) {
+        console.error('Failed to update booking status:', error);
+      }
+    },
+
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
+        window.scrollTo(0, 0); // Cuộn lên đầu trang khi chuyển trang
       }
     },
     formatDate(dateString) {
@@ -203,17 +228,18 @@ export default {
 
 .success-message {
   position: fixed;
-  top: 10px;
-  right: 10px;
-  background: #7bef83;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  border-radius: 5px;
+  top: 15px;
+  right: 15px;
+  background-color: #28a745;
+  color: white;
+  border-radius: 8px;
   padding: 10px 20px;
   display: flex;
   align-items: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
 
 .checkmark {
   font-size: 20px;
@@ -227,4 +253,10 @@ export default {
     max-width: 300px;
     margin-bottom: 15px;
 }
+.small-select {
+  width: 150px; /* Giảm chiều rộng */
+  font-size: 14px; /* Giảm kích thước chữ */
+  padding: 5px; /* Giảm padding bên trong */
+}
+
 </style>
