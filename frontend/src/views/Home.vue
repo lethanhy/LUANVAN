@@ -52,6 +52,8 @@
 
     </header>
 
+    
+
   <section class="section__container popular__container">
     <!-- <h2 class="section__header">Popular Hotels </h2> -->
     <!-- <div class="popular__grid">
@@ -87,6 +89,8 @@
       Xem thêm <i class="fa-solid fa-arrow-right"></i>
     </div> -->
 
+    
+
     <div class="best--offer text-start mt-3">
       <h3 class="fw-bold">Ưu đãi tốt nhất trong tháng này</h3>
       <div class="d-flex justify-content-between mb-3">
@@ -102,8 +106,8 @@
           
           <div class="text-center">
             <h2 class="fw-bold text-danger">50% Off</h2>
-            <p>This can be detaled description or just a short text.</p>
-            <div class="btn btn-info text-white">Book Now</div>
+            <p>Giảm đến 50%, kèm bữa sáng miễn phí và đưa đón sân bay. Đặt ngay để tận hưởng!</p>
+            <div class="btn btn-info text-white">Đặt ngay</div>
           </div>
         </div>
 
@@ -113,10 +117,42 @@
           </div>
           
           <div class="text-center">
-            <h2 class="fw-bold text-danger">50% Off</h2>
-            <p>This can be detaled description or just a short text.</p>
-            <div class="btn btn-info  text-white">Book Now</div>
+            <h2 class="fw-bold text-danger">30% Off</h2>
+            <p>Giảm đến 30%, kèm bữa sáng miễn phí và đưa đón sân bay. Đặt ngay để tận hưởng!</p>
+            <div class="btn btn-info  text-white">Đặt ngay</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container popular--body">
+      <div class="col-lg-6 ">
+        <div class="room--info text-start">
+          <h3>Phòng gia đình có giường đôi</h3>
+          <p>15 - Bà rịa, Vũng Tàu</p>
+          <p>Phòng Gia Đình mang đến không gian
+             rộng rãi và thoải mái, lý tưởng cho những kỳ nghỉ của cả gia
+              đình hoặc nhóm bạn. Với thiết kế hiện đại, nội thất tinh tế và 
+              tông màu ấm áp, căn phòng tạo cảm giác ấm cúng như ở nhà.
+          </p>
+
+          <span class="me-3">Số lượng: 4 người</span>
+          <span class="me-3">Diện tích: 100-150cm</span>
+          <span><i class="fas fa-wifi"></i>  Wi-Fi</span>
+
+          <h2 class="mt-2">800.000 VND</h2>
+
+          <div class="d-inline-flex align-items-center">
+            <button class="btn btn-info d-flex align-items-center">
+              Đặt ngay <i class="fa-solid fa-arrow-right ms-2"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="room--img">
+          <img src="../assets/bb5bc13f084d668ad95f432efba0d97d.jpg" alt="">
         </div>
       </div>
     </div>
@@ -125,7 +161,7 @@
 
 
     <div class="about-us container mt-3">
-        <h1 class="fw-bold text-center">About Us</h1>
+        <!-- <h1 class="fw-bold text-center">About Us</h1> -->
         <div class="row align-items-center mt-4">
           <div class="col-md-6 col-12 mb-4 about" >
             <img src="../assets/Villa Chinka by Astor Garden Hotel.jpg" alt="Ocean Breeze Hotel" class="about-us__image img-fluid shadow-lg">
@@ -406,6 +442,11 @@ export default {
   background-color: rgb(150, 240, 234);
 }
 
+.popular--body {
+  display: flex;
+  margin: 3rem;
+}
+
 .about-us {
   padding: 2rem 0;
 }
@@ -440,6 +481,22 @@ export default {
   padding: 1rem;
   border-radius: 40% ;
   
+}
+
+.room--info {
+  margin: 2rem 3rem;
+}
+
+.room--img {
+  margin: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.room--img img{
+  width: 360px;
+  height: 350px;
 }
 
 

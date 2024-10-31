@@ -256,7 +256,7 @@ export default {
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 30%;
+  width: 20%;
   min-width: 300px; /* Ensures sidebar doesn't get too small */
 }
 
@@ -320,7 +320,7 @@ export default {
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 70%;
+  width: 80%;
   min-width: 300px; /* Ensures content area doesn't get too small */
 }
 .header__booking {

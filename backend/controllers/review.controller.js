@@ -135,5 +135,5 @@ module.exports = {
   getReviewById,
   feedbackCustomer,
   deleteById,
-  getReviewByBooking
+//   getReviewByBooking
 };
