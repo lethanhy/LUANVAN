@@ -280,7 +280,7 @@ const createPayment = async (bookingId) => {
 
 <style scoped>
 .order--room {
-  margin-top: 7rem;
+  margin-top: 1rem;
 }
 
 .order--room h2 {

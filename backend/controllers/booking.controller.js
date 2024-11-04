@@ -32,6 +32,7 @@ const createBooking = async (req, res) => {
     try {
         // Find or create a new customer based on phone number
         let customer = await Customer.findOne({ phone });
+         // Nếu không tìm thấy khách hàng, tạo mới
         if (!customer) {
             customer = new Customer({
                 name: customerName,
@@ -43,17 +44,26 @@ const createBooking = async (req, res) => {
             });
             await customer.save();
         }
+
+          // Lấy ID của khách hàng vừa tìm thấy hoặc mới tạo
+          const customerId = customer._id;
+
   
         // Create bookings and update room statuses
         const bookingPromises = rooms.map(async (room) => {
             // Create new booking for each room
             const newBooking = new Booking({
                 staff: staff,
-                customer: customer._id,
+                customer: customerId,
                 room: room.id, // Assuming room.id is ObjectId
                 paid: false,
                 checkin: room.checkin,
                 checkout: room.checkout,
+                bookingType:"tại chỗ",
+                payment: {
+                    phuongthuc:"Thanh toán tiền mặt",
+                    paymentStatus:"thành công"
+                },
             });
             await newBooking.save();
   
@@ -310,11 +320,18 @@ const getRoomByAvailable = async (req, res) => {
     try {
         // Step 1: Find all bookings that overlap with the requested date range
         const overlappingBookings = await Booking.find({
-            $or: [
-                { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Overlaps with the requested period
-                { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
-                { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checki
-            ],
+            $and: [
+                {
+                $or: [
+                    { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Overlaps with the requested period
+                    { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
+                    { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checki
+                ],
+                },
+        { status: { $nin: ["đã hủy","hoàn thành"]}}
+    ]
+           
+            
         }).select('room'); // Only select the room field
 
         // Step 2: Extract the IDs of rooms that are booked
@@ -322,8 +339,10 @@ const getRoomByAvailable = async (req, res) => {
 
         // Step 3: Find rooms that are NOT in the bookedRoomIds array
         const availableRooms = await Room.find({
-            _id: { $nin: bookedRoomIds }, // Exclude rooms that are booked
-            // status: 'trống', // Ensure the room is marked as available
+            _id: { $nin: bookedRoomIds },
+            // maxGuests: adults,
+            // children:children, // Exclude rooms that are booked
+            trangthai: 'Đã dọn dẹp', // Ensure the room is marked as available
         });
 
         // Step 4: Return available rooms
@@ -440,8 +459,9 @@ const getRoomDate = async (req, res) => {
             $or: [
                 { checkin: { $lte: date }, checkout: { $gte: date } }, // Includes the date within check-in and check-out range
             ],
-            paid: false, // Ensure that only unpaid bookings are included
-            // status: { $ne: 'đã hủy' }
+            // paid: false, // Ensure that only unpaid bookings are included
+            status: { $nin: ['đã hủy', 'hoàn thành'] }
+
         })
         .populate('customer')
         .populate('room');
@@ -546,8 +566,8 @@ const confirmation = async (req, res) => {
         // Cập nhật các trường khác trong phòng
         Object.assign(booking, updateData);
 
-        // Đặt trạng thái thành 'đã nhận'
-        booking.status = 'đã đặt';
+        // // Đặt trạng thái thành 'đã nhận'
+        // booking.status = 'đã đặt';
 
         // Lưu phòng đã cập nhật
         await booking.save();

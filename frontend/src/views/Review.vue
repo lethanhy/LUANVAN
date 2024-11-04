@@ -98,7 +98,7 @@ export default {
 
 <style>
 .review {
-  margin-top: 7rem;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   background: #fff;
 }

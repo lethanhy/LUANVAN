@@ -245,12 +245,13 @@ export default {
 <style>
 
 .header__container{
-  padding: 5rem 1rem 2rem 1rem;
-  margin-top: 5rem;
+  padding: 2rem 1rem 2rem 1rem;
+  /* margin-top: 1rem; */
+ 
 }
 
 .header__image__container{
-  position: relative;
+  /* position: relative; */
   min-height: 500px;
   background-image: linear-gradient(
     to right,
@@ -262,6 +263,7 @@ export default {
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 2rem;
+
 }
 
 .header__content{
@@ -283,14 +285,15 @@ export default {
 
 .booking__container{
   position: absolute;
-  bottom: -5rem;
+  bottom: -1rem;
   left: 50%;
+  /* right: 60%; */
   transform: translateX(-50%);
-  width: calc(100% - 6rem);
+  width: calc(100% - 30rem);
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 3rem 2rem;
+  padding: 2rem 2rem;
   border-radius: 2rem;
   background-color: rgba(255, 255, 255, 0.7);
   -webkit-backdrop-filter: blur(10px);
@@ -497,6 +500,29 @@ export default {
 .room--img img{
   width: 360px;
   height: 350px;
+}
+
+@media screen and (max-width: 800px) {
+
+  .booking__container{
+  position: absolute;
+  bottom: -1rem;
+  left: 50%;
+  /* right: 60%; */
+  transform: translateX(-50%);
+  width: calc(100% - 10rem);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 2rem;
+  border-radius: 2rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 5px 5px 30px rgba(0, 0, 0, 0.1);
+}
+
+  
 }
 
 

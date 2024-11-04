@@ -11,7 +11,7 @@
         <div class="ml-4">
 
           <h1 class="fw-bold fst-italic text-start">Phòng đôi hướng biển</h1>
-          <p class=" text-start fs-4">{{ formatCurrency(rooms.price) }}/Đêm</p>
+          <p class=" text-start text-danger fs-4">{{ formatCurrency(rooms.price) }}/Đêm</p>
           <p class="text-start">{{ rooms.description }}</p>
 
           <hr>
@@ -20,20 +20,20 @@
           <!-- Features Section -->
           <div class="d-flex justify-content-around pt-2">
             <div>
-              <p><i class="fa-solid fa-bed"></i> King Size Bed</p>
+              <p><i class="fa-solid fa-bed"></i> Giường cỡ lớn</p>
             </div>
             <div>
-              <p><i class="fa-solid fa-water"></i> Ocean View</p>
+              <p><i class="fa-solid fa-water"></i> Nhìn ra biển</p>
             </div>
           </div>
           <hr>
           
           <div class="d-flex justify-content-around">
             <div>
-              <p><i class="fa-solid fa-ruler-combined"></i> 50m² in size</p>
+              <p><i class="fa-solid fa-ruler-combined"></i> Diện tích 50m²</p>
             </div>
             <div>
-              <p><i class="fa-solid fa-utensils"></i> Free Breakfast</p>
+              <p><i class="fa-solid fa-utensils"></i> Bữa sáng miễn phí</p>
             </div>
           </div>
           <hr>
@@ -42,12 +42,12 @@
           <div class="d-flex justify-content-around align-items-center">
             <div class="d-flex">
               <p class="mt-3">0939 834 780</p>
-              <button class="btn btn-info ms-2">
+              <button class="btn btn-info ms-2 text-white">
                 <i class="fa-solid fa-arrow-right"></i>
               </button>
             </div>
             <div>
-              <button @click.prevent="goToOrder"  class="btn btn-info">Đặt phòng ngay</button>
+              <button @click.prevent="goToOrder"  class="btn btn-info text-white">Đặt phòng ngay</button>
             </div>
           </div>
 
@@ -262,8 +262,8 @@
   </div>
 
   <div class="notification" v-if="showNotification">
-  <p>Please log in to book a room.</p>
-  <button @click="closeNotification">Close</button>
+  <p>Vui lòng đăng nhâp để đặt phòng.</p>
+  <button class="" @click="closeNotification">Thoát</button>
 </div>
 
 
@@ -308,6 +308,16 @@ export default {
         console.log('Failed to fetch room:', error);
       }
     },
+
+    // async getAllRooms() {
+    //   try {
+    //     const response = await api.get('/rooms');
+    //   } catch (error) { 
+        
+    //   }
+
+    // },
+
     handleImageUpload(event) {
       this.newProfileImage = event.target.files[0];
     },
@@ -371,7 +381,7 @@ export default {
 
 <style scoped>
 .room--details {
-  margin-top: 7rem;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   max-width: 900px;
 }

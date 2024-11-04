@@ -42,6 +42,34 @@ import TheWelcome from './components/TheWelcome.vue'
 
       </div>
     </nav>
+
+      <!-- Nút mở Box Chat -->
+    <!-- <div class="chatbox-button" @click="toggleChat">
+      <i class="fa-solid fa-comments"></i> Chat
+    </div> -->
+
+    <!-- Box Chat -->
+    <div v-if="showChat" class="chatbox-container">
+      <div class="chatbox-content">
+        <div class="chatbox-header">
+          <div class="chatbox-title">Ocean Breeze AI</div>
+          <button class="chatbox-close" @click="toggleChat">✖</button>
+        </div>
+        <div class="chatbox-messages">
+          <p>Xin chào! Hôm nay tôi có thể giúp gì cho bạn?</p>
+          <!-- Tin nhắn từ Ocean AI và người dùng -->
+        </div>
+        <form @submit.prevent="sendMessage" class="chatbox-input">
+          <input type="text" v-model="userMessage" placeholder="Nhập tin nhắn..." required />
+          <button type="submit">Gửi</button>
+        </form>
+      </div>
+    </div>
+
+   
+
+   
+
     
 
     
@@ -94,11 +122,14 @@ import TheWelcome from './components/TheWelcome.vue'
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref,computed, onMounted } from 'vue';
 import { useUserStore } from './stores/userStore';
 
 // Use the store
 const userStore = useUserStore();
+
+const showChat = ref(false);
+const userMessage = ref("");
 
 // Khôi phục trạng thái người dùng khi ứng dụng tải lại
 onMounted(() => {
@@ -109,10 +140,26 @@ onMounted(() => {
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const user = computed(() => userStore.user);
 
+const toggleChat = () => {
+  showChat.value = !showChat.value;
+};
+
+const sendMessage = () => {
+  if (userMessage.value.trim() !== "") {
+    // Xử lý gửi tin nhắn (như lưu hoặc gửi lên server)
+    console.log("User message:", userMessage.value);
+    userMessage.value = ""; // Clear input field
+  }
+};
+
+
+
 // Methods
 const logout = () => {
   userStore.clearUser();
 };
+
+
 </script>
 
 <style>
@@ -174,7 +221,7 @@ img{
 }
 
 .nav {
-  position: fixed;
+  /* position: sticky; */
   top: 0;
   left: 0;
   width: 100%;
@@ -187,7 +234,7 @@ img{
   align-items: center;
   justify-content: space-around;
   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  
 }
 /* nav{
   max-width: var(--max-width);
@@ -225,6 +272,7 @@ img{
 #dropdown {
   position: relative;
   display: inline-block;
+  z-index: 1000 !important;
 }
 
 .dropdown-content {
@@ -338,6 +386,97 @@ img{
   transform: translateY(-50%);
   width: 20rem;
   background-color: var(--text-light);
+}
+
+.chatbox-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 15px;
+  background-color: #1f2da7;
+  color: white;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Chatbox container to position chatbox on the bottom right */
+.chatbox-container {
+  position: fixed;
+  bottom: 80px; /* Adjust for space above chat button */
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  z-index: 1001;
+}
+
+/* Content of the chatbox */
+.chatbox-content {
+  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatbox-header {
+  background-color: #1f2da7;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chatbox-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.chatbox-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.chatbox-messages {
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f3f4f6;
+}
+
+.chatbox-input {
+  display: flex;
+  padding: 0.5rem;
+  border-top: 1px solid #ddd;
+}
+
+.chatbox-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.chatbox-input button {
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  background-color: #1f2da7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 </style>

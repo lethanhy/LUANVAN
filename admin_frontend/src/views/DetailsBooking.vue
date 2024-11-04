@@ -48,9 +48,27 @@
                 <p><strong>Thời gian:</strong> {{ calculateDays(bookings.checkin, bookings.checkout) }} ngày</p>
                 <p><strong>Tổng tiền phòng:</strong> {{ calculateRoomTotal(bookings.room.price, bookings.checkin, bookings.checkout) }}</p>
               </div>
+
+              <button @click="handleChangeRoom" class="btn btn-info mt-2 text-white ">Đổi phòng</button>
+            </div>
+
+            <div
+              
+              class="room-details"
+              v-if="bookings"
+            >
+              <div class="">
+                <p class="room-number">Thanh toán</p>
+              </div>
+              <div class="room-info">
+                <p><strong>Phương thức: </strong> {{ bookings.payment.phuongthuc }}</p>
+                <p><strong>Trạng thái giao dịch: </strong> {{ bookings.payment.paymentStatus }}</p>
+              </div>
             </div>
             <!-- <p v-else>Không có phòng đặt nào.</p> -->
           </div>
+
+          
         </div>
   
         <!-- Ordered Products Section (Below the two top sections) -->
@@ -76,7 +94,7 @@
               <h4 class="section-title">Tổng tiền</h4>
               <p class="total-text">Tổng tiền: {{ calculateTotal() }}</p>
             </div>
-            <div class="text-center" v-if="bookings" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
+            <div class="text-center" v-if="bookings && bookings.status !== 'đã hủy'" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
               <button 
                  v-if="bookings.paid"
                 @click="handlePayment" 
@@ -85,7 +103,7 @@
                 Xem hóa đơn
               </button>
               <button 
-                 v-if="!bookings.paid"
+                v-if="!bookings.paid && bookings.status !== 'đã hủy'"
                 @click="handlePayment" 
                 class="btn text-white"
               >
@@ -97,6 +115,48 @@
 
 
     </div>
+
+              <div v-if="showChangeRoom" class="modal-overlay" @click.self="showChangeRoom = false">
+                <div v-if="bookings" class="modal-content p-3 modal-sm">
+                  <!-- Hotel Info -->
+                  <h2 class="modal-title text-center mb-2 text-info">Đổi Phòng</h2>
+
+                  <p>Thời gian nhận phòng: {{ formatDate(bookings.checkin) }}</p>
+                  <p>Thời gian nhận phòng: {{ formatDate(bookings.checkout) }}</p>
+
+                  <!-- <div class="form-group-date">
+                    <label for="start-date">Thời gian nhận phòng</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-calendar-alt"></i>
+                      <input type="date" v-model="bookings.checkin"  />
+                    </div>
+                  </div>
+                  <div class="form-group-date">
+                    <label for="start-date">Thời gian trả phòng</label>
+                    <div class="input-wrapper">
+                      <i class="fas fa-calendar-alt"></i>
+                      <input type="date" v-model="bookings.checkout" />
+                    </div>
+                  </div> -->
+
+                  <div v-if="rooms.length">
+                    <h2>Phòng trống</h2>
+                    <ul>
+                      <li v-for="room in rooms" :key="room.id">
+                        phòng {{ room.roomNumber }} - {{ room.type }} - số lượng {{ room.maxGuests }} - {{ room.price.toLocaleString() }} VND
+
+                       
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Close Button -->
+                  <div class="text-center">
+                    <button type="button" class="btn btn-secondary me-2" @click="showChangeRoom = false">Hủy</button>
+                    <button class="btn btn-primary">In Hóa Đơn</button>
+                  </div>
+                </div>
+              </div>
 
               <!-- Thanh toán Modal -->
                 <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
@@ -180,11 +240,16 @@
       return {
         bookings: null,
         showModal: false,
-         currentDate: '',
+        showChangeRoom: false,
+        currentDate: '',
+        rooms: [],
+        
+
       };
     },
     mounted() {
     this.getCurrentDate();
+    this.getRoomAvailable();
   },
     async created() {
       try {
@@ -195,7 +260,36 @@
         console.log('Failed to load booking details:', error);
       }
     },
+    
     methods: {
+
+      handleChangeRoom() {
+    if (this.bookings) {
+      this.showChangeRoom = true;
+      this.getRoomAvailable(); // Fetch available rooms whenever the modal is opened
+    } else {
+      console.error('Bookings data is not available.');
+    }
+  },
+
+      async getRoomAvailable() {
+        console.log('Check-in date:', this.bookings.checkin);
+        console.log('Check-out date:', this.bookings.checkout);
+  
+ 
+    try {
+      const response = await api.get('/bookings/order', {
+        params: {
+          checkin: this.bookings.checkin,
+          checkout: this.bookings.checkout
+        }
+      });
+      this.rooms = response.data;
+    } catch (error) {
+      console.log('Failed to load room details:', error);
+      alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
+    }
+},
 
       getCurrentDate() {
       const today = new Date();

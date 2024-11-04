@@ -112,10 +112,10 @@ export default {
 <style>
 .signup {
   max-width: 1000px;
-  margin-top: 7rem;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   border-radius: 12px;
-  padding: 1.5rem;
+  /* padding: 1.5rem; */
 }
 
 .signup--body {

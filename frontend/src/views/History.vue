@@ -91,6 +91,7 @@
             </form>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -229,11 +230,11 @@ export default {
 }
 
 .history {
-  margin-top: 7rem;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   background: #fff;
   border-radius: 12px;
-  padding: 1.5rem;
+  /* padding: 1.5rem; */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 

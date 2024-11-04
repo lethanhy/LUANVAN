@@ -29,6 +29,15 @@
         </select>
       </div>
 
+       <!-- Search Bar for Payment Status -->
+       <div class="search-bar">
+        <select v-model="searchType" class="form-select" required>
+          <option value="">Đơn hàng</option>
+          <option value="tại chỗ">Tại chỗ</option>
+          <option value="online">Online</option>
+        </select>
+      </div>
+
       <!-- Search Bar -->
       <div class="search-bar">
         <input 
@@ -47,6 +56,7 @@
           <th scope="col">Tên khách hàng</th>
           <th scope="col">Ngày lập phiếu</th>
           <th scope="col">Tên nhân viên</th>
+          <th scope="col">Đặt phòng</th>
           <th scope="col">Hóa đơn</th>
           <th scope="col">Trạng thái</th>
           <th scope="col">Chi tiết</th>
@@ -60,6 +70,9 @@
           <td>{{ formatDate(booking.createdAt) }}</td>
           <td>Lê Thành Y</td>
           <td>
+            <p class="text-info fw-bold">{{ booking.bookingType }}</p>
+          </td>
+          <td>
             <button 
               :class="{ 'bill--false': !booking.paid, 'bill--true': booking.paid }"
               @click="togglePayment(booking)"
@@ -71,6 +84,7 @@
             <select @change="updateStatus(booking)"  v-model="booking.status" class="form-select small-select">
               <option value="đã đặt">Đã Đặt</option>
               <option value="đã nhận">Đã Nhận</option>
+              <option value="đã hủy">Đã Hủy</option>
               <option value="chờ xác nhận">Chờ Xác Nhận</option>
               <option value="hoàn thành">Hoàn thành</option>
             </select>
@@ -134,6 +148,7 @@ export default {
       searchQuery: '', // Dữ liệu tìm kiếm theo tên khách hàng
       searchHoaDon: '', // Tìm kiếm theo tình trạng hóa đơn
       searchDate:'',
+      searchType:'',
     };
   },
   async created() {
@@ -146,7 +161,8 @@ export default {
         const matchesName = booking.customer.name.toLowerCase().includes(this.searchQuery.toLowerCase());
         const matchesStatus = this.searchHoaDon === '' || String(booking.paid) === this.searchHoaDon;
         const matchesDate = booking.createdAt.toLowerCase().includes(this.searchDate.toLowerCase());
-        return matchesName && matchesStatus && matchesDate;
+        const matchesType = booking.bookingType.toLowerCase().includes(this.searchType.toLowerCase());
+        return matchesName && matchesStatus && matchesDate && matchesType;
       });
     },
     // Chia danh sách đã lọc theo trang

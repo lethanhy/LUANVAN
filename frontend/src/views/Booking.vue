@@ -6,13 +6,13 @@
         <div class="group__booking">
           <div class="form__booking">
             <div class="input__booking">
-              <label for="checkin">Check-In Date</label>
+              <label for="checkin">Ngày nhận phòng</label>
               <input type="date" v-model="checkin" :min="minDate" id="checkin">
             </div>
           </div>
           <div class="form__booking">
             <div class="input__booking">
-              <label for="checkout">Check-Out Date</label>
+              <label for="checkout">Ngày trả phòng</label>
               <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate" id="checkout">
             </div>
           </div>
@@ -21,13 +21,13 @@
         <div class="group__booking">
           <div class="form__booking">
           <div class="input__booking">
-            <label for="adults">Adults</label>
+            <label for="adults">Người lớn</label>
             <input type="number" id="adults" min="1" value="1">
           </div>
         </div>
         <div class="form__booking">
           <div class="input__booking">
-            <label for="children">Children</label>
+            <label for="children">Trẻ em</label>
             <input type="number" id="children" min="0" value="0">
           </div>
         </div>
@@ -78,7 +78,24 @@
             <option value="least-popular">Ít phổ biến nhất</option>
           </select>
         </div>
+
+        <div class="filter__booking">
+          <label for="roomType">Loại phòng:</label>
+          <select id="roomType" v-model="selectedType" @change="handleFilterChange">
+            <option value="">Tất cả</option>
+            <option value="single">Phòng đơn</option>
+            <option value="Double">Phòng đôi</option>
+            <option value="family">Phòng gia đình</option>
+          </select>
+        </div>
+
+
       </div>
+
+      <div>
+        <p class="text-start fs-3">Tổng đang có {{ totalRooms }} phòng trống</p>
+      </div>
+
       <div class="card__room">
         <div v-for="room in rooms" :key="room.id" class="popular__room">
           <img v-if="room.image" :src="`http://localhost:3000/uploads/${room.image}`" alt="popular hotel">
@@ -140,13 +157,21 @@ export default {
   data() {
     return {
      rooms:[],
+     originalRooms: [], // Store the original rooms list here
      minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
      checkin:'',
      checkout:'',
+    
      selectedPrice: '', // State for price filter
     selectedPopularity: '', // State for popularity filter
+    selectedType:'',
     };
 
+  },
+  computed: {
+    totalRooms() {
+      return this.rooms.length;
+    },
   },
   methods: {
 
@@ -176,10 +201,12 @@ export default {
           const response = await api.get('/bookings/order', {
             params: {
               checkin: this.checkin,
-              checkout: this.checkout
+              checkout: this.checkout,
+
             }
           });
           this.rooms = response.data;
+          this.originalRooms = [...response.data]; // Store a copy of all rooms
         } catch (error) {
           console.log('Failed to load room details:', error);
           alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
@@ -193,7 +220,7 @@ export default {
 
     handleFilterChange() {
       // Implement your filter logic here based on selectedPrice and selectedPopularity
-      let filteredRooms = this.rooms;
+      let filteredRooms =  [...this.originalRooms];
 
       if (this.selectedPrice) {
         filteredRooms = filteredRooms.sort((a, b) => {
@@ -205,6 +232,13 @@ export default {
         filteredRooms = filteredRooms.sort((a, b) => {
           return this.selectedPopularity === 'most-popular' ? b.rating - a.rating : a.rating - b.rating;
         });
+      }
+
+      // Filter by room type
+      if (this.selectedType) {
+        filteredRooms = filteredRooms.filter(
+          room => room.type.toLowerCase() === this.selectedType.toLowerCase()
+        );
       }
 
       this.rooms = filteredRooms;
@@ -244,7 +278,7 @@ export default {
 
 <style>
 .booking {
-  margin-top: 6rem;
+  margin-top: 1rem;
   display: flex;
   padding: 0 40px;
   gap: 2rem;

@@ -3,6 +3,8 @@ const querystring = require('qs');
 const Booking = require('../models/booking.model')
 const moment = require('moment');
 const config = require('../config/default.json');
+// Thêm import mailer
+const { sendBookingConfirmationEmail } = require('../utils/mailer');
 const { createBooking } = require('./booking.controller');
 
 // Hàm sắp xếp đối tượng theo thứ tự bảng chữ cái
@@ -125,9 +127,16 @@ class PaymentController {
                   // Tìm booking dựa trên BookingID và cập nhật thông tin
                   const bookingUpdate = await Booking.findOneAndUpdate(
                       {_id: orderId }, // Tìm booking bằng BookingID
-                      { paid: true, payment: "Thanh toán ngân hàng" }, // Cập nhật thông tin
+                      { paid: true,
+                        payment:{
+                          phuongthuc: "Thanh toán ngân hàng",
+                          paymentStatus:"thành công",
+                        }, 
+                        bookingType: "online",
+                        status:"chờ xác nhận"
+                       }, // Cập nhật thông tin
                       { new: true } // Trả về bản ghi đã cập nhật
-                  );
+                  ).populate('room').populate('customer');
   
                   if (!bookingUpdate) {
                       return res.status(404).json({
@@ -135,10 +144,22 @@ class PaymentController {
                           msg: "Không tìm thấy đơn hàng để cập nhật",
                       });
                   }
+
+                  // Gửi email xác nhận khi thanh toán thành công
+              sendBookingConfirmationEmail(
+                bookingUpdate.customer.email, // Email của khách hàng
+                {
+                  BookingID: bookingUpdate._id,
+                  checkin: bookingUpdate.checkin,
+                  checkout: bookingUpdate.checkout,
+                  roomType: bookingUpdate.room.type,
+                  totalCost: bookingUpdate.room.price,
+                }
+              );
   
                   return res.status(200).json({
                       statusCode: 200,
-                      msg: "Đơn hàng đã được xác nhận",
+                      msg: "Đơn hàng đã được xác nhận và email xác nhận đã gửi",
                       data: {
                             BookingID: bookingUpdate.BookingID, // Đảm bảo bạn trả về trường này
                             ...bookingUpdate // Hoặc bao gồm toàn bộ dữ liệu nếu cần
@@ -147,9 +168,16 @@ class PaymentController {
               } else {
                   // Giao dịch không thành công
                   await Booking.findOneAndUpdate(
-                      { BookingID: orderId },
-                      { status: "cancel" },
-                      { new: true }
+                    {_id: orderId }, // Tìm booking bằng BookingID
+                    { paid: false,
+                      payment:{
+                        phuongthuc: "Thanh toán ngân hàng",
+                        paymentStatus:"thất bại",
+                      },
+                      bookingType: "online",
+                      status:"đã hủy"
+                     }, // Cập nhật thông tin
+                    { new: true } // Trả về bản ghi đã cập nhật
                   );
   
                   return res.status(400).json({

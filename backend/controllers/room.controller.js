@@ -215,7 +215,7 @@ const getRooms = async (req, res) => {
         const rooms = await Room.find(); // Lấy tất cả các phòng
 
         // Lấy tất cả bookings để kiểm tra
-        const bookings = await Booking.find({paid: false,  status: { $ne: 'đã hủy' } }).populate('customer'); // Giả định bạn có một mô hình Booking
+        const bookings = await Booking.find({ status: { $nin: ['đã hủy', 'hoàn thành','chờ xác nhận'] } }).populate('customer'); // Giả định bạn có một mô hình Booking
 
         const filteredRooms = rooms.map((room) => {
             // Tìm các booking liên quan đến phòng này
@@ -261,24 +261,37 @@ const deleteRoomById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find and delete the room by ID
+        // Kiểm tra xem phòng có bản ghi đặt với trạng thái khác 'đã hủy' và 'hoàn thành' không
+        const bookingExists = await Booking.findOne({ 
+            room: id, 
+            status: { $nin: ['đã hủy', 'hoàn thành'] } 
+        });
+
+        if (bookingExists) {
+            return res.status(400).json({ message: 'Phòng đang có người đặt, không thể xóa' });
+        }
+
+        // Nếu không có bản ghi đặt nào, tiến hành xóa phòng
         const result = await Room.findByIdAndDelete(id);
 
         if (result) {
-            res.status(200).json({ message: 'Room deleted successfully' });
+            res.status(200).json({ message: 'Xóa phòng thành công' });
         } else {
-            res.status(404).json({ message: 'Room not found' });
+            res.status(404).json({ message: 'Không tìm thấy phòng' });
         }
     } catch (error) {
-        console.error('Error deleting room:', error);
-        res.status(500).json({ message: 'Error deleting room', error });
+        console.error('Lỗi khi xóa phòng:', error);
+        res.status(500).json({ message: 'Lỗi khi xóa phòng', error });
     }
 };
+
 
 const deleteRoom = async (req, res) => {
     try {
         const { id } = req.params;
         const room = await Room.findByIdAndDelete(id);
+
+        
         if(!room) {
             return res.status(404).send({ message: "Room not found"});
         }
@@ -378,8 +391,8 @@ const getRoomByIdAndDate = async (req, res) => {
         // 2. Find an unpaid booking for the given room ID and date range
         const bookingForDate = await Booking.findOne({
             room: id,
-            paid: false,
-            status: { $ne: 'đã hủy' }, // Exclude canceled bookings
+            // paid: false,
+            status: { $nin: ['đã hủy', 'hoàn thành', 'chờ xác nhận'] },
             checkin: { $lte: selectedDate }, // Selected date must be on or after check-in
             checkout: { $gte: selectedDate }  // Selected date must be on or before check-out
         })

@@ -1,15 +1,38 @@
 <template>
-  <div class="container text-center">
-    <h1>Kết quả thanh toán</h1>
+  <div class="container text-center d-flex justify-content-center">
+    
     <div v-if="loading">Đang xử lý...</div>
     <div v-else-if="success">
-      <p class="text-success fw-bold fs-4">Thanh toán thành công!</p>
-      <p>Mã đơn đặt phòng: {{ bookingId }}</p>
+      <div class="message--success shadow">
+            <div class="icon--check">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <p class="fs-3 fw-bold mt-2">Thanh toán thành công</p>
+            <p class="m-3">Mọi thứ đều hoạt động bình thường.</p>
+            <div class="success--input">
+              <button  @click="$router.push('/')" class="btn border border-success text-success m-2">Quay lại trang chủ</button>
+            </div>
+        </div>
     </div>
     <div v-else>
-      <p class="text-danger fw-bold fs-4">Thanh toán thất bại. Vui lòng thử lại.</p>
+      <div class="message--false shadow">
+        
+        <div class="icon--check--error">
+          <i class="fa-solid fa-xmark"></i>
+        </div>
+        <p class="fs-3 fw-bold mt-2">Thanh toán thất bại</p>
+        <p class="m-3">Rất tiết!, Đã xảy ra lỗi!</p>
+        <div class="success--input">
+          <button @click="$router.push('/')"  class="btn border border-danger text-danger m-2">Quay lại trang chủ</button>
+        </div>
+      </div>
+      
+      
+
+        
+      
     </div>
-    <router-link to="/" class="btn btn-primary mt-4">Quay lại trang chủ</router-link>
+    
   </div>
 </template>
 
@@ -47,6 +70,29 @@ export default {
 
 <style scoped>
 .container {
-  margin-top: 7rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+.message--success {
+    /* position: fixed; */
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa icon và text theo chiều ngang */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.message--false {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa icon và text theo chiều ngang */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

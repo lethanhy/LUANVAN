@@ -389,9 +389,17 @@ export default {
                 }
             } catch (error) {
                 console.log('Error deleting room:', error);
-                this.successMessage = 'Có lỗi xảy ra khi xóa phòng';
+                this.successMessage = error.response.data.message;
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
+
+        //         if (error.response && error.response.data) {
+        //     console.error(error.response.data.message); // Lấy thông báo lỗi từ server
+        //     // Hiển thị thông báo lỗi trong giao diện người dùng
+        //     alert(error.response.data.message); // "Phòng đang có người đặt, không thể xóa"
+        // } else {
+        //     console.error('Đã xảy ra lỗi không xác định');
+        // }
             }
         },
             async updateRooms() {
