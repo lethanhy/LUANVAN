@@ -5,7 +5,7 @@
         <div class="card--header">
           <div class="amount">
             <span class="title">Phòng</span>
-            <span class="amount--value">{{ totalRooms }}</span> <!-- Dynamic Value -->
+            <span class="amount--value">{{ totalRooms }}</span>
           </div>
           <i class="fa-solid fa-calendar-days icon dark-red"></i>
         </div>
@@ -38,7 +38,7 @@
         <div class="card--header">
           <div class="amount">
             <span class="title">Liên Hệ</span>
-            <span class="amount--value">5</span>
+            <span class="amount--value">{{ totalContacts }}</span>
           </div>
           <i class="fas fa-question-circle icon dark-blue"></i>
         </div>
@@ -54,7 +54,48 @@
       </div>
 
       <div class="main--table">
-        <PieChart />
+        <h3 class="text-info mt-2">Lịch đặt phòng</h3>
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th scope="col">STT</th>
+              <th scope="col">Khách</th>
+              <th scope="col">Phòng</th>
+              <th scope="col">Ngày</th>
+              <th scope="col">Trạng thái</th>
+
+            </tr>
+          </thead>
+          <tbody v-if="bookings.length">
+            <tr v-for="(booking, index) in bookings.slice(0, 7)" :key="booking._id">
+              <th scope="row">{{ index + 1 }}</th>
+              <td>{{ booking.customer.name }}</td>
+              <td>{{ booking.room.roomNumber }}</td>
+              <td>{{ formatDate(booking.checkin) }}</td>
+              <td>
+                <button 
+                  class="btn" 
+                  :class="{
+                    'text-success': booking.status === 'hoàn thành', 
+                    'text-danger': booking.status === 'hủy',
+                    'text-primary': booking.status === 'đã đặt',
+
+                  }"
+                >
+                  {{ booking.status }}
+                </button>
+              </td>
+
+            </tr>
+          </tbody>
+          <tr v-else>
+            <td colspan="4">Đang tải dữ liệu...</td>
+          </tr>
+        </table>
+        <div class="text-end">
+          <button class="btn btn-dark text-white"><router-link to="/bookings" class="text-decoration-none text-white">Xem thêm</router-link></button>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -63,31 +104,47 @@
 <script>
 import { defineComponent, ref, onMounted } from 'vue';
 import BarChart from '@/components/BarChart.vue';
-import PieChart from '@/components/PieChart.vue';
 import api from '../api'; // Ensure this points to your axios instance
-import { Filler } from 'chart.js';
 
 export default defineComponent({
   name: 'Dashboard',
-  components: { BarChart, PieChart },
+  components: { BarChart },
 
   setup() {
-    const totalRooms = ref(0); // Reactive state for room count
-    const bookingRooms = ref(0); // Reactive state for today's bookings
+    const totalRooms = ref(0);
+    const bookingRooms = ref(0);
     const totalCustomer = ref(0);
-    const customers = ref(0);
+    const customers = ref([]);
+    const totalContacts = ref(0);
+    const bookings = ref([]);
 
-    // Fetch all rooms
     const getAllRooms = async () => {
       try {
         const response = await api.get('/rooms');
-        totalRooms.value = response.data.length; // Update totalRooms count
+        totalRooms.value = response.data.length;
       } catch (error) {
         console.error('Error fetching rooms:', error);
       }
     };
 
-    // Get current date in YYYY-MM-DD format
+    const getAllContacts = async () => {
+      try {
+        const response = await api.get('/contact');
+        totalContacts.value = response.data.length;
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      }
+    };
+
+    const getAllBooking = async () => {
+      try {
+        const response = await api.get('/bookings');
+        bookings.value = response.data;
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+      }
+    };
+
     const getCurrentDate = () => {
       const today = new Date();
       const yyyy = today.getFullYear();
@@ -96,49 +153,53 @@ export default defineComponent({
       return `${yyyy}-${mm}-${dd}`;
     };
 
-    // Fetch bookings for today
     const getBookingRoomsToday = async () => {
       try {
         const date = getCurrentDate();
         const response = await api.get(`/bookings/date/${date}`);
-        bookingRooms.value = response.data.length; // Update today's bookings count
+        bookingRooms.value = response.data.length;
       } catch (error) {
-        console.error('Error fetching today', error);
+        console.error('Error fetching today\'s bookings:', error);
       }
     };
 
     const getAllCustomer = async () => {
       try {
-        const date = getCurrentDate(); // Get current date in 'YYYY-MM-DD' format
+        const date = getCurrentDate();
         const response = await api.get('/customers');
-        
         customers.value = response.data;
 
-        // Filter customers whose createdAt matches the current date (YYYY-MM-DD)
         const filteredCustomers = customers.value.filter(customer => {
-          const createdDate = customer.createdAt.split('T')[0]; // Extract date part
+          const createdDate = customer.createdAt.split('T')[0];
           return createdDate === date;
         });
 
-        totalCustomer.value = filteredCustomers.length; // Store the count of today's customers
-
+        totalCustomer.value = filteredCustomers.length;
       } catch (error) {
         console.error('Error fetching customers:', error);
       }
     };
 
+    const formatDate = (dateString) => {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      return new Date(dateString).toLocaleDateString('vi-VN', options);
+    };
 
-    // Call API methods when the component is mounted
-    onMounted(() => {
-      getAllRooms();
-      getBookingRoomsToday();
-      getAllCustomer();
+    onMounted(async () => {
+      await Promise.all([
+        getAllRooms(),
+        getBookingRoomsToday(),
+        getAllCustomer(),
+        getAllContacts(),
+        getAllBooking()
+      ]);
     });
 
-    return { totalRooms, bookingRooms, totalCustomer };
-  },
+    return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate };
+  }
 });
 </script>
+
 
   
   <style>
@@ -249,7 +310,7 @@ export default defineComponent({
   }
   
   .main--content {
-    margin-top: 20px; /* Space between card section and this section */
+    margin-top: 10px; /* Space between card section and this section */
   }
   
   .content-wrapper {
@@ -261,7 +322,7 @@ export default defineComponent({
     flex: 1; /* Allows both sections to take equal space */
     margin: 0 10px; /* Adds space between the two sections */
     background: #fff;
-    padding: 1.5rem;
+    padding: 1rem;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }

@@ -8,6 +8,9 @@ const RoomSchema = mongoose.Schema(
             required: [true, 'Room number is required'],
             unique: true,
         },
+        roomName: {
+            type: String,
+        },
         type: {
             type: String,
             required: [ true, 'Room type is required'],
@@ -17,6 +20,12 @@ const RoomSchema = mongoose.Schema(
             type: Number,
             require: [true, 'Room price is required'],
            
+        },
+        children: {
+            type: Number,
+        },
+        adults: {
+            type: Number,
         },
         // available: {
         //     type: Boolean,
@@ -50,13 +59,17 @@ const RoomSchema = mongoose.Schema(
         description: {
             type: String,
         },
-        maxGuests: {
-            type: Number,
-            required: [true, "Maximum number of guests is required"],
-        },
-        bookings: {
-            type: [String],
+        // maxGuests: {
+        //     type: Number,
+        //     required: [true, "Maximum number of guests is required"],
+        // },
+        xoaRoom: {
+            type: Boolean,
+            default: true
         }
+        // bookings: {
+        //     type: [String],
+        // }
     },
     {
         timestamps: true,

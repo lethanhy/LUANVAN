@@ -8,7 +8,7 @@ const Staff = require("../models/staff.model.js");
 const getBooking = async (req, res) => {
     try {
         // Tìm booking và populate thông tin phòng
-        const booking = await Booking.find().populate('customer');
+        const booking = await Booking.find().populate('customer').populate('room');
 
         if(!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -343,6 +343,7 @@ const getRoomByAvailable = async (req, res) => {
             // maxGuests: adults,
             // children:children, // Exclude rooms that are booked
             trangthai: 'Đã dọn dẹp', // Ensure the room is marked as available
+            xoaRoom: true,
         });
 
         // Step 4: Return available rooms
@@ -352,6 +353,54 @@ const getRoomByAvailable = async (req, res) => {
         res.status(500).json({ message: 'Error fetching available rooms' });
     }
 };
+
+const getRoomByUserOnline = async (req, res) => {
+    const { checkin, checkout, adults, children } = req.query; // Thêm adults và children vào tham số truy vấn
+
+    try {
+        // Step 1: Tìm các booking trùng lặp với khoảng thời gian yêu cầu
+        const overlappingBookings = await Booking.find({
+            $and: [
+                {
+                    $or: [
+                        { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Trùng với khoảng thời gian
+                        { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
+                        { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checkin
+                    ],
+                },
+                { status: { $nin: ["đã hủy", "hoàn thành"] } } // Loại trừ trạng thái đã hủy hoặc hoàn thành
+            ]
+        }).select('room'); // Chỉ chọn trường room
+
+        // Step 2: Trích xuất ID các phòng đã đặt
+        const bookedRoomIds = overlappingBookings.map(bookings => bookings.room);
+
+        // Step 3: Tìm các phòng trống có điều kiện về sức chứa
+        const query = {
+            _id: { $nin: bookedRoomIds }, // Loại trừ các phòng đã đặt
+            trangthai: 'Đã dọn dẹp', // Phòng có trạng thái 'Đã dọn dẹp'
+            xoaRoom: true // Phòng chưa bị xóa
+        };
+
+        // Add adults and children condition if they are provided
+        if (adults) {
+            query.adults = { $gte: adults }; // Số người lớn tối thiểu
+        }
+
+        if (children) {
+            query.children = { $gte: children }; // Số trẻ em tối thiểu
+        }
+
+        const availableRooms = await Room.find(query);
+
+        // Step 4: Trả về danh sách các phòng trống
+        res.status(200).json(availableRooms);
+    } catch (error) {
+        console.error('Error fetching available rooms:', error);
+        res.status(500).json({ message: 'Error fetching available rooms' });
+    }
+};
+
 
 
 
@@ -660,6 +709,79 @@ const getWeeklyBookings = async (req, res) => {
       }
 }
 
+const getDailyBookings = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Đặt thời gian đầu ngày
+
+        const endOfDay = new Date(currentDate);
+        endOfDay.setHours(23, 59, 59, 999); // Đặt thời gian cuối ngày
+
+        const bookings = await Booking.find({
+            checkin: {
+                $gte: currentDate,
+                $lte: endOfDay,
+            },
+        });
+
+        // Khởi tạo mảng chứa số lượng đặt phòng cho mỗi giờ trong ngày (0h đến 23h)
+        const dailyData = Array(24).fill(0);
+
+        bookings.forEach(booking => {
+            const hour = new Date(booking.checkin).getHours(); // Lấy chỉ số giờ (0 đến 23)
+            dailyData[hour] += 1; // Tăng số lượng đặt phòng cho giờ tương ứng
+        });
+
+        res.status(200).json({
+            message: 'Daily bookings retrieved successfully',
+            data: dailyData, // [Số đơn đặt 0h, 1h, ..., 23h]
+        });
+    } catch (error) {
+        console.error('Error fetching daily bookings:', error);
+        res.status(500).json({
+            message: 'Error fetching daily bookings',
+            error: error.message,
+        });
+    }
+};
+
+const getMonthlyBookings = async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1); // Ngày đầu tháng
+        const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0); // Ngày cuối tháng
+
+        const bookings = await Booking.find({
+            checkin: {
+                $gte: startOfMonth,
+                $lte: endOfMonth,
+            },
+        });
+
+        // Khởi tạo mảng chứa số lượng đặt phòng cho mỗi ngày trong tháng
+        const daysInMonth = endOfMonth.getDate();
+        const monthlyData = Array(daysInMonth).fill(0);
+
+        bookings.forEach(booking => {
+            const day = new Date(booking.checkin).getDate() - 1; // Lấy chỉ số ngày trong tháng (0 = Ngày 1, ...)
+            monthlyData[day] += 1; // Tăng số lượng đặt phòng cho ngày tương ứng
+        });
+
+        res.status(200).json({
+            message: 'Monthly bookings retrieved successfully',
+            data: monthlyData, // [Số đơn đặt ngày 1, 2, ..., ngày cuối]
+        });
+    } catch (error) {
+        console.error('Error fetching monthly bookings:', error);
+        res.status(500).json({
+            message: 'Error fetching monthly bookings',
+            error: error.message,
+        });
+    }
+};
+
+
+
 
 
 
@@ -687,6 +809,9 @@ module.exports = {
     confirmation,
     earlyCheckout,
     getWeeklyBookings,
+    getDailyBookings,
+    getMonthlyBookings,
+    getRoomByUserOnline
 
 
 };

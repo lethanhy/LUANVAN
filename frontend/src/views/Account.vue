@@ -139,7 +139,7 @@ export default {
 
 <style>
 .account {
-  margin-top: 7rem;
+  margin-top: 1rem;
   margin-bottom: 2rem;
   background: #fff;
   border-radius: 12px;

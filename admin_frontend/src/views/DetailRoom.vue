@@ -119,8 +119,8 @@
                         <h3>Menu</h3>
                         <ul>
                             <li v-for="item in menuItems" :key="item._id">
-                                {{ item.name }} - {{ formatCurrency(item.price) }}
-                                <button type="button" class="btn btn-success" @click="selectItem(item)">Chọn</button>
+                                {{ item.name }} - {{ formatCurrency(item.price) }} - {{ item.quantity }}
+                                <button type="button" class="btn btn-success" @click="selectItem(item, item.quantity)">Chọn</button>
                             </li>
                         </ul>
                     </div>
@@ -291,27 +291,35 @@ export default {
               console.error('Lỗi khi lấy danh sách món ăn:', error);
             }
         },
-        // Hàm thêm món vào danh sách đã chọn
-        selectItem(item) {
-            const exists = this.selectedItems.find(selectedItem => selectedItem._id === item._id);
-            if (exists) {
-                exists.quantity += 1;
+         // Hàm thêm món vào danh sách đã chọn
+    selectItem(item, quantity) {
+        const exists = this.selectedItems.find(selectedItem => selectedItem._id === item._id);
+        
+        // Kiểm tra nếu món đã có trong danh sách và số lượng chưa vượt quá số lượng có sẵn
+        if (exists) {
+            if (exists.quantity < quantity) {
+                exists.quantity += 1;  // Tăng số lượng món nếu chưa vượt quá số lượng có sẵn
             } else {
-                this.selectedItems.push({ ...item, quantity: 1 });
+                alert('Không thể chọn thêm món này, đã đủ quá số lượng'); // Thông báo nếu số lượng đã đủ
             }
-        },
-
-
-        // Hàm xóa món khỏi danh sách đã chọn
-        removeItem(index) {
-      const item = this.selectedItems[index];
-      if (item.quantity > 1) {
-        item.quantity -= 1;
-      } else {
-        this.selectedItems.splice(index, 1);
-      }
+        } else {
+            if (1 <= quantity) {
+                this.selectedItems.push({ ...item, quantity: 1 }); // Thêm món vào danh sách với số lượng ban đầu là 1
+            } else {
+                alert('Không thể chọn món này, hết hàng'); // Thông báo nếu không có sẵn món
+            }
+        }
     },
 
+    // Hàm xóa món khỏi danh sách đã chọn
+    removeItem(index) {
+        const item = this.selectedItems[index];
+        if (item.quantity > 1) {
+            item.quantity -= 1;  // Giảm số lượng nếu lớn hơn 1
+        } else {
+            this.selectedItems.splice(index, 1);  // Xóa món nếu số lượng là 1
+        }
+    },
         // Hàm gửi đơn hàng đã chọn
         async addMenu() {
           if (this.selectedItems.length === 0) {

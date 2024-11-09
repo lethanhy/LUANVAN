@@ -14,6 +14,9 @@ import DetailsBooking from '@/views/DetailsBooking.vue';
 import Profile from '@/views/Profile.vue';
 import Bill from '@/views/Bill.vue';
 import Review from '@/views/Review.vue';
+import RoomType from '@/views/RoomType.vue';
+import Contact from '@/views/Contact.vue';
+import Role from '@/views/Role.vue';
 
 
 const routes = [
@@ -31,6 +34,9 @@ const routes = [
   { path: '/profile/:id', name: 'Profile', component: Profile },
   { path: '/bill', name: 'Bill', component: Bill },
   { path: '/review', name: 'Review', component: Review },
+  { path: '/roomtype', name: 'RoomType', component: RoomType },
+  { path: '/contact', name: 'Contact', component: Contact },
+  { path: '/role', name: 'Role', component: Role},
   
 ];
 

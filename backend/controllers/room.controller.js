@@ -8,11 +8,11 @@ const config = require('../config/config.js');
 
 const createRoom = async (req, res) => {
     try {
-        const { roomNumber, type, price, status, trangthai, maxGuests,description } = req.body;
+        const { roomNumber, roomName, type, price, children, adults, trangthai,description } = req.body;
         const image = req.file.filename; // Giả sử bạn sử dụng multer để upload hình ảnh
 
         // Xác nhận dữ liệu đầu vào
-        if (!roomNumber || !type || !price || !status || !trangthai || !maxGuests || !description) {
+        if (!roomNumber || !roomName ||!type || !price || !trangthai || !children ||!adults || !description) {
             return res.status(400).json({ message: 'Thiếu thông tin cần thiết' });
         }
 
@@ -23,11 +23,12 @@ const createRoom = async (req, res) => {
 
         const newRoom = new Room({
             roomNumber,
+            roomName,
             type,
             price,
-            status,
+            children,
+            adults,
             trangthai,
-            maxGuests,
             description,
             image,  // Lưu URL ảnh
            
@@ -212,7 +213,7 @@ const getRooms = async (req, res) => {
 
         // console.log("Selected Date:", selectedDate); // Kiểm tra ngày được chọn
 
-        const rooms = await Room.find(); // Lấy tất cả các phòng
+        const rooms = await Room.find({ xoaRoom: true}); // Lấy tất cả các phòng
 
         // Lấy tất cả bookings để kiểm tra
         const bookings = await Booking.find({ status: { $nin: ['đã hủy', 'hoàn thành','chờ xác nhận'] } }).populate('customer'); // Giả định bạn có một mô hình Booking
@@ -271,19 +272,24 @@ const deleteRoomById = async (req, res) => {
             return res.status(400).json({ message: 'Phòng đang có người đặt, không thể xóa' });
         }
 
-        // Nếu không có bản ghi đặt nào, tiến hành xóa phòng
-        const result = await Room.findByIdAndDelete(id);
+        // Nếu không có bản ghi đặt nào, tiến hành cập nhật phòng
+        const result = await Room.findByIdAndUpdate(
+            id,
+            { xoaRoom: false },  // Cập nhật trường xoaRoom thành false
+            { new: true }  // Trả về document mới đã được cập nhật
+        );
 
         if (result) {
-            res.status(200).json({ message: 'Xóa phòng thành công' });
+            res.status(200).json({ message: 'Cập nhật phòng thành công', room: result });
         } else {
             res.status(404).json({ message: 'Không tìm thấy phòng' });
         }
     } catch (error) {
-        console.error('Lỗi khi xóa phòng:', error);
-        res.status(500).json({ message: 'Lỗi khi xóa phòng', error });
+        console.error('Lỗi khi cập nhật phòng:', error);
+        res.status(500).json({ message: 'Lỗi khi cập nhật phòng', error });
     }
 };
+
 
 
 const deleteRoom = async (req, res) => {

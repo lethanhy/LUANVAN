@@ -7,6 +7,7 @@
         class="form-date mb-3" 
         v-model="searchDate" 
         @change="fetchBookings"
+        :min="minDate"
       />
     </div>
 
@@ -36,6 +37,7 @@ export default {
       singleRooms: [], // Phòng đơn
       doubleRooms: [], // Phòng đôi
       familyRooms: [], // Phòng gia đình
+      minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
     
 
     };

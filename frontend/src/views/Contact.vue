@@ -6,20 +6,20 @@
                     <h2 class="contact--title fw-bold">Hãy liên lạc</h2>
                     <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn 24/7. Nếu có bất kỳ câu hỏi hoặc yêu cầu nào, 
                         đừng ngần ngại liên hệ với chúng tôi qua thông tin bên dưới:
-                        
                     </p>
                     <div class="contact--body">
+                        <!-- Contact details here -->
                         <div class="d-flex align-items-center mb-1">
                             <div class="icon-circle">
                                 <i class="fa-solid fa-location-dot"></i>
                             </div>
-                            
                             <div class="ms-3">
                                 <p class="contact--title">Head Office</p>
                                 <p>28 Đường Thi Sách, Phường Thắng Tám, TP Vũng Tàu, BR-VT</p>
                                 <p>Việt Nam</p>
                             </div>
                         </div>
+                        <!-- Email and Phone Info here -->
 
                         <div class="d-flex align-items-center mb-3">
                             <div class="icon-circle">
@@ -42,16 +42,17 @@
                                 <p>+123456789</p>
                             </div>
                         </div>
-
                     </div>
                     
                     <hr>
                     <div class="mt-3">
                         <p class="contact--title">Follow our social media</p>
                         <div class="d-flex gap-3">
+                            <!-- Social media icons here -->
                             <div class="icon-circle">
                                 <i class="fa-brands fa-facebook"></i>
                             </div>
+
                             <div class="icon-circle">
                                 <i class="fa-brands fa-twitter"></i>
                             </div>
@@ -64,52 +65,91 @@
                         </div>
                     </div>
                 </div>
-                
-               
-
             </div>
+
             <div class="col-lg-6 d-flex align-items-center justify-content-center">
                 <div class="contact--send">
-
                     <h2 class="contact--title">Gửi tin nhắn cho chúng tôi</h2>
-                    <form action="" class="row g-3">
+                    <form @submit.prevent="createContact" class="row g-3">
                         <div class="col-md-6">
-                            <!-- <label for="name" class="form-label">Tên</label> -->
-                            <input type="text" class="form-control" id="name" placeholder="Tên">
+                            <input v-model="contactForm.ten" type="text" class="form-control" placeholder="Tên">
                         </div>
                         <div class="col-md-6">
-                            <!-- <label for="address" class="form-label">Địa chỉ</label> -->
-                            <input type="text" class="form-control" id="address" placeholder="Địa chỉ">
+                            <input v-model="contactForm.diachi" type="text" class="form-control" placeholder="Địa chỉ">
                         </div>
                         <div class="col-md-6">
-                            <!-- <label for="phone" class="form-label">Số điện thoại</label> -->
-                            <input type="text" class="form-control" id="phone" placeholder="Số điện thoại">
+                            <input v-model="contactForm.sodienthoai" type="text" class="form-control" placeholder="Số điện thoại">
                         </div>
                         <div class="col-md-6">
-                            <!-- <label for="inputPassword4" class="form-label">Password</label> -->
-                            <input type="password" class="form-control" id="inputPassword4" placeholder="Mật khẩu">
+                            <input v-model="contactForm.email" type="email" class="form-control" placeholder="Email">
                         </div>
-
                         <div class="form-floating">
-                            <textarea class="form-control bg-light" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                            <textarea v-model="contactForm.tinnhan" class="form-control bg-light" placeholder="Leave a comment here" style="height: 100px"></textarea>
                             <label for="floatingTextarea2">Tin nhắn</label>
                         </div>
-
-                        <div class=" d-grid mx-auto rounded-3">
-                            <button class="btn btn-primary ">Gửi ngay</button>
+                        <div class="d-grid mx-auto rounded-3">
+                            <button type="submit" class="btn btn-primary">Gửi ngay</button>
                         </div>
-
                     </form>
-
                 </div>
-                
-               
-
             </div>
         </div>
-
     </div>
 </template>
+
+<script>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import api from '../api';
+import { useUserStore } from '../stores/userStore';
+
+export default {
+  name: 'Contact',
+
+  setup() {
+    const userStore = useUserStore();
+    const route = useRoute();
+    
+    // Reactive form data
+    const contactForm = ref({
+      ten: '',
+      diachi: '',
+      sodienthoai: '',
+      email: '',
+      tinnhan: ''
+    });
+
+    onMounted(() => {
+      userStore.restoreUser();
+    });
+
+    const createContact = async () => {
+      const contactData = {
+        customerId: userStore.user && userStore.user.id ? userStore.user.id : null,
+        ...contactForm.value // Include form values in contact data
+      };
+
+      try {
+        const response = await api.post('/contact', contactData);
+        console.log('API response:', response.data);
+        alert('Gửi liên hệ thành công!');
+        // Reset form after submission
+        contactForm.value = { ten: '', daichi: '', sodienthoai: '', email: '', tinnhan: '' };
+      } catch (error) {
+        console.error('Lỗi khi tạo booking:', error);
+        alert('Có lỗi xảy ra khi gửi liên hệ. Vui lòng thử lại.');
+      }
+    };
+
+    return {
+      user: userStore.user,
+      contactForm,
+      createContact
+    };
+  },
+};
+</script>
+
 <style>
 .contact {
     max-width: 1000px;

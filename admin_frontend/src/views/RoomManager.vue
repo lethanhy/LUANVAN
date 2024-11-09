@@ -4,6 +4,7 @@
             <h1 class="text-center text-info fw-bold">Quản lý phòng</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+                <button class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> <router-link to="/roomtype" class="text-decoration-none text-white">Loại phòng</router-link> </button>
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> Thêm phòng</button>
             </div>
 
@@ -104,9 +105,8 @@
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
                     <h2 class="modal-title text-center text-info">Thêm phòng</h2>
-                    <form @submit.prevent="addRoom">
+                    <form @submit.prevent="addRoom" class="addRoom">
 
-                        <div class="d-flex justify-content-between">
                             <div class="mb-3">
                                 <label for="roomNumber" class="form-label">Số phòng</label>
                                 <input type="text" id="roomNumber" v-model="newRoom.roomNumber" class="form-control" required>
@@ -120,20 +120,20 @@
                                     <option value="family">Phòng gia đình</option>
                                 </select>
                             </div>
-                        </div>
+                        
 
-                        <div class="d-flex justify-content-between">
+                        
                             <div class="mb-3">
                                 <label for="price" class="form-label">Giá phòng</label>
                                 <input type="text" id="price" v-model="newRoom.price" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label for="status" class="form-label">Trạng thái phòng trống</label>
-                                <input type="text" id="status" v-model="newRoom.status" class="form-control" required>
+                                <label for="roomName" class="form-label">Tên phòng</label>
+                                <input type="text" id="roomName" v-model="newRoom.roomName" class="form-control" required>
                             </div>
-                        </div>
+                      
 
-                        <div class="d-flex justify-content-between">
+                        
                             <div class="mb-3">
                                 <label for="trangthai" class="form-label">Trạng thái</label>
                                 <select id="trangthai" v-model="newRoom.trangthai" class="form-select" required>
@@ -143,10 +143,15 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="maxGuests" class="form-label">Số lượng khách</label>
-                                <input type="text" id="maxGuests" v-model="newRoom.maxGuests" class="form-control" required>
+                                <label for="adults" class="form-label">Người lớn</label>
+                                <input type="text" id="adults" v-model="newRoom.adults" class="form-control" required>
                             </div>
-                        </div>
+                        
+
+                        <div class="mb-3">
+                                <label for="children" class="form-label">Trẻ em</label>
+                                <input type="text" id="children" v-model="newRoom.children" class="form-control" required>
+                            </div>
 
                         <div class="mb-3">
                             <label for="description" class="form-label">Thông tin</label>
@@ -169,9 +174,9 @@
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
                     <h2 class="modal-title text-center text-info">Chỉnh Sửa Phòng</h2>
-                    <form @submit.prevent="updateRooms">
+                    <form @submit.prevent="updateRooms" class="editRoom">
                        
-                        <div class="d-flex justify-content-between">
+                        
                             <div class="mb-3">
                                 <label for="editRoomNumber" class="form-label">Số phòng</label>
                                 <input type="text" id="editRoomNumber" v-model="editRoom.roomNumber" class="form-control" required>
@@ -187,22 +192,22 @@
                             </div>
 
                             
-                        </div>
+                       
 
                       
-                        <div class="d-flex justify-content-between">
+                        
                             <div class="mb-3">
                                 <label for="editPrice" class="form-label">Giá phòng</label>
                                 <input type="text" id="editPrice" v-model="editRoom.price" class="form-control" required>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="editStatus" class="form-label">Trạng thái phòng trống</label>
-                                <input type="text" id="editStatus" v-model="editRoom.status" class="form-control" required>
+                                <label for="editRoomName" class="form-label">Tên phòng</label>
+                                <input type="text" id="editRoomName" v-model="editRoom.roomName" class="form-control" required>
                             </div>
-                        </div>
+                       
 
-                        <div class="d-flex justify-content-between">
+                        
                             <div class="mb-3">
                                 <label for="editTrangthai" class="form-label">Trạng thái</label>
                                 <select id="editTrangthai" v-model="editRoom.trangthai" class="form-select" required>
@@ -212,18 +217,25 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="editMaxGuests" class="form-label">Số lượng khách</label>
-                                <input type="text" id="editMaxGuests" v-model="editRoom.maxGuests" class="form-control" required>
+                                <label for="editAdults" class="form-label">Người lớn</label>
+                                <input type="text" id="editAdults" v-model="editRoom.adults" class="form-control" required>
                             </div>
-                        </div>
+                      
 
                         
+                            <div class="mb-3">
+                                <label for="editChildren" class="form-label">Trẻ em</label>
+                                <input type="text" id="editChildren" v-model="editRoom.children" class="form-control" required>
+                            </div>
+
                         
-                        <div class="mb-3">
-                            <label for="editDescription" class="form-label">Thông tin</label>
-                            <textarea class="form-control" id="editDescription" v-model="editRoom.description" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
+                            <div class="mb-3">
+                                <label for="editDescription" class="form-label">Thông tin</label>
+                                <textarea class="form-control" id="editDescription" v-model="editRoom.description" rows="3"></textarea>
+                            </div>
+                        
+                        
+                        <div class="mb-2">
                             <label for="image">Ảnh phòng hiện tại:</label>
                             <img v-if="editRoom.image" :src="`http://localhost:3000/uploads/${editRoom.image}`" alt="Room Image" style="width: 100px; height: 100px; object-fit: cover;" />
                             <br />
@@ -253,20 +265,22 @@ export default {
             showModalEdit: false,
             newRoom: {
                 roomNumber: '',
+                roomName:'',
                 type: '',
                 price: '',
-                status: '',
+                children:'',
                 trangthai: '',
-                maxGuests: '',
+                adults:'',
                 description:'',
                 image: '' // Add this line to store image filename
             },
             editRoom: {
                 _id: '',
                 roomNumber: '',
+                roomName:'',
                 type: '',
                 price: '',
-                status: '',
+                children:'',
                 trangthai: '',
                 maxGuests: '',
                 description:'',
@@ -328,9 +342,11 @@ export default {
     try {
         const formData = new FormData();
         formData.append('roomNumber', this.newRoom.roomNumber);
+        formData.append('roomName', this.newRoom.roomName);
         formData.append('type', this.newRoom.type);
         formData.append('price', this.newRoom.price);
-        formData.append('status', this.newRoom.status);
+        formData.append('adults', this.newRoom.adults);
+        formData.append('children', this.newRoom.children);
         formData.append('trangthai', this.newRoom.trangthai);
         formData.append('maxGuests', this.newRoom.maxGuests);
         formData.append('description', this.newRoom.description);
@@ -350,7 +366,7 @@ export default {
 
         // Handle the response
         if (response.status === 201) {
-            this.newRoom = { roomNumber: '', type: '', price: '', status: '', trangthai: '', maxGuests: '',description:'' };
+            this.newRoom = { roomNumber: '', roomName:'', children:'', adults:'', type: '', price: '', trangthai: '', maxGuests: '',description:'' };
             this.showModal = false;
             await this.getAllRooms(); // Refresh the room list
             this.successMessage = 'Thêm phòng thành công!';
@@ -406,9 +422,11 @@ export default {
                 try {
                     const formData = new FormData();
                     formData.append('roomNumber', this.editRoom.roomNumber);
+                    formData.append('roomName', this.editRoom.roomName);
                     formData.append('type', this.editRoom.type);
                     formData.append('price', this.editRoom.price);
-                    formData.append('status', this.editRoom.status);
+                    formData.append('adults', this.editRoom.adults);
+                    formData.append('children', this.editRoom.children);
                     formData.append('trangthai', this.editRoom.trangthai);
                     formData.append('maxGuests', this.editRoom.maxGuests);
                     formData.append('description', this.editRoom.description);
@@ -476,8 +494,9 @@ export default {
     background: #fff;
     padding: 1.5rem; /* Reduced padding */
     border-radius: 8px; /* Slightly smaller border radius */
-    width: 80%; /* Adjusted for smaller screens */
-    max-width: 500px; /* Smaller max width */
+    width: 100%; /* Adjusted for smaller screens */
+    max-width: 700px; /* Smaller max width */
+    /* height: 600px; */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Smaller shadow */
 }
 
@@ -538,6 +557,13 @@ export default {
     width: 80px; /* Reduced image width */
     height: 80px; /* Reduced image height */
     object-fit: cover;
+}
+.addRoom,
+.editRoom {
+    display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Creates three equal columns */
+  grid-template-rows: auto; /* Adjusts row height automatically */
+  gap: 20px; 
 }
 
 

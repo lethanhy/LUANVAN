@@ -43,6 +43,10 @@ const CustomerSchema = mongoose.Schema(
         nationality: {
             type: String,
         },
+        xoaCustomer: {
+            type: Boolean,
+            default: true
+        }
         
         // refreshToken: {
         //     type: String,

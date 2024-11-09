@@ -13,7 +13,7 @@
           <div class="form__booking">
             <div class="input__booking">
               <label for="checkout">Ngày trả phòng</label>
-              <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate" id="checkout">
+              <input type="date" v-model="checkout" id="checkout" :min="getCheckoutMinDate()" @change="validateCheckout">
             </div>
           </div>
         </div>
@@ -22,13 +22,13 @@
           <div class="form__booking">
           <div class="input__booking">
             <label for="adults">Người lớn</label>
-            <input type="number" id="adults" min="1" value="1">
+            <input type="number" v-model="adults" id="adults" :min="1" value="1" placeholder="Nhập số người lớn">
           </div>
         </div>
         <div class="form__booking">
           <div class="input__booking">
             <label for="children">Trẻ em</label>
-            <input type="number" id="children" min="0" value="0">
+            <input type="number" v-model="children" id="children" :min="0" value="0" placeholder="Nhập số trẻ em">
           </div>
         </div>
 
@@ -102,7 +102,7 @@
           <span v-else>Không có ảnh</span>
           <div class="room__content">
             <div class="room__card__header">
-              <h4>{{ room.roomNumber }}</h4>
+              <h4>{{ room.roomName }}</h4>
               <h4>{{ formatCurrency(room.price) }}/đêm</h4>
             </div>
 
@@ -112,8 +112,8 @@
               </div>
             
             <div class="room__card__main">
-              <p>Max occupancy:</p>
-              <p>{{ room.maxGuests }} adults</p>
+              <p>Số lượng:</p>
+              <p>{{ room.maxGuests }} người</p>
             </div>
 
             <div class="room__card__icon">
@@ -122,13 +122,13 @@
               <i class="fa-solid fa-mug-hot"></i>
               <i class="fa-solid fa-tv"></i>
             </div>
-            <div class="room__card__note">
+            <!-- <div class="room__card__note">
               <i class="fa-solid fa-check"></i>
               <p>Pay at hotel or pay today</p>
               
-            </div>
+            </div> -->
           
-            <button><router-link :to="{ name: 'Room', params: { id: room._id }, query: { checkin: checkin, checkout: checkout } }">Xem thêm</router-link></button>
+            <button class="mt-2"><router-link :to="{ name: 'Room', params: { id: room._id }, query: { checkin: checkin, checkout: checkout } }">Xem thêm</router-link></button>
             <!-- <p>New York City, USA</p> -->
           </div>
       </div>
@@ -161,6 +161,8 @@ export default {
      minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
      checkin:'',
      checkout:'',
+     adults:'',
+     children:'',
     
      selectedPrice: '', // State for price filter
     selectedPopularity: '', // State for popularity filter
@@ -174,6 +176,19 @@ export default {
     },
   },
   methods: {
+
+    validateCheckout() {
+    // Ensure checkout date is after check-in date
+    if (this.checkout && this.checkin && this.checkout <= this.checkin) {
+      alert('Ngày trả phòng phải sau ngày nhận phòng và lớn hơn ngày nhận phòng!');
+      this.checkout = ''; // Reset the checkout date
+    }
+  },
+
+  // Ensure the checkout date's min date is dynamically updated based on the check-in date
+  getCheckoutMinDate() {
+    return this.checkin ? this.checkin : this.minDate;
+  },
 
      // Format currency to VND without leading zero
      formatCurrency(value) {
@@ -193,15 +208,22 @@ export default {
     // },
 
     async getRoomAvailable() {
+
+      const adults = this.adults || 1;
+      const children = this.children || 0;
       console.log('Check-in date:', this.checkin);
       console.log('Check-out date:', this.checkout);
+      console.log('Check-out date:', adults);
+      console.log('Check-out date:', children);
   
       if (this.checkin && this.checkout) {
         try {
-          const response = await api.get('/bookings/order', {
+          const response = await api.get('/bookings/Online', {
             params: {
               checkin: this.checkin,
               checkout: this.checkout,
+              adults: this.adults,
+              children: this.children,
 
             }
           });
@@ -266,13 +288,20 @@ export default {
   this.getRoomAvailable();
   },
   watch: {
-    checkin() {
-        this.getRoomAvailable();
-    },
-    checkout() {
-        this.getRoomAvailable();
-    },
+  // Watch for changes in adults or children
+  adults(newValue) {
+    this.getRoomAvailable(); // Reload room availability when adults change
   },
+  children(newValue) {
+    this.getRoomAvailable(); // Reload room availability when children change
+  },
+  checkin(newValue) {
+    this.getRoomAvailable(); // Reload room availability when checkin date changes
+  },
+  checkout(newValue) {
+    this.getRoomAvailable(); // Reload room availability when checkout date changes
+  },
+},
 };
 </script>
 
@@ -418,7 +447,8 @@ export default {
 }
 
 .room__card__header h4 {
-  font-size: 1.2rem;
+  text-align: start;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-dark);
 }

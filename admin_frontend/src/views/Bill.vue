@@ -4,7 +4,9 @@
             <h1 class="text-center text-info fw-bold">Quản lý nhân viên</h1>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
+                <button class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> <router-link to="/role" class="text-decoration-none text-white">Công Việc</router-link> </button>
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus"></i> Thêm Nhân Viên</button>
+                
             </div>
 
             <div class="d-flex">
@@ -49,9 +51,10 @@
                     <tr>
                         <th scope="col">STT</th>
                         <th scope="col">Họ và tên</th>
+                        <th scope="col">Công việc</th>
                         <th scope="col">Email</th>
                         <th scope="col">Số điện thoại</th>
-                        <th scope="col">Địa chỉ</th>
+                        <th scope="col">Địa chỉ</th> 
                         <th scope="col">Sửa</th>
                         <th scope="col">Xóa</th>
                     </tr>
@@ -60,6 +63,9 @@
                     <tr v-for="(staff, index) in paginatedStaffs" :key="staff._id">
                         <th scope="row">{{ (currentPage - 1) * itemsPerPage + index + 1 }}</th>
                         <td>{{ staff.name }}</td>
+                        <td class="text-primary">
+                            {{ staff.role }}
+                        </td>
                         <td>{{ staff.email }}</td>
                         <td>{{ staff.phone }}</td>
                         <td>{{ staff.address }}</td>                      
@@ -123,6 +129,16 @@
                             <label for="address" class="form-label">Địa chỉ</label>
                             <input type="text" id="address" v-model="newStaff.address" class="form-control" required>
                         </div>
+
+                        <!-- Chỉnh sửa phần thêm nhân viên -->
+                            <label for="role" class="form-label">Công việc</label>
+                            <select id="role" v-model="newStaff.role" class="form-select" required>
+                                <option v-for="role in roles" :key="role._id" :value="role.name">
+                                    {{ role.name }}
+                                </option>
+                            </select>
+
+                       
                         
                         
                         <button type="submit" class="btn btn-primary">Thêm</button>
@@ -130,6 +146,14 @@
                     </form>
                 </div>
             </div>
+
+           
+
+
+
+
+
+
 
             <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
@@ -153,6 +177,14 @@
                             <label for="editAddress" class="form-label">Địa chỉ</label>
                             <input type="text" id="editAddress" v-model="editStaff.address" class="form-control" required>
                         </div>
+
+                         <!-- Chỉnh sửa phần thêm nhân viên -->
+                         <label for="role" class="form-label">Công việc</label>
+                            <select id="role" v-model="editStaff.role" class="form-select" required>
+                                <option v-for="role in roles" :key="role._id" :value="role.name">
+                                    {{ role.name }}
+                                </option>
+                            </select>
                         
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <button type="button" class="btn btn-secondary ms-2" @click="showModalEdit = false">Hủy</button>
@@ -178,6 +210,7 @@ export default {
                 phone: '',
                 address: '',
                 password:'',
+                role:'',
             },
             editStaff: {
                 _id: '',
@@ -185,9 +218,12 @@ export default {
                 email: '',
                 phone: '',
                 address: '',
+                role:'',
              
             },
+           
             staffs: [], // Array to hold customers data
+            roles:[],
             currentPage: 1, // Current active page
             itemsPerPage: 5, // Number of items to show per page
             totalItems: 0 ,// Total number of items (rooms)
@@ -243,6 +279,7 @@ export default {
                         phone: '',
                         address: '',
                         password:'',
+                        role:'',
                        
                     };
                     this.showModal = false;
@@ -306,10 +343,20 @@ export default {
         editStaffData(staff) {
             this.editStaff = { ...staff };
             this.showModalEdit = true;
+        },
+        async getRole() {
+            try {
+                const response = await api.get('/role');
+                this.roles = response.data;
+            } catch (error) {
+                console.error('Error fetching customers:', error);
+            }
         }
+        
     },
     created() {
         this.getAllStaff();
+        this.getRole();
     }
 }
 </script>
@@ -335,21 +382,25 @@ export default {
 
 .modal-content {
     background: #fff;
-    padding: 2rem;
+    padding: 1.5rem; /* Giảm padding */
     border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
+    width: 80%; /* Giảm chiều rộng */
+    max-width: 400px; /* Giảm kích thước tối đa */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+   
 }
 
+
 .modal-title {
-    margin-bottom: 1rem;
+    margin-bottom: 5px;
 }
 
 .form-label {
     margin-bottom: 0.5rem;
     font-weight: bold;
 }
+
+
 
 .form-control, .form-select {
     margin-bottom: 1rem;
@@ -395,5 +446,36 @@ export default {
 }
 .search-bar{
     margin-left: 10px;
+}
+
+.role--list {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.role--list h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.role--list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.role--list li {
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: #555;
+    border-bottom: 1px solid #eee;
+}
+
+.role--list li:last-child {
+    border-bottom: none;
 }
 </style>

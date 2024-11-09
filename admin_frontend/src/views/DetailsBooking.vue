@@ -94,6 +94,7 @@
               <h4 class="section-title">Tổng tiền</h4>
               <p class="total-text">Tổng tiền: {{ calculateTotal() }}</p>
             </div>
+            <!-- <button @click="generateExcel" class="btn ">In</button> -->
             <div class="text-center" v-if="bookings && bookings.status !== 'đã hủy'" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
               <button 
                  v-if="bookings.paid"
@@ -400,77 +401,84 @@
 
 
 
-  // generateExcel() {
-  //     // Prepare the invoice data
-  //     const invoiceData = [
-  //       ['Thông tin khách hàng'],
-  //       ['Tên', this.bookings.customer.name],
-  //       ['Email', this.bookings.customer.email],
-  //       ['Số điện thoại', this.bookings.customer.phone],
-  //       ['Địa chỉ', this.bookings.customer.address],
-  //       ['CCCD', this.bookings.customer.cccd],
+  // async generateExcel() {
+  //   try {
+  //       // Check if booking data is available
+  //       if (!this.bookings || !this.bookings.customer || !this.bookings.room || !this.bookings.orders) {
+  //           alert('Dữ liệu đặt phòng không đầy đủ');
+  //           return;
+  //       }
 
-  //       [''], // Empty row for separation
-  //       ['Thông tin phòng đã đặt'],
-  //       ['Số phòng', this.bookings.room.roomNumber],
-  //       ['Loại phòng', this.bookings.room.type],
-  //       ['Giá phòng', `${this.bookings.room.price} VND`],
-  //       ['Ngày nhận phòng', this.formatDate(this.bookings.checkin)],
-  //       ['Ngày trả phòng', this.formatDate(this.bookings.checkout)],
-  //       ['Số ngày', this.calculateDays(this.bookings.checkin, this.bookings.checkout)],
-  //       ['Tổng tiền phòng', `${this.calculateRoomTotal(this.bookings.room.price, this.bookings.checkin, this.bookings.checkout)} VND`],
+  //       // Prepare the invoice data with improved styling
+  //       const invoiceData = [
+  //           ['Thông tin khách hàng'],  // Section title
+  //           ['Tên:', this.bookings.customer.name],
+  //           ['Email:', this.bookings.customer.email],
+  //           ['Số điện thoại:', this.bookings.customer.phone],
+  //           ['Địa chỉ:', this.bookings.customer.address],
+  //           ['CCCD:', this.bookings.customer.cccd],
 
-  //       [''], // Another empty row for separation
-  //       ['Sản phẩm đã đặt'],
-  //       ...this.bookings.orders.map(order => [
-  //         `Sản phẩm: ${order.itemName}`,
-  //         `Số lượng: ${order.quantity}`,
-  //         `Đơn giá: ${order.price} VND`,
-  //         `Tổng tiền: ${order.price * order.quantity} VND`,
-  //       ]),
+  //           [''], // Empty row for separation
+  //           ['Thông tin phòng đã đặt'],  // Section title
+  //           ['Số phòng:', this.bookings.room.roomNumber],
+  //           ['Loại phòng:', this.bookings.room.type],
+  //           ['Giá phòng:', `${this.bookings.room.price.toLocaleString()} VND`],
+  //           ['Ngày nhận phòng:', this.formatDate(this.bookings.checkin)],
+  //           ['Ngày trả phòng:', this.formatDate(this.bookings.checkout)],
+  //           ['Số ngày:', this.calculateDays(this.bookings.checkin, this.bookings.checkout)],
+  //           ['Tổng tiền phòng:', `${this.calculateRoomTotal(this.bookings.room.price, this.bookings.checkin, this.bookings.checkout).toLocaleString()} VND`],
+
+  //           [''], // Empty row for separation
+  //           ['Sản phẩm đã đặt'],  // Section title for ordered items
+  //           ['Tên sản phẩm', 'Số lượng', 'Đơn giá (VND)', 'Tổng tiền (VND)'], // Column headers
+  //           ...this.bookings.orders.map(order => [
+  //               order.itemName,
+  //               order.quantity,
+  //               `${order.price.toLocaleString()} VND`,
+  //               `${(order.price * order.quantity).toLocaleString()} VND`,
+  //           ]),
+
+  //           [''], // Empty row for separation
+  //           ['Tổng tiền hóa đơn', this.calculateTotal().toLocaleString() + ' VND']
+  //       ];
+
+  //       // Create a new workbook and worksheet
+  //       const ws = XLSX.utils.aoa_to_sheet(invoiceData);
         
-  //       [''], // Empty row for separation
-  //       ['Tổng tiền hóa đơn', this.calculateTotal() + ' VND']
-  //     ];
+  //       // Styling options for column widths
+  //       ws['!cols'] = [
+  //           { wch: 30 }, // Wider columns for item names
+  //           { wch: 20 },
+  //           { wch: 15 },
+  //           { wch: 20 }
+  //       ];
 
-  //     // Create a new workbook and worksheet
-  //     const ws = XLSX.utils.aoa_to_sheet(invoiceData); // Create sheet from array of arrays
-  //     const wb = XLSX.utils.book_new(); // Create a new workbook
-  //     XLSX.utils.book_append_sheet(wb, ws, 'Invoice'); // Append worksheet to workbook
+  //       // Add borders to each cell (optional, requires modifying cell style)
+  //       for (let cell in ws) {
+  //           if (cell[0] === '!') continue; // Skip metadata like column width
+  //           ws[cell].s = {
+  //               border: {
+  //                   top: { style: "thin", color: { auto: 1 } },
+  //                   right: { style: "thin", color: { auto: 1 } },
+  //                   bottom: { style: "thin", color: { auto: 1 } },
+  //                   left: { style: "thin", color: { auto: 1 } },
+  //               },
+  //               alignment: { vertical: "center", horizontal: "center" } // Center align for better appearance
+  //           };
+  //       }
 
-  //     // Generate Excel file and trigger download
-  //     XLSX.writeFile(wb, `HoaDon_${this.bookings.customer.name}.xlsx`);
-  //   },
+  //       const wb = XLSX.utils.book_new();
+  //       XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
 
-  //   // Method to format date
-  //   formatDate(dateString) {
-  //     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  //     return new Date(dateString).toLocaleDateString('vi-VN', options);
-  //   },
-
-  //   // Calculate the number of days between check-in and check-out
-  //   calculateDays(checkin, checkout) {
-  //     const checkinDate = new Date(checkin);
-  //     const checkoutDate = new Date(checkout);
-  //     const timeDiff = checkoutDate - checkinDate;
-  //     return Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-  //   },
-
-  //   // Calculate total room price
-  //   calculateRoomTotal(price, checkin, checkout) {
-  //     const days = this.calculateDays(checkin, checkout);
-  //     return price * days;
-  //   },
-
-  //   // Calculate the total of the entire invoice
-  //   calculateTotal() {
-  //     let total = this.calculateRoomTotal(this.bookings.room.price, this.bookings.checkin, this.bookings.checkout);
-      
-  //     // Add total for ordered products
-  //     total += this.bookings.orders.reduce((sum, order) => sum + (order.price * order.quantity), 0);
-      
-  //     return total;
+  //       // Generate Excel file and trigger download
+  //       XLSX.writeFile(wb, `HoaDon_${this.bookings.customer.name}.xlsx`);
+  //       alert('Xuất hóa đơn thành công!');
+  //   } catch (error) {
+  //       console.error('Lỗi khi tạo file Excel:', error);
+  //       alert('Có lỗi xảy ra khi xuất hóa đơn. Vui lòng thử lại.');
   //   }
+  // }
+
 }
 
   };

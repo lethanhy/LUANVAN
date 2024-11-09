@@ -66,6 +66,7 @@ import TheWelcome from './components/TheWelcome.vue'
                       </router-link>
                 </li>
                 
+                
                 <!-- <li class="logout">
                     <a href="" >
                         <i class="fas fa-sign-out-alt"></i>
@@ -82,19 +83,26 @@ import TheWelcome from './components/TheWelcome.vue'
                   <h2>Dashboard</h2>
               </div>
               <div class="user--info">
-                  <div class="searh--box">
+
+                  <div class="bell-contact">
+                    <div>1</div>
+                    <router-link to="/contact" class="text-dark"><i class="fa-solid fa-bell"></i></router-link>
+                    
+                  </div>
+                  <!-- <div class="searh--box">
                       <i class="fa-solid fa-search"></i>
                       <input type="text" placeholder="Search">
-                  </div>
+                  </div> -->
                   
                   <div class="dropdown">
                     <a class="nav-link dropdown-toggle d-flex" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       <img src="./assets/logo.jpg" alt="">
-                      <p>{{ user.name }}</p>
+                      <p class="fs-5">{{ user.name }}</p>
+                     <!-- <p>{{ user.role }}</p> -->
                     </a>
 
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                      <li><a class="dropdown-item" href="#"><router-link :to="{ name: 'Profile', params: { id: user.id } }" class="menu-item text-dark">Tài khoản</router-link></a></li>
+                      <li><a class="dropdown-item" href="#"><router-link :to="{ name: 'Profile', params: { id: user.id } }" class="fs-6 menu-item text-dark">Tài khoản</router-link></a></li>
                       <li><a class="dropdown-item" href="#">Lịch sử</a></li>
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item"  @click="logout" href="#">Đăng xuất</a></li>
@@ -319,7 +327,7 @@ export default {
     flex-wrap: wrap;
     background: #fff;
     border-radius: 10px;
-    padding: 10px 2rem;
+    padding: 3px 2rem;
     margin-bottom: 1rem;
 }
 .header--title{
@@ -437,6 +445,36 @@ export default {
   padding: 0.75rem;
   font-size: 16px;
 }
+.bell-contact {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px; /* Adjust width to fit the icon size */
+    height: 40px; /* Adjust height to fit the icon size */
+    cursor: pointer;
+}
+
+.bell-contact i {
+  padding-top: 9px;
+  font-size: 24px; /* Adjust the icon size as needed */
+   
+}
+
+.bell-contact div {
+    position: absolute;
+    top: -4px; /* Position the badge above the bell */
+    right: -5px; /* Position the badge to the right of the bell */
+    background-color: #ff3b3b; /* Badge color */
+    color: white; /* Text color */
+    border-radius: 50%;
+    padding: 4px 8px; /* Adjust padding for badge size */
+    font-size: 12px; /* Font size for the badge */
+    font-weight: bold;
+    min-width: 20px; /* Minimum width to make sure it's a circle */
+    text-align: center;
+}
+
 
 
 </style>

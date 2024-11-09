@@ -10,7 +10,7 @@
       <div class="col-lg-7 ">
         <div class="ml-4">
 
-          <h1 class="fw-bold fst-italic text-start">Phòng đôi hướng biển</h1>
+          <h1 class="fw-bold fst-italic text-start">{{ rooms.roomName }}</h1>
           <p class=" text-start text-danger fs-4">{{ formatCurrency(rooms.price) }}/Đêm</p>
           <p class="text-start">{{ rooms.description }}</p>
 

@@ -1,4 +1,5 @@
 const Customer = require("../models/customer.model.js");
+const Booking = require("../models/booking.model")
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
@@ -112,17 +113,31 @@ const deleteCustomerById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find and delete the customer by ID
-        const result = await Customer.findByIdAndDelete(id);
+        // Kiểm tra xem phòng có bản ghi đặt với trạng thái khác 'đã hủy' và 'hoàn thành' không
+        const bookingExists = await Booking.findOne({ 
+            customer: id, 
+            status: { $nin: ['đã hủy', 'hoàn thành'] } 
+        });
+
+        if (bookingExists) {
+            return res.status(400).json({ message: 'Khách đang ở, không thể xóa' });
+        }
+
+        // Nếu không có bản ghi đặt nào, tiến hành cập nhật phòng
+        const result = await Customer.findByIdAndUpdate(
+            id,
+            { xoaCustomer: false },  // Cập nhật trường xoaRoom thành false
+            { new: true }  // Trả về document mới đã được cập nhật
+        );
 
         if (result) {
-            res.status(200).json({ message: 'Customer deleted successfully' });
+            res.status(200).json({ message: 'Cập nhật khách thành công', customer: result });
         } else {
-            res.status(404).json({ message: 'Customer not found' });
+            res.status(404).json({ message: 'Không tìm thấy khách' });
         }
     } catch (error) {
-        console.error('Error deleting customer:', error);
-        res.status(500).json({ message: 'Error deleting customer', error });
+        console.error('Lỗi khi cập nhật khách:', error);
+        res.status(500).json({ message: 'Lỗi khi cập nhật khách', error });
     }
 };
 

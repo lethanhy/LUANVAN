@@ -14,7 +14,11 @@ router.post('/order/cart', bookingController.addCart);
 // router.get('/order/cart', bookingController.getCart);
 router.get('/order', bookingController.getRoomByAvailable);
 
+router.get('/Online', bookingController.getRoomByUserOnline);
+
 router.get('/weekly', bookingController.getWeeklyBookings);
+router.get('/daily', bookingController.getDailyBookings);
+router.get('/monthly', bookingController.getMonthlyBookings);
 
 // Endpoint to get bookings by date
 router.get('/date/:date', bookingController.getRoomDate);

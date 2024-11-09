@@ -7,27 +7,27 @@
             <h2 class="text-primary fw-bold">Thông tin khách hàng</h2>
             <div class="form-group">
                 <i class="fas fa-user"></i>
-              <input type="text" v-model="customerName" placeholder="Nhập thông tin khách hàng" required />
+              <input type="text" v-model="customerName" placeholder="Nhập thông tin khách hàng"  />
             </div>
             <div class="form-group">
                 <i class="fas fa-user"></i>
-              <input type="text" v-model="email" placeholder="Nhập email" required />
+              <input type="text" v-model="email" placeholder="Nhập email"/>
             </div>
             <div class="form-group">
                 <i class="fa-regular fa-id-card"></i>
-              <input type="text" v-model="cccd" placeholder="Nhập CCCD" required />
+              <input type="text" v-model="cccd" placeholder="Nhập CCCD"/>
             </div>
             <div class="form-group">
                 <i class="fa-solid fa-phone"></i>
-              <input type="text" v-model="phone" placeholder="Nhập số điện thoại" required />
+              <input type="text" v-model="phone" placeholder="Nhập số điện thoại"/>
             </div>
             <div class="form-group">
                 <i class="fa-solid fa-location-dot"></i>
-              <input type="text" v-model="address" placeholder="Nhập địa chỉ" required />
+              <input type="text" v-model="address" placeholder="Nhập địa chỉ"/>
             </div>
             <div class="form-group">
                 <i class="fa-solid fa-venus-mars"></i>
-              <select class="form-select" v-model="gioitinh" required>
+              <select class="form-select" v-model="gioitinh">
                 <option value="" disabled selected>Nhập giới tính</option>
                 <option value="Nam">Nam</option>
                 <option value="Nữ">Nữ</option>

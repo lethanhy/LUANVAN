@@ -54,6 +54,7 @@
                         <th scope="col">Địa chỉ</th>
                         <th scope="col">Giới tính</th>
                         <th scope="col">Quốc tịch</th>
+                        <th scope="col">Trạng thái</th>
                         <th scope="col">Sửa</th>
                         <th scope="col">Xóa</th>
                     </tr>
@@ -67,6 +68,12 @@
                         <td>{{ customer.address }}</td>
                         <td>{{ customer.gioitinh }}</td>
                         <td>{{ customer.nationality }}</td>
+                        <td v-if="customer.xoaCustomer == false">
+                           <p class="xoaCustomerFalse fw-bold">Ngừng hoạt động</p>
+                        </td>
+                        <td v-else>
+                           <p class="xoaCustomerTrue fw-bold">Hoạt động</p>
+                        </td>
                         <td>
                             <button @click="editCustomerData(customer)" type="button" class="btn btn-warning shadow"><i class="fa-solid fa-pen-to-square text-white"></i></button>
                         </td>
@@ -429,5 +436,11 @@ export default {
 }
 .search-bar{
     margin-left: 10px;
+}
+.xoaCustomerFalse {
+    color: #ff9375;
+}
+.xoaCustomerTrue {
+    color: #2def5a;
 }
 </style>

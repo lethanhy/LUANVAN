@@ -103,10 +103,9 @@ export default {
 }
 
 .room {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Creates 5 equal-width columns */
+  gap: 1rem; /* Adds space between items */
 }
 
 .main--room {
