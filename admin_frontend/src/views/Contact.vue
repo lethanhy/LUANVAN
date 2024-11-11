@@ -1,9 +1,21 @@
 <template>
     <div class="contact">
-      <h2 class="mb-3 text-info">Liên hệ</h2>
-      <div class="contact--body">
-        <table class="table align-middle mb-0 bg-white text-center ">
-          <thead class="bg-light  table-dark ">
+
+      <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <!-- Thay <a> bằng <router-link> -->
+                <li class="breadcrumb-item">
+                    <router-link to="/"  class="text-decoration-none">Trang chủ</router-link>
+                </li>
+                <li class="breadcrumb-item" aria-current="page">Liên hệ</li>
+            </ol>
+        </nav>
+
+
+      <h2 class="mb-2 text-info">Liên hệ</h2>
+      <div class="contact--body bg-light shadow">
+        <table class="table table-borderless m-3 ">
+          <thead class=" ">
             <tr>
               <th>Tên</th>
               <th>Địa chỉ</th>
@@ -12,7 +24,7 @@
               <th>Hành động</th>
             </tr>
           </thead>
-          <tbody v-for="contact in contacts" :key="contact._id" class="text-center">
+          <tbody v-for="contact in contacts" :key="contact._id" class="">
             <tr>
               <td>
                 <div class="d-flex align-items-center">

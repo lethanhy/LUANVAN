@@ -385,8 +385,8 @@ const getRoomByIdAndDate = async (req, res) => {
         const selectedDate = new Date(req.query.date + 'T00:00:00Z'); // Date from query parameters
         // selectedDate.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00
 
-        console.log('Raw Date Input:', req.query.date); // Log để kiểm tra giá trị
-        console.log('Selected Date:', selectedDate); // Log để kiểm tra giá trị đã chuyển đổi
+        // console.log('Raw Date Input:', req.query.date); // Log để kiểm tra giá trị
+        // console.log('Selected Date:', selectedDate); // Log để kiểm tra giá trị đã chuyển đổi
 
         // 1. Fetch the room by ID
         const room = await Room.findById(id);
@@ -446,6 +446,15 @@ const getRoomByIdAndDate = async (req, res) => {
     }
 };
 
+const getRoomUndeleted = async (req,res) => {
+    try {
+        const rooms = await Room.find({ trangthai: 'Chưa dọn dẹp'});
+        res.status(200).json(rooms);
+    } catch (error) {
+         res.status(500).json({ message: 'Lỗi khi lấy danh sách phòng.' });
+    }
+}
+
 
 
 
@@ -461,6 +470,7 @@ module.exports = {
    updateRooms,
    deleteRoomById,
    getRoomByUserId,
-   getRoomByIdAndDate
+   getRoomByIdAndDate,
+   getRoomUndeleted
 //    getoneRoom,
 };

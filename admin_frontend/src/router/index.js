@@ -17,6 +17,7 @@ import Review from '@/views/Review.vue';
 import RoomType from '@/views/RoomType.vue';
 import Contact from '@/views/Contact.vue';
 import Role from '@/views/Role.vue';
+import CleanRoom from '@/views/CleanRoom.vue';
 
 
 const routes = [
@@ -37,6 +38,7 @@ const routes = [
   { path: '/roomtype', name: 'RoomType', component: RoomType },
   { path: '/contact', name: 'Contact', component: Contact },
   { path: '/role', name: 'Role', component: Role},
+  { path: '/cleanroom', name: 'CleanRoom', component: CleanRoom},
   
 ];
 

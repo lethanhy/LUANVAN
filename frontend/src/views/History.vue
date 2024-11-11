@@ -1,7 +1,7 @@
 <template>
   <div class="container history">
     <div class="history--body">
-      <h1 class="text-start fw-bold text-primary">Lịch sử đặt phòng</h1>
+      <h1 class="text-start fw-bold text-primary m-3">Lịch sử đặt phòng</h1>
 
       <div v-if="loading">
         <p>Loading...</p> <!-- Loading indicator -->
@@ -30,10 +30,16 @@
             <p>Phòng {{ booking.room?.roomNumber || 'N/A' }}</p>
             <p>Tổng ngày ở: {{ calculateDays(booking.checkin, booking.checkout) }} Ngày</p>
             <p>Tổng người ở: {{ booking.room?.maxGuests || 0 }} Người</p>
-            <p>Cuộn Masala chay x 1, Burger chay x 1, Mì ống Penne chay sốt đỏ x 1</p>
+            <div v-if="booking.orders.length > 0">
+              <p v-for="order in booking.orders" :key="order.id">
+                {{ order.itemName }} - {{ order.quantity }} x {{ order.price }} VND
+              </p>
+            </div>
+
+
             <hr>
             <div class="d-flex justify-content-between align-items-center">
-              <p class="text-primary">
+              <p class="text-primary fs-5">
                 Tổng tiền thanh toán: 
                 {{ formatCurrency(booking.room?.price * calculateDays(booking.checkin, booking.checkout)) }}
               </p>

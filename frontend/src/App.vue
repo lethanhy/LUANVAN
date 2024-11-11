@@ -14,7 +14,9 @@ import TheWelcome from './components/TheWelcome.vue'
     </header> -->
 
     <nav class="nav">
-      <div class="nav__logo">Ocean Breeze Hotel</div>
+      <div class="nav__logo">
+       
+        Ocean Breeze Hotel</div>
 
       <div class="nav__menu">
           <ul class="nav__links">

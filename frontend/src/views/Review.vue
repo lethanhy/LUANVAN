@@ -16,10 +16,10 @@
           <p>{{ review.noidung }}</p>
         </div>
         <div class="review--footer mt-3">
-          <div class="review--icon">
+          <!-- <div class="review--icon">
             <i class="fa-regular fa-thumbs-up fs-3 me-3"></i>
             <i class="fa-regular fa-thumbs-down fs-3 "></i>
-          </div>
+          </div> -->
   
           <button
             v-if="review.phanhoi"

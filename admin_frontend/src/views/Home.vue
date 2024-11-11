@@ -54,8 +54,9 @@
       </div>
 
       <div class="main--table">
-        <h3 class="text-info mt-2">Lịch đặt phòng</h3>
-        <table class="table table-borderless">
+        <div class="bg-light shadow">
+          <h3 class="text-info m-3">Lịch đặt phòng</h3>
+        <table class="table table-borderless m-2">
           <thead>
             <tr>
               <th scope="col">STT</th>
@@ -92,9 +93,12 @@
             <td colspan="4">Đang tải dữ liệu...</td>
           </tr>
         </table>
-        <div class="text-end">
+        <div class="text-end pb-2">
           <button class="btn btn-dark text-white"><router-link to="/bookings" class="text-decoration-none text-white">Xem thêm</router-link></button>
         </div>
+
+        </div>
+        
         
       </div>
     </div>

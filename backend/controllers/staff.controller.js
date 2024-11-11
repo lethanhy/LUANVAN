@@ -105,6 +105,16 @@ const getStaffById = async (req, res) => {
     }
 }
 
+// GET: Lấy danh sách nhân viên
+const getStaffByRole =  async (req, res) => {
+    try {
+        const staff = await Staff.find({ role: 'Dọn phòng' });
+        res.status(200).json(staff);
+    } catch (error) {
+        res.status(500).json({ message: 'Lỗi khi lấy danh sách nhân viên.' });
+    }
+};
+
 
 
 
@@ -116,5 +126,6 @@ module.exports = {
     login,
     register,
     getStaffById,
+    getStaffByRole
     
 };

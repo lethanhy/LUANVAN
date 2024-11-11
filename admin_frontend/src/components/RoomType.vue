@@ -42,7 +42,8 @@
           class="footer--room"
           :class="{
             'trangthai1': room.trangthai === 'Đã dọn dẹp',
-            'trangthai2': room.trangthai === 'Chưa dọn dẹp'
+            'trangthai2': room.trangthai === 'Chưa dọn dẹp',
+            'trangthai3': room.trangthai === 'Đang dọn dẹp'
           }"
         >
           <div class="footer--room--time ">
@@ -215,5 +216,17 @@ export default {
 
 .trangthai2 {
   background:#ffff9f;
+}
+.trangthai3 {
+  background:#ffe5b8;
+}
+
+@media screen and (max-width: 800px) {
+  
+.room {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Creates 5 equal-width columns */
+  gap: 1rem; /* Adds space between items */
+}
 }
 </style>

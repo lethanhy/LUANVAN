@@ -1,11 +1,19 @@
 <template>
   <div class="container order--room">
+
     <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
-        <li class="breadcrumb-item active" aria-current="page"><router-link to="/rooms">Order</router-link></li>
-      </ol>
-    </nav>
+            <ol class="breadcrumb">
+                <!-- Thay <a> bằng <router-link> -->
+                <li class="breadcrumb-item">
+                    <router-link to="/"  class="text-decoration-none">Trang chủ</router-link>
+                </li>
+                <li class="breadcrumb-item">
+                    <router-link to="/rooms"  class="text-decoration-none">Phòng</router-link>
+                </li>
+                <li class="breadcrumb-item" aria-current="page">Đặt phòng</li>
+            </ol>
+        </nav>
+    
     <div class="row">
       <form class="d-flex flex-wrap">
         <!-- Information Section -->

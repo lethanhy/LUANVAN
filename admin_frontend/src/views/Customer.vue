@@ -111,28 +111,46 @@
             <!-- Add Customer Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Thêm Khách Hàng</h2>
+                    <h2 class="modal-title text-info">Thêm Khách Hàng</h2>
                     <form @submit.prevent="addCustomer">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Họ và tên</label>
-                            <input type="text" id="name" v-model="newCustomer.name" class="form-control" required>
+
+                        <div class="d-flex justify-content-between align-items-center ">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Họ và tên</label>
+                                <input type="text" id="name" v-model="newCustomer.name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="text" id="email" v-model="newCustomer.email" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="text" id="email" v-model="newCustomer.email" class="form-control" required>
+
+                        <div class="d-flex justify-content-between align-items-center ">
+                            <div class="mb-3">
+                                <label for="cccd" class="form-label">Căn cước công dân</label>
+                                <input type="text" id="cccd" v-model="newCustomer.cccd" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Số điện thoại</label>
+                                <input type="text" id="phone" v-model="newCustomer.phone" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="cccd" class="form-label">Căn cước công dân</label>
-                            <input type="text" id="cccd" v-model="newCustomer.cccd" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Số điện thoại</label>
-                            <input type="text" id="phone" v-model="newCustomer.phone" class="form-control" required>
-                        </div>
+
+                       <div class="d-flex justify-content-between align-items-center">
                         <div class="mb-3">
                             <label for="address" class="form-label">Địa chỉ</label>
                             <input type="text" id="address" v-model="newCustomer.address" class="form-control" required>
                         </div>
+                        
+                        <div class="mb-3">
+                            <label for="nationality" class="form-label">Quốc tịch</label>
+                            <input type="text" id="nationality" v-model="newCustomer.nationality" class="form-control" required>
+                        </div>
+                       </div>
+                        
+                        
+                        
+
                         <div class="mb-3">
                             <label for="gioitinh" class="form-label">Giới tính</label>
                             <select id="gioitinh" v-model="newCustomer.gioitinh" class="form-select" required>
@@ -140,10 +158,6 @@
                                 <option value="Nam">Nam</option>
                                 <option value="Nữ">Nữ</option>
                             </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="nationality" class="form-label">Quốc tịch</label>
-                            <input type="text" id="nationality" v-model="newCustomer.nationality" class="form-control" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Thêm</button>
                         <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
@@ -154,40 +168,55 @@
             <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Sửa Khách Hàng</h2>
+                    <h2 class="modal-title text-info">Chỉnh sửa Khách Hàng</h2>
                     <form @submit.prevent="updateCustomer">
-                        <div class="mb-3">
-                            <label for="editName" class="form-label">Họ và tên</label>
-                            <input type="text" id="editName" v-model="editCustomer.name" class="form-control" required>
+
+                        <div class="d-flex justify-content-between align-items-center ">
+                            <div class="mb-3">
+                                <label for="editName" class="form-label">Họ và tên</label>
+                                <input type="text" id="editName" v-model="editCustomer.name" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="text" id="editEmail" v-model="editCustomer.email" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">Email</label>
-                            <input type="text" id="editEmail" v-model="editCustomer.email" class="form-control" required>
+
+                        <div  class="d-flex justify-content-between align-items-center ">
+                            <div class="mb-3">
+                                <label for="editCccd" class="form-label">Căn cước công dân</label>
+                                <input type="text" id="editCccd" v-model="editCustomer.cccd" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPhone" class="form-label">Số điện thoại</label>
+                                <input type="text" id="editPhone" v-model="editCustomer.phone" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="editCccd" class="form-label">Căn cước công dân</label>
-                            <input type="text" id="editCccd" v-model="editCustomer.cccd" class="form-control" required>
+
+                        <div class="d-flex justify-content-between align-items-center " >
+                            <div class="mb-3">
+                                <label for="editAddress" class="form-label">Địa chỉ</label>
+                                <input type="text" id="editAddress" v-model="editCustomer.address" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNationality" class="form-label">Quốc tịch</label>
+                                <input type="text" id="editNationality" v-model="editCustomer.nationality" class="form-control" required>
+                            </div>
+                           
                         </div>
+
                         <div class="mb-3">
-                            <label for="editPhone" class="form-label">Số điện thoại</label>
-                            <input type="text" id="editPhone" v-model="editCustomer.phone" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAddress" class="form-label">Địa chỉ</label>
-                            <input type="text" id="editAddress" v-model="editCustomer.address" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editGioitinh" class="form-label">Giới tính</label>
-                            <select id="editGioitinh" v-model="editCustomer.gioitinh" class="form-select" required>
-                                <option value="">Chọn giới tính</option>
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editNationality" class="form-label">Quốc tịch</label>
-                            <input type="text" id="editNationality" v-model="editCustomer.nationality" class="form-control" required>
-                        </div>
+                                <label for="editGioitinh" class="form-label">Giới tính</label>
+                                <select id="editGioitinh" v-model="editCustomer.gioitinh" class="form-select" required>
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                </select>
+                            </div>
+                       
+                        
+                        
+                        
                         <button type="submit" class="btn btn-primary">Cập nhật</button>
                         <button type="button" class="btn btn-secondary ms-2" @click="showModalEdit = false">Hủy</button>
                     </form>

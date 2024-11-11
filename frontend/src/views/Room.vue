@@ -1,5 +1,17 @@
 <template>
   <div class="container room--details">
+
+    <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <!-- Thay <a> bằng <router-link> -->
+                <li class="breadcrumb-item">
+                    <router-link to="/rooms"  class="text-decoration-none">Phòng</router-link>
+                </li>
+                <li class="breadcrumb-item" aria-current="page">Chi tiết phòng</li>
+            </ol>
+    </nav>
+
+
     <div class="row" v-if="rooms">
       <!-- Room Image Section -->
       <div class="col-lg-5 d-flex justify-content-center align-items-center ">

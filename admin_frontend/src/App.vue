@@ -85,7 +85,7 @@ import TheWelcome from './components/TheWelcome.vue'
               <div class="user--info">
 
                   <div class="bell-contact">
-                    <div>1</div>
+                    <div>{{ totalContact }}</div>
                     <router-link to="/contact" class="text-dark"><i class="fa-solid fa-bell"></i></router-link>
                     
                   </div>
@@ -152,7 +152,9 @@ export default {
   data() {
     return {
       name: '',
-      password: ''
+      password: '',
+      contacts:[],
+      totalContact: 0 // Add this line
     };
   },
   setup() {
@@ -179,6 +181,7 @@ export default {
       logout
     };
   },
+  
   methods: {
     async login() {
       try {
@@ -196,7 +199,42 @@ export default {
       } catch (error) {
         console.log('Login failed:', error);
       }
-    }
+    },
+    async getCurrentDate() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    },
+
+
+    async getContact() {
+  try {
+    const date = await this.getCurrentDate();
+    console.log('Ngày hiện tại:', date); // Kiểm tra ngày hiện tại
+    const response = await api.get('/contact');
+    this.contacts = response.data;
+
+    console.log('Danh sách liên hệ:', this.contacts); // Kiểm tra danh sách liên hệ
+
+    const filteredContacts = this.contacts.filter(contact => {
+      const createdDate = contact.createdAt.split('T')[0];
+      console.log('Ngày tạo liên hệ:', createdDate); // Kiểm tra từng ngày tạo liên hệ
+      return createdDate === date;
+    });
+
+    this.totalContact = filteredContacts.length;
+    console.log('Số lượng liên hệ theo ngày:', this.totalContact); // Kiểm tra tổng số liên hệ theo ngày
+  } catch (error) {
+    console.log('Error fetching contacts:', error);
+  }
+}
+
+
+  },
+  created() {
+    this.getContact();
   }
 };
 </script>
@@ -239,8 +277,9 @@ export default {
     transition: 0.5s;
 }
 .logo{
-    height: 80px;
-    padding: 16px;
+    height: 55px;
+    margin-top: 10px ;
+    padding: 6px;
     font-weight: normal;
 }
 .menu{

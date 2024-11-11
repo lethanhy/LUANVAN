@@ -5,6 +5,7 @@
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end mb-2">
                 <button class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> <router-link to="/roomtype" class="text-decoration-none text-white">Loại phòng</router-link> </button>
+                <button class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> <router-link to="/cleanroom" class="text-decoration-none text-white">Buồng phòng</router-link> </button>
                 <button @click="showModal = true" class="btn btn-success me-md-2" type="button"><i class="fas fa-plus "></i> Thêm phòng</button>
             </div>
 

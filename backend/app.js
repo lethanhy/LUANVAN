@@ -11,6 +11,7 @@ const reviewRoutes = require('./routes/review.route.js');
 const paymentRoutes = require('./routes/payment.route.js');
 const contactRoutes = require('./routes/contact.route.js');
 const roleController = require('./routes/role.route.js');
+const cleanRoomController = require('./routes/cleanRoom.route.js');
 const cors = require('cors');
 const multer = require('multer');
 const app = express();
@@ -39,6 +40,7 @@ app.use("/review", reviewRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/contact", contactRoutes);
 app.use("/role", roleController);
+app.use("/cleanroom", cleanRoomController);
 
 // Cấu hình thư mục chứa ảnh được phép truy cập công khai
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

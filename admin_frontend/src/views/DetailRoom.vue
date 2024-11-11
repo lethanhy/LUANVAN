@@ -329,14 +329,19 @@ export default {
 
           // Prepare order data based on room and booking details
           const orderData = {
-              bookingId: this.room.booking.bookingId, // Ensure the booking ID exists
+              bookingId: this.room.booking.bookingId,
+              // Ensure the booking ID exists
+             
               // roomId: this.room._id, // Include room ID for tracking
-              items: this.selectedItems.map(item => ({
-                  id: item._id,
+              items: this.selectedItems.map(item => {
+                console.log('Item ID in order:', item._id);
+                return {
+                  _id: item._id,
                   itemName: item.name,  // Item name
                   quantity: item.quantity,          // Default quantity to 1 (can be modified as needed)
                   price: item.price     // Item price
-              }))
+              };
+          })
           };
 
           // Log order data for debugging
