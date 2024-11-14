@@ -7,6 +7,7 @@ const customerController = require('../controllers/customer.controller.js');
 
 
 router.post('/', customerController.createCustomer);
+router.post('/changePassword', customerController.changePassword);
 
 router.get('/', customerController.getAllCustomer);
 router.get('/:id', customerController.getCustomerById);

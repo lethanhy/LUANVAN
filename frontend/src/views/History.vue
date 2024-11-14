@@ -49,8 +49,8 @@
                 <button class="btn btn-danger" @click="deleteBooking(booking._id)">Hủy đặt phòng</button>
               </div>
               
-              <div v-else class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
-                <button @click="openReviewModal(booking)" v-if="!hasReview(booking._id)" class="btn btn-warning">Đánh Giá</button>
+              <div v-else-if="booking.status === 'hoàn thành'" class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
+                <button  @click="openReviewModal(booking)"  v-if="!hasReview(booking._id)"  class="btn btn-warning">Đánh Giá</button>
                 <button class="btn btn-primary">Hoàn Thành</button>
               </div>
             </div>
@@ -88,7 +88,8 @@
                 </button>
                 <i class="fa-solid fa-star text-warning"></i> Stars
               </div>
-              <button 
+              <button
+                 
                 type="submit" 
                 class="btn btn-primary" 
                 :disabled="!newReview.rating" 

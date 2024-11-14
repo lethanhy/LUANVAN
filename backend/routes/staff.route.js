@@ -7,6 +7,7 @@ const auth = require('../middleware/auth.js');
 
 
 router.post("/", staffController.addStaff); // Thêm mới một phòng
+router.post("/changePassword", staffController.changePassword); // Thêm mới một phòng
 router.get("/", staffController.getStaff); // Lấy danh sách tất cả phòng
 router.get("/role", staffController.getStaffByRole);
 router.get("/:id", staffController.getStaffById); // Xóa một phòng

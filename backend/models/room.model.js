@@ -38,7 +38,7 @@ const RoomSchema = mongoose.Schema(
         },
         trangthai: {
             type: String,
-            enum: ["Chưa dọn dẹp","Đã dọn dẹp","Đang dọn dẹp"],
+            enum: ["Chưa dọn dẹp","Đã dọn dẹp","Đang dọn dẹp","Phân công"],
             default: "Đã dọn dẹp",
 
         },

@@ -59,6 +59,8 @@
                 <tr class="table-info">
                   <th>Số phòng</th> 
                   <th>Loại phòng</th>
+                  <th>Người lớn</th>
+                  <th>Trẻ em</th>
                   <th>Thêm</th>
                 </tr>
               </thead>
@@ -71,6 +73,8 @@
                 <tr v-for="room in rooms" :key="room.id">
                   <td>{{ room.roomNumber }}</td>
                   <td>{{ room.type }}</td>
+                  <td>{{ room.adults }}</td>
+                  <td>{{ room.children }}</td>
                   <td>
                     <button class="btn btn-success rounded" @click.prevent="addRoom(room)"><i class="fa-solid fa-plus"></i></button>
                   </td>

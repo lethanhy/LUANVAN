@@ -13,6 +13,9 @@ const CleanRoomSchema = mongoose.Schema(
             ref: 'Room',
             // required: true
         },
+        roomStatus: {
+            type: String,
+        },
         status: {
             type: String,
         },

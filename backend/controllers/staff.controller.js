@@ -20,12 +20,12 @@ const login = async (req, res) => {
         const { name, password } = req.body;
         const staff = await Staff.findOne({ name });
         if (!staff) {
-            return res.status(400).send({ message: 'Invalid email or password' });
+            return res.status(400).send({ message: 'Không tìm thấy tên' });
         }
 
         const isMatch = await bcrypt.compare(password, staff.password);
         if (!isMatch) {
-            return res.status(400).send({ message: 'Invalid email or password' });
+            return res.status(400).send({ message: 'Sai mật khẩu' });
         }
 
         const token = jwt.sign({ id: staff._id }, config.jwtSecret, { expiresIn: '1h' });
@@ -115,6 +115,36 @@ const getStaffByRole =  async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const { staffId, oldPassword, newPassword } = req.body;
+
+        // Tìm khách hàng trong cơ sở dữ liệu
+        const staff = await Staff.findById(staffId);
+        if (!staff) {
+            return res.status(404).send('Người dùng không tồn tại.');
+        }
+
+        // So sánh mật khẩu cũ với mật khẩu đã mã hóa trong cơ sở dữ liệu
+        const isMatch = await bcrypt.compare(oldPassword, staff.password);
+        if (!isMatch) {
+            return res.status(404).send('Mật khẩu cũ không đúng.');
+        }
+
+        // Cập nhật mật khẩu mới, hệ thống sẽ tự động mã hóa mật khẩu mới khi lưu
+        staff.password = newPassword;
+
+        // Lưu tài liệu (middleware sẽ tự động mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu)
+        await staff.save();
+
+        res.status(200).send('Đổi mật khẩu thành công.');
+    } catch (error) {
+        console.log(error); // Log chi tiết lỗi để dễ dàng debug
+        res.status(500).send('Có lỗi xảy ra.');
+    }
+}
+
+
 
 
 
@@ -126,6 +156,7 @@ module.exports = {
     login,
     register,
     getStaffById,
-    getStaffByRole
+    getStaffByRole,
+    changePassword
     
 };

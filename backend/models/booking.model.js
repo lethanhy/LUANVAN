@@ -6,9 +6,15 @@ const BookingSchema = mongoose.Schema(
             type: Date,
             required: [true, 'Checkin date is required']
         },
+        checkinTime: {
+            type: String,
+        },
         checkout: {
             type: Date,
             required: [true, 'Checkout date is required']
+        },
+        checkoutTime: {
+            type: String,
         },
         adults: {
             type: Number,

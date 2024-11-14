@@ -8,7 +8,7 @@ const Staff = require("../models/staff.model.js");
 const getBooking = async (req, res) => {
     try {
         // Tìm booking và populate thông tin phòng
-        const booking = await Booking.find().populate('customer').populate('room');
+        const booking = await Booking.find().populate('customer').populate('room').populate('staff');
 
         if(!booking) {
             return res.status(404).json({ message: 'Booking not found' });
@@ -31,7 +31,7 @@ const createBooking = async (req, res) => {
   
     try {
         // Find or create a new customer based on phone number
-        let customer = await Customer.findOne({ phone });
+        let customer = await Customer.findOne({ phone, xoaCustomer: { $nin: [false]  }});
          // Nếu không tìm thấy khách hàng, tạo mới
         if (!customer) {
             customer = new Customer({
@@ -560,6 +560,11 @@ const updateRoom = async (req, res) => {
         // Cập nhật các trường khác trong phòng
         Object.assign(booking, updateData);
 
+        // Kiểm tra nếu `checkinTime` có trong `updateData` và cập nhật
+        if (updateData.checkinTime) {
+            booking.checkinTime = updateData.checkinTime;
+        }
+
         // Đặt trạng thái thành 'đã nhận'
         booking.status = 'đã nhận';
 
@@ -654,7 +659,7 @@ const earlyCheckout = async (req, res) => {
 
         // Cập nhật ngày checkout và trạng thái
         booking.checkout = new Date(checkoutDate);
-        // booking.status = 'hoàn thành'; // Nếu cần cập nhật trạng thái
+        booking.status = 'hoàn thành'; // Nếu cần cập nhật trạng thái
 
         booking.updatedAt = new Date(); // Cập nhật timestamp
         await booking.save();
@@ -728,7 +733,7 @@ const getDailyBookings = async (req, res) => {
         const dailyData = Array(24).fill(0);
 
         bookings.forEach(booking => {
-            const hour = new Date(booking.checkin).getHours(); // Lấy chỉ số giờ (0 đến 23)
+            const hour = new Date(booking.createdAt).getHours(); // Lấy chỉ số giờ (0 đến 23)
             dailyData[hour] += 1; // Tăng số lượng đặt phòng cho giờ tương ứng
         });
 

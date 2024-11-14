@@ -42,7 +42,7 @@
           class="footer--room"
           :class="{
             'trangthai1': room.trangthai === 'Đã dọn dẹp',
-            'trangthai2': room.trangthai === 'Chưa dọn dẹp',
+            'trangthai2': room.trangthai === 'Chưa dọn dẹp' || room.trangthai === 'Phân công',
             'trangthai3': room.trangthai === 'Đang dọn dẹp'
           }"
         >

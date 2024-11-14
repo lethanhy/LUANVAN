@@ -20,12 +20,12 @@ const login = async (req, res) => {
         const { email, password } = req.body;
         const customer = await Customer.findOne({ email });
         if (!customer) {
-            return res.status(400).send({ message: 'Invalid email or password' });
+            return res.status(400).send({ message: 'Không tìm thấy email' });
         }
 
         const isMatch = await bcrypt.compare(password, customer.password);
         if (!isMatch) {
-            return res.status(400).send({ message: 'Invalid email or password' });
+            return res.status(400).send({ message: 'Sai password' });
         }
 
         const token = jwt.sign({ id: customer._id }, config.jwtSecret, { expiresIn: '1h' });
@@ -208,6 +208,36 @@ const getCustomerById = async (req, res) => {
     }
 }
 
+const changePassword = async (req, res) => {
+    try {
+        const { customerId, oldPassword, newPassword } = req.body;
+
+        // Tìm khách hàng trong cơ sở dữ liệu
+        const customer = await Customer.findById(customerId);
+        if (!customer) {
+            return res.status(404).send('Người dùng không tồn tại.');
+        }
+
+        // So sánh mật khẩu cũ với mật khẩu đã mã hóa trong cơ sở dữ liệu
+        const isMatch = await bcrypt.compare(oldPassword, customer.password);
+        if (!isMatch) {
+            return res.status(404).send('Mật khẩu cũ không đúng.');
+        }
+
+        // Cập nhật mật khẩu mới, hệ thống sẽ tự động mã hóa mật khẩu mới khi lưu
+        customer.password = newPassword;
+
+        // Lưu tài liệu (middleware sẽ tự động mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu)
+        await customer.save();
+
+        res.status(200).send('Đổi mật khẩu thành công.');
+    } catch (error) {
+        console.log(error); // Log chi tiết lỗi để dễ dàng debug
+        res.status(500).send('Có lỗi xảy ra.');
+    }
+}
+
+
 
 
 
@@ -227,6 +257,7 @@ module.exports = {
     deleteCustomerById,
     createCustomer,
     updateCustomer,
-    getCustomerById
+    getCustomerById,
+    changePassword
     
 };

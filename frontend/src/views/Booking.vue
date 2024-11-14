@@ -190,8 +190,8 @@ export default {
     return this.checkin ? this.checkin : this.minDate;
   },
 
-     // Format currency to VND without leading zero
-     formatCurrency(value) {
+            // Format currency to VND without leading zero
+               formatCurrency(value) {
                 // Convert to integer if the value is a number
                 const numberValue = typeof value === 'number' ? value : parseFloat(value);
                 return `${numberValue.toLocaleString('it-IT')} VND`;

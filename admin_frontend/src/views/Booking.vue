@@ -7,6 +7,14 @@
           <i class="fas fa-plus"></i> Đặt phòng
         </router-link>
       </button>
+
+      <button class="btn btn-primary me-md-2 mb-3 shadow" type="submit">
+        <router-link to="/invoice" class="text-decoration-none text-white">
+           Hóa đơn
+        </router-link>
+      </button>
+
+       
     </div>
 
     <div class="d-flex">
@@ -39,14 +47,33 @@
       </div>
 
       <!-- Search Bar -->
-      <div class="search-bar">
+      <!-- <div class="search-bar">
         <input 
           type="date" 
           v-model="searchDate"
           placeholder="Tìm kiếm theo tên ngày" 
           class="form-control" 
         />
+      </div> -->
+
+      <div class="search-bar d-flex text-center">
+        <input 
+          type="date" 
+          v-model="startDate"  
+          placeholder="Tìm kiếm theo tên ngày" 
+          class="form-control" 
+        />
+        <p class="m-2">Đến</p>
+        <input 
+          type="date" 
+          v-model="endDate"
+          placeholder="Tìm kiếm theo tên ngày" 
+          class="form-control" 
+        />
       </div>
+
+
+
     </div>
 
     <table class="table table-striped table-hover text-center table-borderless">
@@ -68,9 +95,17 @@
           <th scope="row">{{ index + 1 + (currentPage - 1) * itemsPerPage }}</th>
           <td>{{ booking.customer.name }}</td>
           <td>{{ formatDate(booking.createdAt) }}</td>
-          <td>Lê Thành Y</td>
-          <td>
-            <p class="text-info fw-bold">{{ booking.bookingType }}</p>
+          <td v-if="booking.staff">
+            {{ booking.staff.name }}
+          </td>
+          <td v-else>
+            Website Online
+          </td>
+          <td v-if="booking.bookingType === 'tại chỗ'">
+            <p class="text-info">Tại khách sạn</p>
+          </td>
+          <td v-if="booking.bookingType === 'online'">
+            <p class="text-info">Trực tuyến</p>
           </td>
           <td>
             <button 
@@ -149,6 +184,8 @@ export default {
       searchHoaDon: '', // Tìm kiếm theo tình trạng hóa đơn
       searchDate:'',
       searchType:'',
+      startDate: '', // Add this line for start date
+      endDate: '',   // Add this line for end date
     };
   },
   async created() {
@@ -160,8 +197,16 @@ export default {
       return this.bookings.filter(booking => {
         const matchesName = booking.customer.name.toLowerCase().includes(this.searchQuery.toLowerCase());
         const matchesStatus = this.searchHoaDon === '' || String(booking.paid) === this.searchHoaDon;
-        const matchesDate = booking.createdAt.toLowerCase().includes(this.searchDate.toLowerCase());
+        // const matchesDate = booking.createdAt.toLowerCase().includes(this.searchDate.toLowerCase());
         const matchesType = booking.bookingType.toLowerCase().includes(this.searchType.toLowerCase());
+
+        // Kiểm tra ngày
+          const bookingDate = new Date(booking.checkin).getTime();
+          const startDate = new Date(this.startDate).getTime();
+          const endDate = new Date(this.endDate).getTime();
+
+          const matchesDate = (!this.startDate || bookingDate >= startDate) && (!this.endDate || bookingDate <= endDate);
+
         return matchesName && matchesStatus && matchesDate && matchesType;
       });
     },
@@ -198,6 +243,9 @@ export default {
         console.error('Failed to update booking status:', error);
       }
     },
+
+   
+
 
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {

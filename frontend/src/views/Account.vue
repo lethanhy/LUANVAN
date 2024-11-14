@@ -3,7 +3,7 @@
     <div class="account--body row">
       <!-- Profile Picture Section -->
       <div class="account--img col-lg-5">
-        <h4 class="p-2 bg-light text-center full-width fw-bold rounded-2 text-primary">Profile Picture</h4>
+        <h4 class="p-2 bg-light text-center full-width fw-bold rounded-2 text-primary">Ảnh đại diện</h4>
         <div class="text-center mt-3">
           <img src="../assets/unnamed.png" alt="Profile" class="profile-img" />
           <input type="file" @change="handleImageUpload" class="form-control-file mt-3" />
@@ -13,7 +13,7 @@
 
       <!-- Account Details Section -->
       <div class="account--info col-lg-7">
-        <h4 class="p-2 bg-light text-center full-width fw-bold rounded-2 text-primary">Account Details</h4>
+        <h4 class="p-2 bg-light text-center full-width fw-bold rounded-2 text-primary">Thông tin tài khoản</h4>
         <div class="info-container" v-if="customers">
           <!-- User Name & Email -->
           <div class="row g-3 align-items-center mt-3">
@@ -77,12 +77,35 @@
 
           <!-- Save Changes Button -->
           <div class="text-center">
-            <button class="btn btn-primary mt-4" @click="saveChanges">Save changes</button>
+            <button class="btn btn-primary mt-4 me-2" @click="saveChanges">Cập nhật</button>
+            <button @click="showModal = true" class="btn btn-primary mt-4">Đổi mật khẩu</button>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+        <!-- Add Room Modal -->
+        <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+            <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+              <h2 id="modal-title" class="modal-title text-center text-info fw-bold ">Đổi mật khẩu</h2>
+              <form @submit.prevent="handleChangePassword">
+                <div class="mb-3">
+                  <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
+                  <input type="password" v-model="oldPassword" class="form-control" id="oldPassword" required>
+                </div>
+                <div class="mb-3">
+                  <label for="newPassword" class="form-label">Mật khẩu mới</label>
+                  <input type="password" v-model="newPassword" class="form-control" id="newPassword">
+                </div>
+                <button class="btn btn-primary ms-2">Đổi mật khẩu</button>
+                <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+              </form>
+              <p v-if="message">{{ message }}</p>
+            </div>
+        </div>
+
+
 </template>
 
 <script>
@@ -90,8 +113,12 @@ import api from '../api';
 export default {
   data() {
     return {
+      showModal: false,
       customers: null,
       newProfileImage: null,
+      oldPassword: '',
+      newPassword: '',
+      message: ''
     };
   },
   methods: {
@@ -130,6 +157,34 @@ export default {
         alert('Failed to update customer details');
       }
     },
+
+    async handleChangePassword() {
+    if (!this.oldPassword || !this.newPassword) {
+      this.message = 'Cả hai mật khẩu cũ và mới đều phải được điền.';
+      return;
+    }
+    
+    try {
+      const customerId = this.$route.params.id;
+      const response = await api.post('/customers/changePassword', {
+        customerId,
+        oldPassword: this.oldPassword,
+        newPassword: this.newPassword
+      });
+      this.message = 'Đổi mật khẩu thành công!';
+      this.showModal = false;  // Close modal after successful password change
+    } catch (error) {
+      this.message = error.response?.data || 'Có lỗi xảy ra.';
+    }
+  },
+      closeModal() {
+      this.showModal = false;
+      this.oldPassword = '';
+      this.newPassword = '';
+    },
+
+
+    
   },
   mounted() {
     this.getCustomer();

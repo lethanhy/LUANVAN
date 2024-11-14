@@ -413,6 +413,7 @@ const getRoomByIdAndDate = async (req, res) => {
                 customerPhone: bookingForDate.customer?.phone || 'Unknown',
                 checkin: bookingForDate.checkin,
                 checkout: bookingForDate.checkout,
+                checkinTime: bookingForDate.checkinTime,
                 daysBooked: Math.ceil(
                     (new Date(bookingForDate.checkout) - new Date(bookingForDate.checkin)) / (1000 * 60 * 60 * 24)
                 ),
@@ -427,7 +428,7 @@ const getRoomByIdAndDate = async (req, res) => {
             }
             : null;
 
-            console.log('Selected Date:', selectedDate);
+            // console.log('Selected Date:', selectedDate);
         // console.log('Room ID:', id);
         // console.log('Bookings Found:', bookingForDate);
 

@@ -46,25 +46,36 @@
               </div>
               <div class="room-info">
                 <p><strong>Thời gian:</strong> {{ calculateDays(bookings.checkin, bookings.checkout) }} ngày</p>
-                <p><strong>Tổng tiền phòng:</strong> {{ calculateRoomTotal(bookings.room.price, bookings.checkin, bookings.checkout) }}</p>
+                <p><strong>Tổng tiền phòng:</strong> {{ calculateRoomTotal(bookings.room.price, bookings.checkin, bookings.checkout) }} VND</p>
               </div>
 
-              <button @click="handleChangeRoom" class="btn btn-info mt-2 text-white ">Đổi phòng</button>
+              <button v-if="bookings.status === 'đã đặt'" @click="handleChangeRoom" class="btn btn-info mt-2 text-white ">Đổi phòng</button>
             </div>
 
-            <div
-              
+            <!-- <div
               class="room-details"
-              v-if="bookings"
+              v-if="bookings.bookingType === 'tại chỗ'"
             >
               <div class="">
                 <p class="room-number">Thanh toán</p>
               </div>
               <div class="room-info">
-                <p><strong>Phương thức: </strong> {{ bookings.payment.phuongthuc }}</p>
-                <p><strong>Trạng thái giao dịch: </strong> {{ bookings.payment.paymentStatus }}</p>
+                <p><strong>Phương thức: </strong> {{ bookings.bookingType }}</p>
+                <p><strong>Trạng thái giao dịch: </strong> {{ bookings.paid }}</p>
               </div>
             </div>
+            <div
+              class="room-details"
+              v-else
+            >
+              <div class="">
+                <p class="room-number">Thanh toán</p>
+              </div>
+              <div class="room-info">
+                <p><strong>Phương thức: </strong> {{ bookings.payment.phuongthuc}}</p>
+                <p><strong>Trạng thái giao dịch: </strong> {{ bookings.payment.paymentStatus }}</p>
+              </div>
+            </div> -->
             <!-- <p v-else>Không có phòng đặt nào.</p> -->
           </div>
 
@@ -82,7 +93,7 @@
               <div>
                 <p>{{ order.itemName }} - Số lượng: {{ order.quantity }}</p>
               </div>
-              <p>Tổng tiền: {{ formatCurrency(order.price * order.quantity) }}</p>
+              <p>Tổng tiền: {{ formatCurrency(order.price * order.quantity) }} VND</p>
             </div>
           </div>
           <p v-else>Không có sản phẩm đặt nào.</p>
@@ -92,7 +103,7 @@
       <div class="total-amount p-3">
             <div>
               <h4 class="section-title">Tổng tiền</h4>
-              <p class="total-text">Tổng tiền: {{ calculateTotal() }}</p>
+              <p class="total-text">Tổng tiền: {{ formatCurrency(calculateTotal()) }} VND</p>
             </div>
             <!-- <button @click="generateExcel" class="btn ">In</button> -->
             <div class="text-center" v-if="bookings && bookings.status !== 'đã hủy'" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
@@ -211,7 +222,7 @@
                                 </tr>
                                 <tr v-if="bookings">
                                     <td colspan="3" class="fw-bold text-end">Tổng tiền:</td>
-                                    <td class="fw-bold">{{ calculateTotal() }}</td>
+                                    <td class="fw-bold">{{ calculateTotal() }} VND</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -304,12 +315,40 @@
      async handlePayment() {
       try {
         await api.put(`/bookings/${this.bookings._id}`, { paid: true }); // Update the paid status
+        await this.createInvoice()
         this.showModal = true; // Show the modal after payment is successful
       } catch (error) {
         console.log('Failed to update booking status:', error);
         // Handle error appropriately (e.g., show a notification)
       }
     },
+
+    async createInvoice() {
+      if (!this.bookings) {
+        console.error('Không có dữ liệu booking để tạo hóa đơn.');
+        return;
+      }
+
+      try {
+        const invoiceData = {
+          booking: this.bookings._id,
+          totalAmount: this.calculateTotal()
+        };
+        console.log(invoiceData)
+
+        // Gửi yêu cầu POST tới máy chủ để tạo hóa đơn
+        const response = await api.post('/invoice', invoiceData);
+        console.log('Hóa đơn đã được tạo thành công:', response.data);
+
+        // Hiển thị thông báo hoặc cập nhật trạng thái trên giao diện nếu cần
+        alert('Hóa đơn đã được tạo thành công!');
+
+      } catch (error) {
+        console.error('Lỗi khi tạo hóa đơn:', error);
+        alert('Đã xảy ra lỗi khi tạo hóa đơn. Vui lòng thử lại sau.');
+      }
+    },
+
         // Format date
         formatDate(dateString) {
           const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
@@ -364,23 +403,24 @@
                   }
 
                   // console.log('Total:', total); // Kiểm tra tổng
-                  return this.formatCurrency(total); // Định dạng cuối cùng
+                  // return this.formatCurrency(total); // Định dạng cuối cùng
+                  return total;
               },
 
 
 
-            formatCurrency(value) {
-              // Kiểm tra xem giá trị có hợp lệ không
-              if (value === null || value === undefined || isNaN(value)) {
-                  return "0 VND"; // Hoặc bạn có thể xử lý theo cách khác
-              }
+              formatCurrency(value) {
+                  // Kiểm tra giá trị có hợp lệ không
+                  if (value === null || value === undefined || isNaN(value)) {
+                      return "0"; // Trả về giá trị mặc định nếu không hợp lệ
+                  }
 
-              // Chuyển đổi giá trị sang số nếu cần
-              const numberValue = typeof value === 'number' ? value : parseFloat(value);
+                  // Chuyển đổi giá trị sang số nếu cần
+                  const numberValue = typeof value === 'number' ? value : parseFloat(value);
 
-              // Định dạng và trả về giá trị
-              return `${numberValue.toLocaleString('it-IT')} VND`;
-          },
+                  // Định dạng và trả về giá trị
+                  return numberValue.toLocaleString('it-IT');
+              },
 
 
         printInvoice() {
@@ -401,83 +441,7 @@
 
 
 
-  // async generateExcel() {
-  //   try {
-  //       // Check if booking data is available
-  //       if (!this.bookings || !this.bookings.customer || !this.bookings.room || !this.bookings.orders) {
-  //           alert('Dữ liệu đặt phòng không đầy đủ');
-  //           return;
-  //       }
-
-  //       // Prepare the invoice data with improved styling
-  //       const invoiceData = [
-  //           ['Thông tin khách hàng'],  // Section title
-  //           ['Tên:', this.bookings.customer.name],
-  //           ['Email:', this.bookings.customer.email],
-  //           ['Số điện thoại:', this.bookings.customer.phone],
-  //           ['Địa chỉ:', this.bookings.customer.address],
-  //           ['CCCD:', this.bookings.customer.cccd],
-
-  //           [''], // Empty row for separation
-  //           ['Thông tin phòng đã đặt'],  // Section title
-  //           ['Số phòng:', this.bookings.room.roomNumber],
-  //           ['Loại phòng:', this.bookings.room.type],
-  //           ['Giá phòng:', `${this.bookings.room.price.toLocaleString()} VND`],
-  //           ['Ngày nhận phòng:', this.formatDate(this.bookings.checkin)],
-  //           ['Ngày trả phòng:', this.formatDate(this.bookings.checkout)],
-  //           ['Số ngày:', this.calculateDays(this.bookings.checkin, this.bookings.checkout)],
-  //           ['Tổng tiền phòng:', `${this.calculateRoomTotal(this.bookings.room.price, this.bookings.checkin, this.bookings.checkout).toLocaleString()} VND`],
-
-  //           [''], // Empty row for separation
-  //           ['Sản phẩm đã đặt'],  // Section title for ordered items
-  //           ['Tên sản phẩm', 'Số lượng', 'Đơn giá (VND)', 'Tổng tiền (VND)'], // Column headers
-  //           ...this.bookings.orders.map(order => [
-  //               order.itemName,
-  //               order.quantity,
-  //               `${order.price.toLocaleString()} VND`,
-  //               `${(order.price * order.quantity).toLocaleString()} VND`,
-  //           ]),
-
-  //           [''], // Empty row for separation
-  //           ['Tổng tiền hóa đơn', this.calculateTotal().toLocaleString() + ' VND']
-  //       ];
-
-  //       // Create a new workbook and worksheet
-  //       const ws = XLSX.utils.aoa_to_sheet(invoiceData);
-        
-  //       // Styling options for column widths
-  //       ws['!cols'] = [
-  //           { wch: 30 }, // Wider columns for item names
-  //           { wch: 20 },
-  //           { wch: 15 },
-  //           { wch: 20 }
-  //       ];
-
-  //       // Add borders to each cell (optional, requires modifying cell style)
-  //       for (let cell in ws) {
-  //           if (cell[0] === '!') continue; // Skip metadata like column width
-  //           ws[cell].s = {
-  //               border: {
-  //                   top: { style: "thin", color: { auto: 1 } },
-  //                   right: { style: "thin", color: { auto: 1 } },
-  //                   bottom: { style: "thin", color: { auto: 1 } },
-  //                   left: { style: "thin", color: { auto: 1 } },
-  //               },
-  //               alignment: { vertical: "center", horizontal: "center" } // Center align for better appearance
-  //           };
-  //       }
-
-  //       const wb = XLSX.utils.book_new();
-  //       XLSX.utils.book_append_sheet(wb, ws, 'Invoice');
-
-  //       // Generate Excel file and trigger download
-  //       XLSX.writeFile(wb, `HoaDon_${this.bookings.customer.name}.xlsx`);
-  //       alert('Xuất hóa đơn thành công!');
-  //   } catch (error) {
-  //       console.error('Lỗi khi tạo file Excel:', error);
-  //       alert('Có lỗi xảy ra khi xuất hóa đơn. Vui lòng thử lại.');
-  //   }
-  // }
+  
 
 }
 

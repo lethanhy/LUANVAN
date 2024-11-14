@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user', {
   }),
   getters: {
     isLoggedIn: (state) => !!state.user,  // A computed property to check if the user is logged in
+    getUserRole: (state) => state.user?.role,  // Getter to access the user's role
   },
   actions: {
     setUser(user) {

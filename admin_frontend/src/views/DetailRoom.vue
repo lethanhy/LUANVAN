@@ -20,15 +20,20 @@
           </div>
           <div class="d-flex">
             <i class="fa-regular fa-calendar-days"></i>
-            <p>Checkin: {{ formatDate(room.booking?.checkin) || 'Chưa có thông tin' }} 14:00:00</p>
+            <p>Checkin: {{ formatDate(room.booking?.checkin) || 'Chưa có thông tin' }}</p>
+            <span class="ms-2" v-if="room.booking.checkinTime">Giờ nhận phòng: {{ room.booking.checkinTime }} </span>
           </div>
           <div class="d-flex">
             <i class="fa-solid fa-calendar-day"></i>
             <p>Checkout:  {{ formatDate(room.booking?.checkout) || 'Chưa có thông tin' }} 12:00:00</p>
           </div>
           <div class="d-flex">
+            <i class="fa-solid fa-users"></i>
+            <p>{{ room.adults }} khách</p>
+          </div>
+          <div class="d-flex">
             <i class="fa-solid fa-user"></i>
-            <p>{{ room.maxGuests }} khách</p>
+            <p>{{ room.children }} Trẻ em</p>
           </div>
         </div>
   
@@ -161,6 +166,7 @@ export default {
       selectedItems: [], // Danh sách món đã chọn
       bookingId: null, // Lưu booking ID
       orders: [],
+      currentTime: this.getCurrentTime()
     };
   },
   computed: {
@@ -183,21 +189,21 @@ export default {
     // }
     
   },
-  async created() {
-  try {
-    const roomId = this.$route.params.id; // Get the room ID from the route
-    const searchDate = this.$route.query.date; // Get the date from query parameters
-    const response = await api.get(`/rooms/datebooking/${roomId}?date=${searchDate}`); // Make the API call with the room ID
-    this.room = response.data; // Store the response data in the `room` object
-    console.log('Room ID:', roomId);
+    async created() {
+      try {
+        const roomId = this.$route.params.id; // Get the room ID from the route
+        const searchDate = this.$route.query.date; // Get the date from query parameters
+        const response = await api.get(`/rooms/datebooking/${roomId}?date=${searchDate}`); // Make the API call with the room ID
+        this.room = response.data; // Store the response data in the `room` object
+        console.log('Room ID:', roomId);
 
-    // Fetch the orders after getting the room details
-    // await this.getOrder(); // Call getOrder here to fetch orders
+        // Fetch the orders after getting the room details
+        // await this.getOrder(); // Call getOrder here to fetch orders
 
-  } catch (error) {
-    console.log('Failed to load room details:', error);
-  }
-},
+      } catch (error) {
+        console.log('Failed to load room details:', error);
+      }
+    },
 
 
   methods: {
@@ -214,6 +220,7 @@ export default {
             // Tạo đối tượng dữ liệu cập nhật
             const updateData = {
                 status: 'đã nhận',
+                checkinTime: this.currentTime
             };
 
             // // Hiển thị trạng thái tải
@@ -235,6 +242,12 @@ export default {
             // // Tắt trạng thái tải
             // this.loading = false;
         }
+    },
+    getCurrentTime() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
     },
 
             async updateDelete() {
@@ -397,21 +410,24 @@ export default {
 
               window.location.reload(); // Reload trang sau khi thêm thành công
         } catch (error) {
-          console.error('Failed to update checkout:', error);
-          alert('Có lỗi xảy ra. Vui lòng thử lại.');
+           // Kiểm tra nếu có response từ backend
+            if (error.response && error.response.data && error.response.data.message) {
+              console.error('Failed to update checkout:', error.response.data.message);
+              alert(`${error.response.data.message}`);
+            } else {
+              // Nếu không có response hoặc message cụ thể, log lỗi chung
+              console.error('Failed to update checkout:', error);
+              alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
         }
       }
-
-
-
-      
-
-     
-
-
-
-
     
+  },
+  createdHours() {
+    // Cập nhật giờ hiện tại mỗi phút
+    setInterval(() => {
+      this.currentTime = this.getCurrentTime();
+    }, 60000);
   },
     mounted() {
       // Tự động lấy danh sách món ăn khi component được khởi tạo
