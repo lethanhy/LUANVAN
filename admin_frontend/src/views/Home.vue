@@ -55,7 +55,45 @@
 
       <div class="main--table">
         <div class="bg-light shadow">
-          <h3 class="text-info m-3">Lịch đặt phòng</h3>
+
+          <div class="admin-dashboard">
+              <h2 class="text-primary fw-bold">Thống kê doanh thu</h2>
+              <div class="m-4">
+                <h4 class="">Doanh thu theo ngày</h4>
+                <table class="table table-bordered  m-2">
+                  <thead>
+                    <tr>
+                      <th>Ngày</th>
+                      <th>Doanh thu (VND)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="revenue in dailyRevenue" :key="revenue._id">
+                      <td>{{ revenue._id }}</td>
+                      <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="m-4">
+                <h4>Doanh thu theo tháng</h4>
+                <table class="table table-bordered  m-2">
+                  <thead>
+                    <tr>
+                      <th>Tháng</th>
+                      <th>Doanh thu (VND)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="revenue in monthlyRevenue" :key="revenue._id">
+                      <td>{{ revenue._id }}</td>
+                      <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <!-- <h3 class="text-info m-3">Lịch đặt phòng</h3>
         <table class="table table-borderless m-2">
           <thead>
             <tr>
@@ -95,7 +133,9 @@
         </table>
         <div class="text-end pb-2">
           <button class="btn btn-dark text-white"><router-link to="/bookings" class="text-decoration-none text-white">Xem thêm</router-link></button>
-        </div>
+        </div> -->
+
+
 
         </div>
         
@@ -121,6 +161,8 @@ export default defineComponent({
     const customers = ref([]);
     const totalContacts = ref(0);
     const bookings = ref([]);
+    const dailyRevenue = ref([]);
+    const monthlyRevenue = ref([]);
 
     const getAllRooms = async () => {
       try {
@@ -189,17 +231,37 @@ export default defineComponent({
       return new Date(dateString).toLocaleDateString('vi-VN', options);
     };
 
+    const dailyResponse = async () => {
+      try {
+        const response = await api.get('/invoice/daily-revenue');
+        dailyRevenue.value = response.data;
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    };
+
+    const monthlyResponse = async () => {
+      try {
+        const response = await api.get('/invoice/monthly-revenue');
+        monthlyRevenue.value = response.data;
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    }
+
     onMounted(async () => {
       await Promise.all([
         getAllRooms(),
         getBookingRoomsToday(),
         getAllCustomer(),
         getAllContacts(),
-        getAllBooking()
+        getAllBooking(),
+        dailyResponse(),
+        monthlyResponse(),
       ]);
     });
 
-    return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate };
+    return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate, dailyRevenue,monthlyRevenue };
   }
 });
 </script>
@@ -349,5 +411,23 @@ export default defineComponent({
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     text-align: center; /* Center text */
   }
+
+
+.admin-dashboard {
+  padding: 20px;
+}
+/* .main--table .admin-dashboard table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+.main--table .admin-dashboard th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+.main--table .admin-dashboard th {
+  background-color: #f2f2f2;
+} */
   </style>
   

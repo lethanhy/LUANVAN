@@ -153,7 +153,7 @@ export default defineComponent({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  /* margin-top: 20px; */
 }
 
 .timeframe-selector {

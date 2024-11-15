@@ -106,21 +106,29 @@
               <p class="total-text">Tổng tiền: {{ formatCurrency(calculateTotal()) }} VND</p>
             </div>
             <!-- <button @click="generateExcel" class="btn ">In</button> -->
-            <div class="text-center" v-if="bookings && bookings.status !== 'đã hủy'" :class="{ 'btn-success': bookings.paid, 'btn-danger': !bookings.paid }">
-              <button 
-                 v-if="bookings.paid"
-                @click="handlePayment" 
-                class="btn text-white"
-              >
-                Xem hóa đơn
-              </button>
-              <button 
+            <div class="text-center" >
+
+              <div  v-if="bookings.paid">
+                <button class="btn btn-success text-white me-2">Đã thanh toán</button>
+                <button class="btn btn-primary" @click="printInvoice">In hóa đơn</button>
+
+              </div>
+
+              <div  v-else="!bookings.paid && bookings.status !== 'đã hủy'" >
+                <button class="btn btn-danger text-white me-2">Chưa thanh toán</button>
+                <button class="btn btn-primary" @click="handlePayment">Thanh toán</button>
+
+              </div>
+
+
+              
+              <!-- <button 
                 v-if="!bookings.paid && bookings.status !== 'đã hủy'"
                 @click="handlePayment" 
                 class="btn text-white"
               >
                 Chưa thanh toán
-              </button>
+              </button> -->
               
             </div>
       </div>

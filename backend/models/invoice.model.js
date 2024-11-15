@@ -15,7 +15,7 @@ const InvoiceSchema = mongoose.Schema(
         paymentStatus: {
             type: String,
             enum: ['Pending', 'Paid'],
-            default: 'Pending'
+            default: 'Paid'
           },
           paymentMethod: {
             type: String, // Phương thức thanh toán, ví dụ: VNPay, tiền mặt, thẻ tín dụng

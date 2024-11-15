@@ -5,7 +5,11 @@ const { route } = require('./staff.route');
 
 // POST route for adding a cart
 router.post('/', invoiceController.create);
-router.get('/', invoiceController.getAllInvoice)
+router.get('/', invoiceController.getAllInvoice);
+router.get('/total-revenue',invoiceController.calculateTotalRevenue),
+router.get('/monthly-revenue',invoiceController.calculateMonthlyRevenue),
+router.get('/daily-revenue',invoiceController.calculateDailyRevenue)
+
 
 
 

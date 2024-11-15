@@ -235,6 +235,7 @@ export default {
 
             // Hiển thị thông báo thành công cho người dùng
             alert('Nhận phòng thành công!');
+            window.location.reload(); // Reload trang sau khi thêm thành công
         } catch (error) {
             console.log('Lỗi khi nhận phòng:', error);
             alert('Đã xảy ra lỗi khi nhận phòng, vui lòng thử lại sau.');
@@ -390,37 +391,75 @@ export default {
           }
       },
 
+      // async earlyCheckout() {
+      //   try {
+      //       // const newCheckoutDate = prompt('Nhập ngày trả phòng mới (YYYY-MM-DD):');
+      //       const id = this.room.booking?.bookingId;
+
+      //       // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
+      //       const currentDate = new Date().toISOString().slice(0, 10); 
+
+      //         const response = await api.put(`/bookings/checkout/${id}`, {
+      //           checkoutDate: currentDate,
+      //         });
+
+      //         alert('Trả phòng thành công')
+
+      //         // this.showSuccessMessage = true;
+      //         // this.successMessage = response.data.message;
+      //         // setTimeout(() => this.showSuccessMessage = false, 3000);
+
+      //         window.location.reload(); // Reload trang sau khi thêm thành công
+      //   } catch (error) {
+      //      // Kiểm tra nếu có response từ backend
+      //       if (error.response && error.response.data && error.response.data.message) {
+      //         console.error('Failed to update checkout:', error.response.data.message);
+      //         alert(`${error.response.data.message}`);
+      //       } else {
+      //         // Nếu không có response hoặc message cụ thể, log lỗi chung
+      //         console.error('Failed to update checkout:', error);
+      //         alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      //       }
+      //   }
+      // }
+
       async earlyCheckout() {
         try {
-            // const newCheckoutDate = prompt('Nhập ngày trả phòng mới (YYYY-MM-DD):');
+            // Kiểm tra xem có booking ID hợp lệ không
             const id = this.room.booking?.bookingId;
-
-            // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
-            const currentDate = new Date().toISOString().slice(0, 10); 
-
-              const response = await api.put(`/bookings/checkout/${id}`, {
-                checkoutDate: currentDate,
-              });
-
-              alert('Trả phòng thành công')
-
-              // this.showSuccessMessage = true;
-              // this.successMessage = response.data.message;
-              // setTimeout(() => this.showSuccessMessage = false, 3000);
-
-              window.location.reload(); // Reload trang sau khi thêm thành công
-        } catch (error) {
-           // Kiểm tra nếu có response từ backend
-            if (error.response && error.response.data && error.response.data.message) {
-              console.error('Failed to update checkout:', error.response.data.message);
-              alert(`${error.response.data.message}`);
-            } else {
-              // Nếu không có response hoặc message cụ thể, log lỗi chung
-              console.error('Failed to update checkout:', error);
-              alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            if (!id) {
+                alert('Không tìm thấy ID đặt phòng.');
+                return;
             }
+            console.log(id)
+
+            // Tạo đối tượng dữ liệu cập nhật
+            const updateData = {
+                status: 'hoàn thành',
+                checkoutTime: this.currentTime
+            };
+
+            // // Hiển thị trạng thái tải
+            // this.loading = true;
+
+            // Gửi yêu cầu cập nhật trạng thái phòng
+            const response = await api.put(`/bookings/checkout/${id}`, updateData);
+            console.log('Nhận phòng thành công:', response.data);
+
+            // Cập nhật trạng thái phòng trong giao diện người dùng
+            this.room.booking.status = 'hoàn thành';
+
+            // Hiển thị thông báo thành công cho người dùng
+            alert('Trả phòng thành công!');
+            window.location.reload(); // Reload trang sau khi thêm thành công
+        } catch (error) {
+            console.log('Lỗi khi nhận phòng:', error);
+            alert('Đã xảy ra lỗi khi nhận phòng, vui lòng thử lại sau.');
+        } finally {
+            // // Tắt trạng thái tải
+            // this.loading = false;
         }
-      }
+    },
     
   },
   createdHours() {

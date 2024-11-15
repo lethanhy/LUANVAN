@@ -49,7 +49,7 @@
         </div>
       </div>
   
-      <p v-else class="text-center text-muted mt-5">Chưa có đánh giá nào.</p>
+      <p v-else class="text-center text-danger  mt-5">Chưa có đánh giá nào.</p>
     </div>
 </template>
 

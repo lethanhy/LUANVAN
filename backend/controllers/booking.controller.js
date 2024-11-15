@@ -5,6 +5,7 @@ const Cart = require("../models/cart.model.js");
 const MenuItem = require("../models/menu.model.js");
 const Staff = require("../models/staff.model.js");
 
+
 const getBooking = async (req, res) => {
     try {
         // Tìm booking và populate thông tin phòng
@@ -111,6 +112,7 @@ const createBookingUser = async (req, res) => {
             
             try {
                 const savedBooking = await newBooking.save();
+               
                 return res.status(201).json({ bookingId: savedBooking._id });
             } catch (error) {
                 console.error('Error creating booking:', error);
@@ -632,39 +634,71 @@ const confirmation = async (req, res) => {
     }
 };
 
+// const earlyCheckout = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const { checkoutDate } = req.body;
+
+//         const booking = await Booking.findById(id);
+
+//         if (!booking) {
+//             return res.status(404).send({ message: 'Không tìm thấy đặt phòng' });
+//         }
+
+//         const checkoutTime = new Date(checkoutDate).getTime();
+//         const originalCheckoutTime = new Date(booking.checkout).getTime();
+//         const checkinTime = new Date(booking.checkin).getTime();
+
+//         // Kiểm tra nếu ngày trả phòng lớn hơn ngày checkout ban đầu
+//         if (checkoutTime > originalCheckoutTime) {
+//             return res.status(400).send({ message: 'Ngày trả phòng không thể sau ngày đặt ban đầu' });
+//         }
+
+//         // Kiểm tra nếu ngày trả phòng trùng với ngày check-in
+//         if (checkoutTime === checkinTime) {
+//             return res.status(400).json({ message: 'Ngày trả phòng không thể bằng ngày đặt phòng ban đầu' });
+//         }
+
+//         // Cập nhật ngày checkout và trạng thái
+//         booking.checkout = new Date(checkoutDate);
+//         booking.status = 'hoàn thành'; // Nếu cần cập nhật trạng thái
+
+//         booking.updatedAt = new Date(); // Cập nhật timestamp
+//         await booking.save();
+
+//         res.send({ message: 'Cập nhật trả phòng thành công!', booking });
+//     } catch (error) {
+//         res.status(500).send({ message: error.message });
+//     }
+// };
+
 const earlyCheckout = async (req, res) => {
     try {
         const { id } = req.params;
-        const { checkoutDate } = req.body;
+        const updateData = req.body;
 
+        // Tìm phòng theo ID
         const booking = await Booking.findById(id);
 
         if (!booking) {
-            return res.status(404).send({ message: 'Không tìm thấy đặt phòng' });
+            return res.status(404).send({ message: "Không tìm thấy phòng" });
         }
 
-        const checkoutTime = new Date(checkoutDate).getTime();
-        const originalCheckoutTime = new Date(booking.checkout).getTime();
-        const checkinTime = new Date(booking.checkin).getTime();
+        // Cập nhật các trường khác trong phòng
+        Object.assign(booking, updateData);
 
-        // Kiểm tra nếu ngày trả phòng lớn hơn ngày checkout ban đầu
-        if (checkoutTime > originalCheckoutTime) {
-            return res.status(400).send({ message: 'Ngày trả phòng không thể sau ngày đặt ban đầu' });
+        // Kiểm tra nếu `checkinTime` có trong `updateData` và cập nhật
+        if (updateData.checkoutTime) {
+            booking.checkoutTime = updateData.checkoutTime;
         }
 
-        // Kiểm tra nếu ngày trả phòng trùng với ngày check-in
-        if (checkoutTime === checkinTime) {
-            return res.status(400).json({ message: 'Ngày trả phòng không thể bằng ngày đặt phòng ban đầu' });
-        }
+        // Đặt trạng thái thành 'đã nhận'
+        booking.status = 'hoàn thành';
 
-        // Cập nhật ngày checkout và trạng thái
-        booking.checkout = new Date(checkoutDate);
-        booking.status = 'hoàn thành'; // Nếu cần cập nhật trạng thái
-
-        booking.updatedAt = new Date(); // Cập nhật timestamp
+        // Lưu phòng đã cập nhật
         await booking.save();
 
-        res.send({ message: 'Cập nhật trả phòng thành công!', booking });
+        res.send(booking);
     } catch (error) {
         res.status(500).send({ message: error.message });
     }

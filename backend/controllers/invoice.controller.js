@@ -54,10 +54,97 @@ const getAllInvoice = async (req, res) => {
     }
 };
 
+// Hàm tính tổng doanh thu
+const calculateTotalRevenue = async (req, res) => {
+    try {
+      const result = await Invoice.aggregate([
+        {
+          $match: {
+            paymentStatus: 'Paid' // Chỉ lấy những hóa đơn đã thanh toán
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            totalRevenue: { $sum: '$totalAmount' } // Tính tổng trường `totalAmount`
+          }
+        }
+      ]);
+  
+      // Kiểm tra nếu kết quả tồn tại và trả về tổng doanh thu, ngược lại trả về 0
+      const totalRevenue = result.length > 0 ? result[0].totalRevenue : 0;
+    //   console.log(`Tổng doanh thu từ các hóa đơn đã thanh toán là: ${totalRevenue} VND`);
+     res.status(200).json(totalRevenue)
+    } catch (error) {
+      console.error('Lỗi khi tính tổng doanh thu:', error);
+      res.status(500).json('Lỗi')
+    }
+  };
+
+  const calculateMonthlyRevenue = async (req, res) => {
+    try {
+      const result = await Invoice.aggregate([
+        {
+          $match: {
+            paymentStatus: 'Paid' // Chỉ lấy các hóa đơn đã thanh toán
+          }
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m", date: "$issuedDate" } }, // Nhóm theo tháng
+            totalRevenue: { $sum: '$totalAmount' } // Tính tổng tiền
+          }
+        },
+        {
+          $sort: { _id: 1 } // Sắp xếp theo tháng tăng dần
+        }
+      ]);
+  
+    //   console.log('Tổng doanh thu theo tháng:', result);
+      res.status(200).json(result)
+    } catch (error) {
+      console.error('Lỗi khi tính tổng doanh thu theo tháng:', error);
+      return [];
+    }
+  };
+
+  const calculateDailyRevenue = async (req, res) => {
+    try {
+      const result = await Invoice.aggregate([
+        {
+          $match: {
+            paymentStatus: 'Paid' // Chỉ lấy các hóa đơn đã thanh toán
+          }
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: "%Y-%m-%d", date: "$issuedDate" } }, // Nhóm theo ngày
+            totalRevenue: { $sum: '$totalAmount' } // Tính tổng tiền
+          }
+        },
+        {
+          $sort: { _id: 1 } // Sắp xếp theo ngày tăng dần
+        }
+      ]);
+  
+    //   console.log('Tổng doanh thu theo ngày:', result);
+      res.status(200).json(result)
+    } catch (error) {
+      console.error('Lỗi khi tính tổng doanh thu theo ngày:', error);
+      return [];
+    }
+  };
+  
+  
+  
+  
 
 
 module.exports = {
     create,
-    getAllInvoice
+    getAllInvoice,
+    calculateTotalRevenue,
+    calculateMonthlyRevenue,
+    calculateDailyRevenue
     
 };

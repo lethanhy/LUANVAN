@@ -9,7 +9,7 @@ router.get('/', cleanRoomController.getCleanRoom);
 router.put('/:cleanroomId', cleanRoomController.updateClean);
 
 router.put('/:cleanroomId/complete', cleanRoomController.updateRoomStatus);
-router.put('/:cleanroomId/status', cleanRoomController.updateCleanMobile);
+router.put('/mobile/:cleanroomId/status', cleanRoomController.updateCleanMobile);
 
 
 

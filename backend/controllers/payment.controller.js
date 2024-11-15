@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const querystring = require('qs');
 const Booking = require('../models/booking.model')
+const Invoice = require('../models/invoice.model')
 const moment = require('moment');
 const config = require('../config/default.json');
 // Thêm import mailer
@@ -23,6 +24,15 @@ function sortObject(obj) {
     }
     return sorted;
   }
+
+  // Hàm tính tổng chi phí dựa trên số ngày giữa ngày checkin và checkout
+async function calculateTotalCost(checkin, checkout, price) {
+  const checkinDate = new Date(checkin);
+  const checkoutDate = new Date(checkout);
+  const timeDifference = checkoutDate - checkinDate;
+  const numberOfDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)); // Tính số ngày
+  return numberOfDays * price; // Tính tổng chi phí
+}
 
 class PaymentController {
     //[POST] /payment/vnpay/create_payment_url
@@ -103,6 +113,10 @@ class PaymentController {
           }
         }
 
+
+
+        
+
     //[GET] /payment/vnpay/return
     async vnpayReturn(req, res) {
       try {
@@ -144,6 +158,14 @@ class PaymentController {
                           msg: "Không tìm thấy đơn hàng để cập nhật",
                       });
                   }
+
+                   // Tính tổng chi phí
+                   const totalCost = await calculateTotalCost(bookingUpdate.checkin, bookingUpdate.checkout, bookingUpdate.room.price);
+
+                   await Invoice.create({
+                     booking: orderId,
+                     totalAmount: totalCost, // Convert amount to appropriate format if needed
+                   });
 
                   // Gửi email xác nhận khi thanh toán thành công
               sendBookingConfirmationEmail(

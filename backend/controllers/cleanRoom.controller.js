@@ -99,7 +99,7 @@ const updateClean = async (req, res) => {
   const { cleanroomId } = req.params;
   const { status } = req.body;
 
-  console.log('Received cleanroomId:', cleanroomId); // Ghi log ID để kiểm tra
+  // console.log('Received cleanroomId:', cleanroomId); // Ghi log ID để kiểm tra
 
 
   try {
