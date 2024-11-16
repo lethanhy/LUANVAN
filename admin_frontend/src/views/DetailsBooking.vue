@@ -110,7 +110,7 @@
 
               <div  v-if="bookings.paid">
                 <button class="btn btn-success text-white me-2">Đã thanh toán</button>
-                <button class="btn btn-primary" @click="printInvoice">In hóa đơn</button>
+                <button class="btn btn-primary" @click="showModal = true">In hóa đơn</button>
 
               </div>
 

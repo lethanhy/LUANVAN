@@ -93,7 +93,7 @@ const createBooking = async (req, res) => {
 };
 
 const createBookingUser = async (req, res) => {
-    const { checkin, checkout, customer, room,payment} = req.body;
+    const { checkin, checkout, customer, room,payment, infomation} = req.body;
      // Validation
             if (!checkin || !checkout || !customer || !room) {
                 return res.status(400).json({ message: 'All fields are required' });
@@ -106,7 +106,8 @@ const createBookingUser = async (req, res) => {
                 customer,
                 room,
                 status:"chờ xác nhận",
-                payment
+                payment,
+                infomation
             });
 
             

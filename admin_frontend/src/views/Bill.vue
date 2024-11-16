@@ -106,7 +106,7 @@
             <!-- Add Customer Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Thêm Nhân Viên</h2>
+                    <h2 class="modal-title text-info">Thêm Nhân Viên</h2>
                     <form @submit.prevent="addStaff">
                         <div class="mb-3">
                             <label for="name" class="form-label">Họ và tên</label>
@@ -131,7 +131,7 @@
                         </div>
 
                         <!-- Chỉnh sửa phần thêm nhân viên -->
-                            <label for="role" class="form-label">Công việc</label>
+                            <label for="role" class="form-label">Chức vụ</label>
                             <select id="role" v-model="newStaff.role" class="form-select" required>
                                 <option v-for="role in roles" :key="role._id" :value="role.name">
                                     {{ role.name }}
@@ -158,7 +158,7 @@
             <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Sửa Nhân Viên</h2>
+                    <h2 class="modal-title text-info">Chỉnh sửa Nhân Viên</h2>
                     <form @submit.prevent="updateStaff">
                         <div class="mb-3">
                             <label for="editName" class="form-label">Họ và tên</label>
@@ -179,7 +179,7 @@
                         </div>
 
                          <!-- Chỉnh sửa phần thêm nhân viên -->
-                         <label for="role" class="form-label">Công việc</label>
+                         <label for="role" class="form-label">Chức vụ</label>
                             <select id="role" v-model="editStaff.role" class="form-select" required>
                                 <option v-for="role in roles" :key="role._id" :value="role.name">
                                     {{ role.name }}
@@ -301,10 +301,15 @@ export default {
         },
         async deleteStaff(id) {
             try {
+                const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa nhân viên này không?');
+                if (!isConfirmed) {
+                    return; // Dừng hàm nếu người dùng chọn "Hủy"
+                }
+
                 const response = await api.delete(`/staff/${id}`);
                 if (response.status === 200) { // 200 OK status
                     await this.getAllStaff();
-                    this.successMessage = 'Xóa khách nhân viên công!';
+                    this.successMessage = 'Xóa nhân viên thành công!';
                     this.showSuccessMessage = true;
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
@@ -313,12 +318,13 @@ export default {
                     setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
             } catch (error) {
-                console.log('Error deleting customer:', error);
+                console.log('Error deleting staff:', error);
                 this.successMessage = 'Có lỗi xảy ra khi xóa nhân viên';
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
         },
+
         async updateStaff() {
             try {
                 const response = await api.put(`/staff/${this.editStaff._id}`, this.editStaff);

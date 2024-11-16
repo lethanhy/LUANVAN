@@ -2,6 +2,7 @@ const Staff = require("../models/staff.model.js");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config.js');
+const { sendCreateStaffConfirmationEmail } = require('../utils/mailer');
 
 const register = async (req, res) => {
     try {
@@ -46,7 +47,19 @@ const login = async (req, res) => {
 const addStaff = async (req, res) => {
     try {
         const staff = new Staff(req.body);
+
+         // Gửi email xác nhận khi thanh toán thành công
+         sendCreateStaffConfirmationEmail(
+            staff.email, // Email của khách hàng
+            {
+              name: staff.name,
+              password: staff.password,
+              role: staff.role,
+            }
+          );
         await staff.save();
+
+         
         res.status(201).send(staff);
     } catch (error) {
         res.status(400).send({ message: error.message });

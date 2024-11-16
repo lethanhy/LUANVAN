@@ -79,7 +79,7 @@
             <!-- Add Room Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Thêm phòng</h2>
+                    <h2 class="modal-title text-info">Thêm dịch vụ</h2>
                     <form @submit.prevent="addMenu">
                         <div class="mb-3">
                             <label for="name" class="form-label">Tên</label>
@@ -103,7 +103,7 @@
             <!-- Edit Room Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title">Sửa Phòng</h2>
+                    <h2 class="modal-title text-info">Chỉnh sửa dịch vụ</h2>
                     <form @submit.prevent="updateMenu">
                         <div class="mb-3">
                             <label for="editName" class="form-label">Tên</label>
@@ -226,6 +226,10 @@ export default {
         },
         async deleteMenu(id) {
             try {
+                const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa dịch vụ này không?');
+                if (!isConfirmed) {
+                    return; // Dừng hàm nếu người dùng chọn "Hủy"
+                }
                 const response = await api.delete(`/menu/${id}`);
                 if (response.status === 200) { // 200 OK status
                     await this.getAllMenu();
@@ -310,7 +314,6 @@ export default {
 
 .form-label {
     margin-bottom: 0.5rem;
-    font-weight: bold;
 }
 
 .form-control, .form-select {

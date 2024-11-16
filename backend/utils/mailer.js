@@ -75,4 +75,42 @@ async function sendBookingConfirmationEmail(to, bookingDetails) {
   }
 }
 
-module.exports = { sendBookingConfirmationEmail };
+async function sendCreateStaffConfirmationEmail(to, staff) {
+ 
+  const mailOptions = {
+    from: "Mail",
+    to: to,
+    subject: 'THÔNG TIN TÀI KHOẢN NHÂN VIÊN OCEAN BREZEE HOTEL',
+    html: `
+      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #f9f9f9;">
+        <p style="margin-bottom: 20px; font-size: 16px; color: #555;">Thông tin tài khoản đăng nhập của bạn là:</p>
+        <ul style="list-style-type: none; padding: 0; margin: 0; font-size: 15px; color: #333;">
+          <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Tên nhân viên:</strong> ${staff.name}
+          </li>
+          <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Mật khẩu:</strong> ${staff.password}
+          </li>
+          <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Vị trí công việc:</strong> ${staff.role}
+          </li>
+           <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Lưu ý:</strong>Bạn có thể thay đổi mật khẩu tài khoản.
+          </li>
+        </ul>
+        <p style="margin-top: 20px; text-align: center; font-size: 15px; color: #777;">Chúng tôi rất vui khi chào đón bạn trở thành viên của Ocean Breeze hotel!</p>
+      </div>
+    `,
+  };
+
+  console.log('Email user:', process.env.EMAIL_USER);
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email đã được gửi:', info.response);
+  } catch (error) {
+    console.error('Lỗi khi gửi email:', error);
+  }
+}
+
+module.exports = { sendBookingConfirmationEmail, sendCreateStaffConfirmationEmail };

@@ -393,6 +393,10 @@ export default {
 
         async deleteRoom(id) {
             try {
+                const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa phòng này không?');
+                if (!isConfirmed) {
+                    return; // Dừng hàm nếu người dùng chọn "Hủy"
+                }
                 const response = await api.delete(`/rooms/manager/${id}`);
                 if (response.status === 200) { // 200 OK status
                     await this.getAllRooms();
@@ -507,7 +511,6 @@ export default {
 
 .form-label {
     margin-bottom: 0.3rem; /* Reduced margin */
-    font-weight: bold;
     font-size: 0.9rem; /* Slightly smaller font size */
 }
 

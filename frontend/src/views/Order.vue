@@ -55,15 +55,22 @@
             </div>
             <div class="row g-3 mt-3">
               <div class="col-md-6">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control rounded-3" id="email" v-model="user.email" required>
-              </div>
-              <div class="col-md-6">
                 <label for="phone" class="form-label">Số điện thoại</label>
                 <input type="tel" class="form-control rounded-3" id="phone" v-model="user.phone" required>
               </div>
+              <div class="col-md-6">
+                  <label for="message" class="form-label">Thông tin</label>
+                  <textarea class="form-control" id="message" v-model="user.message" rows="3"></textarea>
+              </div>
+              
             </div>
-            <div class="row g-3 mt-3">
+
+            <!-- <div class="row g-3 mt-3">
+              <div class="mb-3">
+                  
+              </div>
+            </div> -->
+            <!-- <div class="row g-3 mt-3">
               <div class="col-md-6">
                 <label for="cccd" class="form-label">Căn cước công dân</label>
                 <input type="text" class="form-control rounded-3" id="cccd" v-model="user.cccd" required>
@@ -76,7 +83,8 @@
                   <option value="Nữ">Nữ</option>
                 </select>
               </div>
-            </div>
+            </div> -->
+
           </div>
         </div>
 
@@ -140,6 +148,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const route = useRoute();
+    const user = ref({ ...userStore.user }); // Tạo một đối tượng user có thể chỉnh sửa
 
     const rooms = ref(null);
     const checkin = ref('');
@@ -216,6 +225,12 @@ const createBooking = async () => {
     checkout: new Date(route.query.checkout).toISOString(),
     room: rooms.value._id,
     customer: userStore.user.id,
+    infomation: {
+        name: user.value.name, // Sử dụng thông tin từ user có thể chỉnh sửa
+        address: user.value.address,
+        phone: user.value.phone,
+        message: user.value.message,
+      }
   };
 
   try {
@@ -269,7 +284,7 @@ const createPayment = async (bookingId) => {
 
 
     return {
-      user: userStore.user,
+      user,
       rooms,
       checkin,
       checkout,

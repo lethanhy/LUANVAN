@@ -74,6 +74,10 @@
                     </tr>
                   </tbody>
                 </table>
+
+              
+
+
               </div>
               <div class="m-4">
                 <h4>Doanh thu theo tháng</h4>
@@ -163,6 +167,7 @@ export default defineComponent({
     const bookings = ref([]);
     const dailyRevenue = ref([]);
     const monthlyRevenue = ref([]);
+   
 
     const getAllRooms = async () => {
       try {
@@ -249,6 +254,8 @@ export default defineComponent({
       }
     }
 
+    
+
     onMounted(async () => {
       await Promise.all([
         getAllRooms(),
@@ -261,7 +268,9 @@ export default defineComponent({
       ]);
     });
 
-    return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate, dailyRevenue,monthlyRevenue };
+    return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate, dailyRevenue,
+      monthlyRevenue,
+       };
   }
 });
 </script>

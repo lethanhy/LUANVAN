@@ -20,6 +20,20 @@ const BookingSchema = mongoose.Schema(
             type: Number,
             default:1,
         },
+        infomation: {
+           name: {
+            type: String
+           },
+           address: {
+            type: String,
+           },
+           phone: {
+            type: String,
+           },
+           message: {
+            type: String,
+           }
+        },
         children: {
             type: Number,
             default: 0

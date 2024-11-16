@@ -136,6 +136,8 @@ import TheWelcome from './components/TheWelcome.vue'
 
       <button type="submit" class="btn btn-primary">Login</button>
     </form>
+
+    <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
   </div>
 </div>
 
@@ -154,7 +156,9 @@ export default {
       name: '',
       password: '',
       contacts:[],
-      totalContact: 0 // Add this line
+      totalContact: 0, // Add this line
+      errorMessage:null,
+
     };
   },
   setup() {
@@ -198,6 +202,8 @@ export default {
         this.$router.push('/');
       } catch (error) {
         console.log('Login failed:', error);
+        this.errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+        // console.error("Registration failed:", error);
       }
     },
     async getCurrentDate() {
