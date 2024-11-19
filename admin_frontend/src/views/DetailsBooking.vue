@@ -159,21 +159,46 @@
                     </div>
                   </div> -->
 
-                  <div v-if="rooms.length">
+                  <div v-if="rooms.length" class="change--room">
                     <h2>Phòng trống</h2>
-                    <ul>
+
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">STT</th>
+                          <th scope="col">Số phòng</th>
+                          <th scope="col">Loại phòng</th>
+                          <th scope="col">Người lớn</th>
+                          <th scope="col">Trẻ em</th>
+                          <th scope="col">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(room, index) in rooms" :key="room._id">
+                          <th scope="row">{{ index + 1 }}</th>
+                          <td>{{ room.roomNumber }}</td>
+                          <td>{{ room.type }}</td>
+                          <td>{{ room.adults }}</td>
+                          <td>{{ room.children }}</td>
+                          <td>
+                            <button class="btn btn-success" @click="changeRoom(room._id)">Đổi</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <!-- <ul>
                       <li v-for="room in rooms" :key="room.id">
                         phòng {{ room.roomNumber }} - {{ room.type }} - số lượng {{ room.maxGuests }} - {{ room.price.toLocaleString() }} VND
 
                        
                       </li>
-                    </ul>
+                    </ul> -->
                   </div>
 
                   <!-- Close Button -->
-                  <div class="text-center">
-                    <button type="button" class="btn btn-secondary me-2" @click="showChangeRoom = false">Hủy</button>
-                    <button class="btn btn-primary">In Hóa Đơn</button>
+                  <div class="text-center d-grid">
+                    <button type="button" class="btn btn-secondary" @click="showChangeRoom = false">Thoát</button>
+                    <!-- <button class="btn btn-primary">In Hóa Đơn</button> -->
                   </div>
                 </div>
               </div>
@@ -357,6 +382,25 @@
       }
     },
 
+    async changeRoom(id) {
+      try {
+        const response = await api.patch('/bookings/changeRoom', {
+          bookingId: this.bookings._id,
+          roomId: id
+        });
+        console.log('Đổi phòng thành công:', response.data);
+        this.showChangeRoom = false;
+
+        // Tải lại trang
+        window.location.reload();
+        
+      } catch (error) {
+        console.error('Lỗi khi đổi phòng:', error);
+        alert('Đã xảy ra lỗi khi đổi phòng. Vui lòng thử lại sau.');
+      }
+    },
+
+
         // Format date
         formatDate(dateString) {
           const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
@@ -445,6 +489,8 @@
           window.location.reload(); // Tải lại trang để khôi phục các sự kiện Vue
         });
       },
+
+      
 
 
 
@@ -606,6 +652,13 @@ button {
 
 h4, h5 {
     font-size: 1.1rem; /* Thu nhỏ tiêu đề */
+}
+
+.change--room table {
+    max-height: 300px; /* Set the maximum height for the table */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    display: block;    /* This is important for overflow to work on the table */
+    width: 100%;       /* Ensure the table takes the full width */
 }
 
 @media print {

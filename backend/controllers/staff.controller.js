@@ -18,10 +18,10 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { name, password } = req.body;
-        const staff = await Staff.findOne({ name });
+        const { phone, password } = req.body;
+        const staff = await Staff.findOne({ phone });
         if (!staff) {
-            return res.status(400).send({ message: 'Không tìm thấy tên' });
+            return res.status(400).send({ message: 'Không tìm thấy số điện thoại' });
         }
 
         const isMatch = await bcrypt.compare(password, staff.password);

@@ -47,6 +47,9 @@ router.put('/rooms/:id', bookingController.updateRoom);
 
 router.put('/rooms/booking/:id', bookingController.updateDeleteRoom);
 
+// Thay đổi phòng
+router.patch('/changeRoom',bookingController.changeRoom);
+
 // Xóa một booking (yêu cầu xác thực)
 router.delete('/:id', bookingController.deleteBooking);
 

@@ -106,8 +106,8 @@
             <!-- Add Customer Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
-                    <h2 class="modal-title text-info">Thêm Nhân Viên</h2>
-                    <form @submit.prevent="addStaff">
+                    <h2 class="modal-title text-info text-center">Thêm Nhân Viên</h2>
+                    <form @submit.prevent="addStaff" class="addStaff">
                         <div class="mb-3">
                             <label for="name" class="form-label">Họ và tên</label>
                             <input type="text" id="name" v-model="newStaff.name" class="form-control" required>
@@ -158,7 +158,7 @@
             <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title text-info">Chỉnh sửa Nhân Viên</h2>
+                    <h2 class="modal-title text-info text-center">Chỉnh sửa nhân viên</h2>
                     <form @submit.prevent="updateStaff">
                         <div class="mb-3">
                             <label for="editName" class="form-label">Họ và tên</label>
@@ -397,13 +397,13 @@ export default {
 }
 
 
-.modal-title {
-    margin-bottom: 5px;
-}
+/* .modal-title {
+    margin-bottom: 2px;
+} */
 
 .form-label {
     margin-bottom: 0.5rem;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 
@@ -483,5 +483,8 @@ export default {
 
 .role--list li:last-child {
     border-bottom: none;
+}
+.addStaff {
+    margin: 0px;
 }
 </style>

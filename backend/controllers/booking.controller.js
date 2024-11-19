@@ -4,6 +4,7 @@ const Customer = require("../models/customer.model.js");
 const Cart = require("../models/cart.model.js");
 const MenuItem = require("../models/menu.model.js");
 const Staff = require("../models/staff.model.js");
+const Invoice = require("../models/invoice.model.js");
 
 
 const getBooking = async (req, res) => {
@@ -61,10 +62,10 @@ const createBooking = async (req, res) => {
                 checkin: room.checkin,
                 checkout: room.checkout,
                 bookingType:"tại chỗ",
-                payment: {
-                    phuongthuc:"Thanh toán tiền mặt",
-                    paymentStatus:"thành công"
-                },
+                // payment: {
+                //     phuongthuc:"Thanh toán tiền mặt",
+                //     paymentStatus:"thành công"
+                // },
             });
             await newBooking.save();
   
@@ -289,18 +290,6 @@ const deleteBooking = async (req, res) => {
         if (!booking) {
             return res.status(404).json({ message: 'Booking not found' });
         }
-
-        // // Kiểm tra xem booking có thuộc về người dùng hiện tại không
-        // if (booking.customer.toString() !== req.user._id.toString()) {
-        //     return res.status(403).json({ message: 'Access denied' });
-        // }
-
-        // // Cập nhật trạng thái phòng
-        // const room = await Room.findById(booking.room);
-        // if (room) {
-        //     room.available = true; // Đánh dấu phòng là có sẵn
-        //     await room.save();
-        // }
 
         res.status(200).json({ message: 'Booking deleted successfully' });
     } catch (error) {
@@ -672,38 +661,80 @@ const confirmation = async (req, res) => {
 //         res.status(500).send({ message: error.message });
 //     }
 // };
-
 const earlyCheckout = async (req, res) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
 
         // Tìm phòng theo ID
-        const booking = await Booking.findById(id);
+        const booking = await Booking.findById(id).populate('room');
 
         if (!booking) {
             return res.status(404).send({ message: "Không tìm thấy phòng" });
         }
 
-        // Cập nhật các trường khác trong phòng
+        // Cập nhật các trường của booking
         Object.assign(booking, updateData);
 
-        // Kiểm tra nếu `checkinTime` có trong `updateData` và cập nhật
-        if (updateData.checkoutTime) {
+
+         // Cập nhật thời gian checkout nếu có trong updateData
+         if (updateData.checkoutTime) {
             booking.checkoutTime = updateData.checkoutTime;
         }
 
-        // Đặt trạng thái thành 'đã nhận'
-        booking.status = 'hoàn thành';
+        // Tính tiền phòng
+        const roomRate = booking.room.price
+        const checkinDate = new Date(booking.checkin);
+        const checkoutDate = new Date(booking.checkout);
+        const numberOfDays = (checkoutDate - checkinDate) / (1000 * 60 * 60 * 24);  // Tính số ngày ở
 
-        // Lưu phòng đã cập nhật
+        // Tính tổng tiền phòng
+        const totalRoomAmount = roomRate * numberOfDays;
+
+        // Tính tổng tiền các món trong đơn hàng
+        const totalOrderAmount = calculateTotalAmount(booking.orders) || 0;
+
+        // Cộng tổng tiền phòng và tổng tiền các món
+        const totalAmount = totalRoomAmount + totalOrderAmount;
+
+        // Tạo mới một hóa đơn
+        const invoice = await Invoice.create({
+            booking,
+            totalAmount,
+        });
+
+        await invoice.save();
+
+        // Cập nhật trạng thái phòng
+        booking.status = 'hoàn thành';
+        booking.paid = true;
+        booking.payment.phuongthuc = "Thanh toán tiền mặt";
+        booking.payment.paymentStatus = "thành công";
         await booking.save();
+
+        const room = await Room.findById(booking.room);
+
+        room.trangthai = 'Chưa dọn dẹp';
+        await room.save();
+
 
         res.send(booking);
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
 };
+
+// Hàm tính tổng tiền từ mảng orders
+const calculateTotalAmount = (orders) => {
+    return orders.reduce((total, order) => {
+        const itemTotal = order.price * order.quantity;  // Tính tiền của mỗi món
+        return total + itemTotal;  // Cộng vào tổng tiền
+    }, 0);
+};
+
+
+
+
 
 const getWeeklyBookings = async (req, res) => {
     try {
@@ -819,6 +850,31 @@ const getMonthlyBookings = async (req, res) => {
         });
     }
 };
+const changeRoom = async (req, res) => {
+    try {
+        const { bookingId, roomId } = req.body;
+
+        // Tìm booking theo ID
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: 'Booking not found' });
+        }
+
+        // Cập nhật phòng
+        booking.room = roomId;
+
+        // Lưu thay đổi vào cơ sở dữ liệu
+        await booking.save();
+
+        // Phản hồi thành công
+        res.status(200).json({ message: 'Room updated successfully', booking });
+    } catch (error) {
+        // Xử lý lỗi
+        console.error('Error updating room:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 
 
 
@@ -851,7 +907,8 @@ module.exports = {
     getWeeklyBookings,
     getDailyBookings,
     getMonthlyBookings,
-    getRoomByUserOnline
+    getRoomByUserOnline,
+    changeRoom
 
 
 };

@@ -135,9 +135,17 @@
     </div>
 
      <!-- Success Message -->
-     <div v-if="showSuccessMessage" class="success-message">
-          <span class="checkmark">✔️</span>
-          <span>{{ successMessage }}</span>
+     <div v-if="showSuccessMessage" class="booking-message">
+        <div class="booking--success shadow">
+              <div class="icon--check">
+                <i class="fa-solid fa-check fs-2"></i>
+              </div>
+              <p class="fs-3 fw-bold mt-2">Tạo phòng thành công</p>
+              <p class="m-2">Mọi thứ đều hoạt động bình thường.</p>
+              <div class="success--input">
+                <button  @click="$router.push('/')" class="btn border border-success text-success m-2">Tiếp tục</button>
+              </div>
+          </div>
       </div>
   </template>
 
@@ -149,7 +157,7 @@ import { useUserStore } from '../stores/userStore.js'; // Pinia store
 export default {
   data() {
     return {
-      showSuccessMessage: false,
+      showSuccessMessage: null,
       successMessage: '',
       rooms: [],
       selectedRooms: [],
@@ -253,9 +261,9 @@ export default {
               const response = await api.post('/bookings/order', bookingData);
               console.log('Bookings created:', response.data);
               // Thông báo thành công cho người dùng
-              this.successMessage = 'Tạo phòng thành công!';
+              // this.successMessage = 'Tạo phòng thành công!';
               this.showSuccessMessage = true;
-              setTimeout(() => this.showSuccessMessage = false, 3000);
+              // setTimeout(() => this.showSuccessMessage = false, 3000);
               this.resetForm();
             } catch (error) {
               console.log('Error creating bookings:', error.response.data);
@@ -431,18 +439,40 @@ form {
     box-sizing: border-box; /* Ensure padding and border are included in width */
 }
 
-.success-message {
+.booking-message {
     position: fixed;
-    top: 10px;
-    right: 10px;
-    background: #7bef83;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 5px;
-    padding: 10px 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000; /* Đảm bảo nằm trên các phần tử khác */
+    width: 90%; /* Đáp ứng tốt trên thiết bị di động */
+    max-width: 400px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    background-color: #fff;
+    overflow: hidden;
+}
+.booking--success {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa icon và text theo chiều ngang */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.icon--check {
+    background-color: rgb(29, 183, 15);
+    color: white;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 2rem;
+    margin-bottom: 1rem;
 }
 
 .checkmark {

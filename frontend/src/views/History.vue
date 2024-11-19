@@ -53,6 +53,18 @@
                 <button  @click="openReviewModal(booking)"  v-if="!hasReview(booking._id)"  class="btn btn-warning">Đánh Giá</button>
                 <button class="btn btn-primary">Hoàn Thành</button>
               </div>
+
+              <div v-if=" booking.status === 'đã hủy' " class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
+                <button class="btn btn-danger text-white">Thanh toán thất bại</button>
+                <!-- <button class="btn btn-danger" @click="deleteBooking(booking._id)">Hủy đặt phòng</button> -->
+              </div>
+
+              <div v-if=" booking.status === 'đã đặt' " class="button-group d-flex gap-2"> <!-- Custom button group with spacing -->
+                <button class="btn btn-primary text-white">Đã xác nhận đặt thành công</button>
+                <!-- <button class="btn btn-danger" @click="deleteBooking(booking._id)">Hủy đặt phòng</button> -->
+              </div>
+
+              
             </div>
           </div>
         </div>

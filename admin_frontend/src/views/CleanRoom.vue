@@ -1,13 +1,13 @@
 <template>
   <div class="assign-room">
-    <h2 class="text-center text-info">Phân công phòng dọn dẹp</h2>
+    <h2 class=" text-info">Phân công phòng dọn dẹp</h2>
 
     <!-- Thông báo khi không có phòng hoặc nhân viên -->
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
 
     <!-- Bảng hiển thị danh sách phòng chưa dọn dẹp -->
     <div v-if="rooms.length > 0">
-      <h3>Danh sách phòng chưa dọn dẹp</h3>
+      <h3 >Danh sách phòng chưa dọn dẹp</h3>
       <table>
         <thead>
           <tr>
@@ -28,7 +28,8 @@
               }">{{ room.trangthai }}</span>
             </td>
             <td>
-              <select v-model="assignments[index].staff">
+              <select v-model="assignments[index].staff" >
+                <option value="">Chọn nhân viên</option>
                 <option v-for="staff in staffMembers" :key="staff._id" :value="staff._id">
                   {{ staff.name }}
                 </option>
@@ -41,7 +42,7 @@
         </tbody>
       </table>
     </div>
-    <p v-else>Không có phòng nào cần dọn dẹp.</p>
+    <p v-else class="text-danger">Không có phòng nào cần dọn dẹp.</p>
 
     <!-- Bảng hiển thị danh sách phòng đã được phân công -->
     <div v-if="cleanrooms.length > 0" class="mt-4">

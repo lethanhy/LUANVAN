@@ -43,6 +43,10 @@ const CustomerSchema = mongoose.Schema(
         nationality: {
             type: String,
         },
+        image: {
+            type: String, // Lưu trữ URL của hình ảnh
+            required: false // Không bắt buộc
+        },
         xoaCustomer: {
             type: Boolean,
             default: true

@@ -436,7 +436,7 @@ export default {
             // Tạo đối tượng dữ liệu cập nhật
             const updateData = {
                 status: 'hoàn thành',
-                checkoutTime: this.currentTime
+                checkoutTime: this.currentTime,
             };
 
             // // Hiển thị trạng thái tải

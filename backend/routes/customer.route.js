@@ -5,6 +5,20 @@ const auth = require('../middleware/auth.js');
 // const bcrypt = require("bcrypt");
 const customerController = require('../controllers/customer.controller.js');
 
+const multer = require('multer');
+// Cấu hình multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); // Nơi lưu trữ hình ảnh
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Đặt tên file
+    }
+});
+
+const upload = multer({ storage: storage });
+
+
 
 router.post('/', customerController.createCustomer);
 router.post('/changePassword', customerController.changePassword);
@@ -15,6 +29,8 @@ router.get('/:id', customerController.getCustomerById);
 router.delete('/:id', customerController.deleteCustomerById);
 
 router.put('/:id', customerController.updateCustomer);
+
+router.put('/:customerId/upload-image', upload.single('image'),customerController.uploadProfileImage);
 // Đăng ký
 router.post('/register', customerController.register);
 

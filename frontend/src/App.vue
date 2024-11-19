@@ -31,7 +31,7 @@ import TheWelcome from './components/TheWelcome.vue'
               <button><a href=""><router-link to="/customers/login">Đăng nhập</router-link></a></button>
             </div>
             <div v-else class="nav__button" id="dropdown">
-              <button class="dropbtn">Welcome, {{ user.name }}</button>
+              <button class="dropbtn"> {{ user.name }}</button>
               <div class="dropdown-content">
                 <a href="#"><router-link :to="{ name: 'Customers', params: { id: user.id } }">Tài khoản</router-link></a>
                 <a href="#"><router-link :to="{ name: 'History', params: { id: user.id } }">Lịch sử</router-link></a>
@@ -132,10 +132,12 @@ const userStore = useUserStore();
 
 const showChat = ref(false);
 const userMessage = ref("");
+const customers = ref([])
 
 // Khôi phục trạng thái người dùng khi ứng dụng tải lại
 onMounted(() => {
   userStore.restoreUser();
+
 });
 
 // Computed properties
@@ -154,11 +156,22 @@ const sendMessage = () => {
   }
 };
 
+// const getCustomer = async () => {
+//   try {
+//     const id = user.value.id;
+//     const response = await api.get(`/customer/${id}`);
+//     customers.value = response.data;
+//   } catch (error) {
+    
+//   }
+// }
+
 
 
 // Methods
 const logout = () => {
   userStore.clearUser();
+  router.push('/customers/login'); // Thay '/path-to-new-page' bằng đường dẫn bạn muốn chuyển đến
 };
 
 

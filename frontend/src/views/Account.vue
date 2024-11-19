@@ -2,10 +2,10 @@
   <div class="container account">
     <div class="account--body row">
       <!-- Profile Picture Section -->
-      <div class="account--img col-lg-5">
+      <div class="account--img col-lg-5" v-if="customers">
         <h4 class="p-2 bg-light text-center full-width fw-bold rounded-2 text-primary">Ảnh đại diện</h4>
         <div class="text-center mt-3">
-          <img src="../assets/unnamed.png" alt="Profile" class="profile-img" />
+          <img :src="`http://localhost:3000${customers.image}`" alt="Profile" class="profile-img" />
           <input type="file" @change="handleImageUpload" class="form-control-file mt-3" />
           <button class="btn btn-primary mt-3" @click="updateProfileImage">Update New Image</button>
         </div>
@@ -90,11 +90,11 @@
             <div class="modal-content" role="dialog" aria-labelledby="modal-title" aria-modal="true">
               <h2 id="modal-title" class="modal-title text-center text-info fw-bold ">Đổi mật khẩu</h2>
               <form @submit.prevent="handleChangePassword">
-                <div class="mb-3">
+                <div class="mb-3 text-start">
                   <label for="oldPassword" class="form-label">Mật khẩu cũ</label>
                   <input type="password" v-model="oldPassword" class="form-control" id="oldPassword" required>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 text-start">
                   <label for="newPassword" class="form-label">Mật khẩu mới</label>
                   <input type="password" v-model="newPassword" class="form-control" id="newPassword">
                 </div>

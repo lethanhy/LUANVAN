@@ -7,6 +7,18 @@ const config = require('../config/config.js');
 
 const register = async (req, res) => {
     try {
+        // Kiểm tra email đã tồn tại chưa
+        const existingCustomerEmail = await Customer.findOne({ email: req.body.email });
+         if (existingCustomerEmail) {
+             return res.status(400).send({ message: 'Email đang được sử dụng.' });
+         }
+         // Kiểm tra phone đã tồn tại chưa
+         const existingCustomerPhone = await Customer.findOne({ phone: req.body.phone });
+         if (existingCustomerPhone) {
+             return res.status(400).send({ message: 'Số điện thoại đã được sử dụng.' });
+         }
+         
+        // Tạo và lưu khách hàng mới
         const customer = new Customer(req.body);
         await customer.save();
         res.status(201).send(customer);
@@ -17,15 +29,15 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const customer = await Customer.findOne({ email });
+        const { phone, password } = req.body;
+        const customer = await Customer.findOne({ phone });
         if (!customer) {
-            return res.status(400).send({ message: 'Không tìm thấy email' });
+            return res.status(400).send({ message: 'Không tìm thấy số điện thoại' });
         }
 
         const isMatch = await bcrypt.compare(password, customer.password);
         if (!isMatch) {
-            return res.status(400).send({ message: 'Sai password' });
+            return res.status(400).send({ message: 'Sai mật khẩu' });
         }
 
         const token = jwt.sign({ id: customer._id }, config.jwtSecret, { expiresIn: '1h' });
@@ -238,6 +250,34 @@ const changePassword = async (req, res) => {
 }
 
 
+// Handle image upload
+const uploadProfileImage = async (req, res) => {
+    try {
+      // Make sure the file is uploaded
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded!' });
+      }
+  
+      // Find the customer by ID and update the profile image
+      const customer = await Customer.findById(req.params.customerId);
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+  
+      // Save the image URL (path of the uploaded image)
+      customer.image = `/uploads/${req.file.filename}`;
+  
+      // Save the customer record
+      await customer.save();
+  
+      res.status(200).json({ message: 'Profile image updated successfully', imageUrl: customer.image });
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+
 
 
 
@@ -258,6 +298,7 @@ module.exports = {
     createCustomer,
     updateCustomer,
     getCustomerById,
-    changePassword
+    changePassword,
+    uploadProfileImage
     
 };

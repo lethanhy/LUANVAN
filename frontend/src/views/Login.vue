@@ -5,11 +5,11 @@
       <div class="col-lg-6 bg-white d-flex align-items-center justify-content-center">
         <div class="login--body text-center">
           <p class="text-start text-primary">Ocean Breeze Hotel</p>
-          <h4 class="login--title">Log in to your Account</h4>
-          <p>Welcome back, select method to log in</p>
+          <h4 class="login--title">Đăng nhập vào tài khoản của bạn</h4>
+          <!-- <p>Chào mừng quay trở lại, chọn phương thức đăng nhập</p> -->
 
           <!-- Social Login Inputs -->
-          <div class="social-input">
+          <!-- <div class="social-input">
             <div class=" border rounded">
               <div class="d-flex align-items-center m-1">
                 <img src="../assets/google.png" alt="Google" class="social-icon" />
@@ -23,45 +23,46 @@
                 <p class="ms-2 mb-0">Facebook</p>
               </div>
             </div>
-          </div>
+          </div> -->
 
-          <hr /><span>or continue with email</span>
+          <!-- <hr /><span>or continue with email</span> -->
 
           <!-- Login Form -->
           <form @submit.prevent="login" class="mt-4">
             <input
-              v-model="email"
-              type="email"
+              v-model="phone"
+              type="text"
               class="form-control mb-3"
-              placeholder="Email"
-              @blur="validateEmail"
+              placeholder="Nhập số điện thoại..."
             />
-            <div v-if="errors.email" class="text-start rounded error">
+            <!-- <div v-if="errors.email" class="text-start rounded error">
               <p class="p-2">{{ errors.email }}</p>
-            </div>
+            </div> -->
 
             <input
               v-model="password"
               type="password"
               class="form-control mb-3"
-              placeholder="Password"
+              placeholder="Nhập mật khẩu..."
               @blur="validatePassword"
             />
-            <div v-if="errors.password" class="text-start rounded error">
+            <!-- <div v-if="errors.password" class="text-start rounded error">
               <p class="p-2">{{ errors.password }}</p>
-            </div>
+            </div> -->
 
             <div class="recover text-end">
-              <a href="#">Forgot Password?</a>
+              <a href="#">Quên mật khẩu?</a>
             </div>
 
-            <button class="btn btn-primary w-100 mt-3" type="submit">Login</button>
+            <button class="btn btn-primary w-100 mt-3" type="submit">Đăng nhập</button>
           </form>
 
           <div class="member mt-3">
-            Not a member?
-            <router-link to="/customers/register">Register Now</router-link>
-          </div>
+            Không phải là thành viên?
+            <router-link to="/customers/register">Đăng ký ngay bây giờ ?</router-link>
+          </div> 
+
+          <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
         </div>
       </div>
 
@@ -74,31 +75,7 @@
       </div>
     </div>
 
-     <!-- Success Message -->
-     <div v-if="messageType === 'success'"  class="success-message">
-      <div class="icon--check">
-        <i class="fa-solid fa-check"></i>
-      </div>
-      <p class="fs-3 fw-bold mt-2">{{ successMessage }}</p>
-      <p class="m-3">Everything is working normally.</p>
-      <div class="success--input">
-        <button  @click="$router.push('/')" class="btn border border-success text-success m-2">CONTINUE</button>
-      </div>
-    </div>
-
-    <!-- Success Message -->
-    <div  v-if="messageType === 'error'"  class="error-message">
-      <div class="icon--check--error">
-        <i class="fa-solid fa-xmark"></i>
-      </div>
-      <p class="fs-3 fw-bold mt-2">{{ successMessage }}</p>
-      <p class="m-3">Oops!, Something went wrong!</p>
-      <div class="success--input">
-        <button  @click="login" class="btn border border-danger text-danger m-2">TRY AGAIN</button>
-      </div>
-    </div>
-
-
+    
     
   </div>
 
@@ -113,44 +90,19 @@ import { useUserStore } from '@/stores/userStore';
 export default {
   data() {
     return {
-      messageType: null, // Can be 'success', 'error', or null
-      successMessage: '',
-      email: '',
+      phone: '',
       password: '',
-      errors: { email: '', password: '' }, // Store errors for validation
-      touched: { email: false, password: false } // Track if fields have been touched
+      errorMessage: null,
+      // errors: { email: '', password: '' }, // Store errors for validation
+      // touched: { email: false, password: false } // Track if fields have been touched
     };
   },
   methods: {
-    validateEmail() {
-      this.touched.email = true;
-      if (!this.email) {
-        this.errors.email = 'Vui lòng nhập email!';
-      } else if (!/\S+@\S+\.\S+/.test(this.email)) {
-        this.errors.email = 'Email không hợp lệ!';
-      } else {
-        this.errors.email = ''; // Clear error if valid
-      }
-    },
-    validatePassword() {
-      this.touched.password = true;
-      if (!this.password) {
-        this.errors.password = 'Vui lòng nhập password!';
-      } else {
-        this.errors.password = ''; // Clear error if valid
-      }
-    },
+    
     async login() {
-      // Validate both fields before submission
-      this.validateEmail();
-      this.validatePassword();
-
-      // Stop login if there are validation errors
-      if (this.errors.email || this.errors.password) return;
-
       try {
         const response = await api.post('/customers/login', {
-          email: this.email,
+          phone: this.phone,
           password: this.password
         });
 
@@ -158,27 +110,11 @@ export default {
 
         const userStore = useUserStore();
         userStore.setUser(response.data.user);
-       
-            this.successMessage = 'Success!';
-            this.messageType = 'success';
-
-            setTimeout(() => {
-              this.messageType = null;
-              // this.$router.push('/');
-            }, 3000);
-            //  this.$router.push('/');
+        this.$router.push('/');
 
       } catch (error) {
-        console.error('Login failed:', error);
-        if (error.response && error.response.data) {
-          this.successMessage = 'Error!';
-          this.messageType = 'error';
-
-        setTimeout(() => {
-          this.messageType = null;
-        }, 3000);
-          // alert(error.response.data.message || 'Đăng nhập thất bại!');
-        }
+        this.errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+        console.error("Registration failed:", error);
       }
     }
   }

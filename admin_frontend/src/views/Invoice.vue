@@ -1,6 +1,6 @@
 <template>
   <div class="invoice">
-    <h2>Hóa đơn</h2>
+    <h2 class="text-info">Hóa đơn</h2>
 
     <div class="d-flex">
       <!-- Search Bar -->
@@ -24,10 +24,9 @@
       <!-- Search Bar for Room Type -->
       <div class="search-bar">
         <select id="type" v-model="roomTypeQuery" class="form-select">
-          <option value="">Chọn loại phòng</option>
-          <option value="single">Phòng đơn</option>
-          <option value="double">Phòng đôi</option>
-          <option value="family">Phòng gia đình</option>
+          <option value="">Tổng tiền</option>
+          <option value="single">Từ cao đến thấp</option>
+          <option value="double">Từ thấp đến cao</option>
         </select>
       </div>
 
@@ -67,7 +66,7 @@
           <td>{{ formatDate(invoice.issuedDate) }}</td>
           <td>{{ invoice.booking.customer.name }}</td>
           <td>{{ formatCurrency(invoice.totalAmount) }} VND</td>
-          <td><button class="bg-danger">Xóa</button></td>
+          <td><button class="bg-danger" @click="deleteInvoice(invoice._id)">Xóa</button></td>
         </tr>
       </tbody>
     </table>
@@ -138,6 +137,21 @@ export default {
         this.errorMessage = "Lỗi khi lấy danh sách hóa đơn.";
       }
     },
+    async deleteInvoice(id) {
+      try {
+        const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa hóa đơn này không?');
+          if (!isConfirmed) {
+            return; // Dừng hàm nếu người dùng chọn "Hủy"
+          }
+        const response =  await api.delete(`/invoice/${id}`);
+        alert('Xóa thành công');
+
+      } catch (error) {
+        this.errorMessage = "Lỗi khi xóa hóa đơn.";
+      }
+
+    },
+
     formatDate(dateString) {
       const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
       return new Date(dateString).toLocaleDateString('vi-VN', options);

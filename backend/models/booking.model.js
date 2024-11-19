@@ -16,10 +16,10 @@ const BookingSchema = mongoose.Schema(
         checkoutTime: {
             type: String,
         },
-        adults: {
-            type: Number,
-            default:1,
-        },
+        // adults: {
+        //     type: Number,
+        //     default:1,
+        // },
         infomation: {
            name: {
             type: String
@@ -34,10 +34,10 @@ const BookingSchema = mongoose.Schema(
             type: String,
            }
         },
-        children: {
-            type: Number,
-            default: 0
-        },
+        // children: {
+        //     type: Number,
+        //     default: 0
+        // },
         staff: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Staff',

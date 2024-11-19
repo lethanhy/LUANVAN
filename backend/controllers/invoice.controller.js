@@ -54,6 +54,17 @@ const getAllInvoice = async (req, res) => {
     }
 };
 
+const deleteInvoiceById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoice = await Invoice.findByIdAndDelete(id);
+      res.status(200).json('Xóa thành công');
+    } catch (error) {
+       res.status(500).json({ message: 'Lỗi khi lấy danh sách hóa đơn. Vui lòng thử lại.' });
+    }
+
+};
+
 // Hàm tính tổng doanh thu
 const calculateTotalRevenue = async (req, res) => {
     try {
@@ -145,6 +156,7 @@ module.exports = {
     getAllInvoice,
     calculateTotalRevenue,
     calculateMonthlyRevenue,
-    calculateDailyRevenue
+    calculateDailyRevenue,
+    deleteInvoiceById
     
 };

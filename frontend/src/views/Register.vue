@@ -1,19 +1,20 @@
 <template>
   <div class="container signup">
     <div class="row shadow rounded">
-      <div class="col-lg-6 bg-light d-flex align-items-center justify-content-center">
+      <div class="col-lg-6 bg-light d-flex align-items-center justify-content-center signup-image">
           <img 
-            src="../assets/Hotel Reservations _ Book Hotel Rooms Online.jpg" 
+            src="../assets/dangky.jpg" 
             alt="Hotel Reservations" 
-            class="login-image img-fluid"
+            class=" img-fluid"
           />
         </div>
       <div class="col-lg-6 bg-white d-flex align-items-center justify-content-center">
         <div class="signup--body">
-          <h3 class="signup--title">Sign up for an account</h3>
-          <p>Book rooms and stay conveniently</p>
+          <p class="text-start text-primary">Ocean Breeze Hotel</p>
+          <h3 class="signup--title">Đăng ký tài khoản</h3>
+          <p>Đặt phòng và ở thuận tiện</p>
 
-          <div class="social-media">
+          <!-- <div class="social-media">
             <div class=" border">
               <div class="d-flex align-items-center m-2">
                 <img src="../assets/google.png" alt="Google" class="social-icon" />
@@ -28,31 +29,31 @@
               </div>
               
             </div>
-          </div>
+          </div> -->
 
 
           <form @submit.prevent="Register" class="mt-4">
-            <input v-model="name" type="text" class="form-control mb-3" placeholder="Username" required />
-            <input v-model="password" type="password" class="form-control mb-3" placeholder="Password" required />
-            <input v-model="email" type="email" class="form-control mb-3" placeholder="Email" required />
-            <input v-model="address" type="text" class="form-control mb-3" placeholder="Address" required />
-            <input v-model="phone" type="text" class="form-control mb-3" placeholder="Phone" required />
+            <input v-model="name" type="text" class="form-control mb-3" placeholder="Nhập họ và tên..." required />
+            <input v-model="password" type="password" class="form-control mb-3" placeholder="Nhập mật khẩu..." required />
+            <input v-model="email" type="email" class="form-control mb-3" placeholder="Nhập email..." required />
+            <input v-model="address" type="text" class="form-control mb-3" placeholder="Nhập địa chỉ..." required />
+            <input v-model="phone" type="text" class="form-control mb-3" placeholder="Nhập số điện thoại..." required />
 
             <div class="form-check">
               <input v-model="agreedToTerms" type="checkbox" class="form-check-input" id="terms" />
               <label class="form-check-label" for="terms">
-                I agree to the <a href="#">Terms & Conditions</a>
+                Tôi đồng ý với <a href="#">Điều khoản & Điều kiện</a>
               </label>
             </div>
 
             <button class="btn btn-primary w-100 mt-3" type="submit" :disabled="isSubmitting || !agreedToTerms">
               <span v-if="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-              Sign Up
+              Đăng ký
             </button>
           </form>
 
           <div class="member mt-3">
-            Already have an account? <router-link to="/customers/login">Sign In</router-link>
+            Đã có tài khoản? <router-link to="/customers/login">Đăng nhập</router-link>
           </div>
           <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
         </div>
@@ -154,5 +155,9 @@ export default {
 
 .alert {
   font-size: 0.9rem;
+}
+.signup-image img {
+  max-height: 600px; /* Chỉnh chiều cao theo ý muốn */
+  object-fit: cover; /* Giữ tỉ lệ hình ảnh */
 }
 </style>

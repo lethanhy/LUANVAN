@@ -243,6 +243,15 @@ export default {
         console.error('Failed to update booking status:', error);
       }
     },
+    async deleteBooking(id) {
+      try {
+        const response = await api.delete(`bookings/${id}`);
+        alert('Xóa thành công');
+        await this.getAllBooking();
+      } catch (error) {
+        console.error('Failed to update booking status:', error);
+      }
+    },
 
    
 

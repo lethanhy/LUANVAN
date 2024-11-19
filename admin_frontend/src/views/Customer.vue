@@ -40,6 +40,17 @@
                     />
                 </div>
 
+                <!-- Search Bar for Room Type -->
+                <div class="search-bar">
+                    <!-- <label for="type" class="form-label">Loại phòng</label> -->
+                    <select id="type" v-model="searchStatus" class="form-select">
+                        <option value="">Chọn trạng thái </option>
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngừng hoạt động</option>
+                        
+                    </select>
+                </div>
+
                 
 
             </div>
@@ -82,7 +93,7 @@
                         </td>
                     </tr>
                     <tr v-if="!filteredCustomers.length">
-                        <td colspan="9">Không tìm thấy khách hàng</td>
+                        <td colspan="10">Không tìm thấy khách hàng</td>
                     </tr>
                 </tbody>
             </table>
@@ -111,7 +122,7 @@
             <!-- Add Customer Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                 <div class="modal-content">
-                    <h2 class="modal-title text-info">Thêm Khách Hàng</h2>
+                    <h2 class="modal-title text-info text-center">Thêm khách hàng</h2>
                     <form @submit.prevent="addCustomer">
 
                         <div class="d-flex justify-content-between align-items-center ">
@@ -159,8 +170,12 @@
                                 <option value="Nữ">Nữ</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary">Thêm</button>
-                        <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+                       
+                       
+                            <button type="submit" class="btn btn-primary">Thêm</button>
+                            <button type="button" class="btn btn-secondary ms-2" @click="showModal = false">Hủy</button>
+                       
+                        
                     </form>
                 </div>
             </div>
@@ -168,7 +183,7 @@
             <!-- Edit Customer Modal -->
             <div v-if="showModalEdit" class="modal-overlay" @click.self="showModalEdit = false">
                 <div class="modal-content">
-                    <h2 class="modal-title text-info">Chỉnh sửa Khách Hàng</h2>
+                    <h2 class="modal-title text-info text-center">Chỉnh sửa khách hàng</h2>
                     <form @submit.prevent="updateCustomer">
 
                         <div class="d-flex justify-content-between align-items-center ">
@@ -260,7 +275,8 @@ export default {
             totalItems: 0 ,// Total number of items (rooms)
             searchQuery: '', // Holds the search input for filtering by room number
             customerPhoneQuery: '',    // For room type search
-            customerCccd: '', 
+            customerCccd: '',
+            searchStatus:'',
         };
     },
     computed: {
@@ -270,6 +286,10 @@ export default {
             const matchesCustomerName = customer.name?.toString().includes(this.searchQuery);
             const matchesCustomerPhone = (customer.phone || '').toLowerCase().includes(this.customerPhoneQuery.toLowerCase());
             const matchesCustomerCccd = (customer.cccd || '').toLowerCase().includes(this.customerCccd.toLowerCase());
+           
+
+
+
 
             return matchesCustomerName && matchesCustomerPhone && matchesCustomerCccd;
         });
@@ -418,7 +438,7 @@ export default {
 
 .form-label {
     margin-bottom: 0.5rem;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .form-control, .form-select {

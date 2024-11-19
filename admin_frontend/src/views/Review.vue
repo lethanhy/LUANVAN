@@ -74,7 +74,7 @@
           </tbody>
         </table>
   
-        <p v-if="!isLoading && reviews.length === 0">Không tìm thấy đánh giá</p>
+        <p v-if="!isLoading && reviews.length === 0" class="text-danger">Không tìm thấy đánh giá nào...</p>
       </div>
   
       <!-- Modal hiển thị thông tin và thêm phản hồi -->

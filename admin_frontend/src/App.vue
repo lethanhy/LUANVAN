@@ -122,19 +122,20 @@ import TheWelcome from './components/TheWelcome.vue'
  <div v-else class="login-container">
   <div class="login">
     <form @submit.prevent="login">
-      <h2>Đăng Nhập</h2>
+      <p class="text-primary">Ocean Breeze Hotel</p>
+      <h2 class="login--title">Đăng nhập vào trang quản lý</h2>
       
       <div class="mb-3">
-        <label for="name" class="form-label">Nhập tên</label>
-        <input type="name" v-model="name" class="form-control" id="name" required />
+        <!-- <label for="name" class="form-label">Nhập tên</label> -->
+        <input type="text" v-model="phone" class="form-control" id="phone" placeholder="Nhập số điện thoại..." required />
       </div>
 
       <div class="mb-3">
-        <label for="password" class="form-label">Nhập mật khẩu</label>
-        <input type="password" v-model="password" class="form-control" id="password" required />
+        <!-- <label for="password" class="form-label">Nhập mật khẩu</label> -->
+        <input type="password" v-model="password" class="form-control" id="password" placeholder="Nhập mật khẩu..." required />
       </div>
 
-      <button type="submit" class="btn btn-primary">Login</button>
+      <button type="submit" class="btn btn-primary">Đăng nhập</button>
     </form>
 
     <div v-if="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
@@ -153,7 +154,7 @@ import { useUserStore } from './stores/userStore'; // Pinia store
 export default {
   data() {
     return {
-      name: '',
+      phone: '',
       password: '',
       contacts:[],
       totalContact: 0, // Add this line
@@ -189,7 +190,7 @@ export default {
   methods: {
     async login() {
       try {
-        const response = await api.post('/staff/login', { name: this.name, password: this.password });
+        const response = await api.post('/staff/login', { phone: this.phone, password: this.password });
 
         // Save the token in localStorage
         localStorage.setItem('authToken', response.data.token);
@@ -257,6 +258,7 @@ export default {
     outline: none;
     box-sizing: border-box;
     font-family: "Afacad Flux", sans-serif;
+    /* color: #2c3e50; */
     font-size: 17px;
    
 }
@@ -520,6 +522,9 @@ export default {
     text-align: center;
 }
 
+.login--title {
+  color: #123f92;
+}
 
 
 </style>

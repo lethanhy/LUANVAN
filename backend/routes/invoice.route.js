@@ -8,7 +8,8 @@ router.post('/', invoiceController.create);
 router.get('/', invoiceController.getAllInvoice);
 router.get('/total-revenue',invoiceController.calculateTotalRevenue),
 router.get('/monthly-revenue',invoiceController.calculateMonthlyRevenue),
-router.get('/daily-revenue',invoiceController.calculateDailyRevenue)
+router.get('/daily-revenue',invoiceController.calculateDailyRevenue),
+router.delete('/:id', invoiceController.deleteInvoiceById)
 
 
 

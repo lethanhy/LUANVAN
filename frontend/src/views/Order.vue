@@ -29,8 +29,9 @@
               />
             </div>
             <div class="col-lg-9 ms-3 text-start">
-              <p class="mb-1 fw-bold fs-5">Phòng {{ rooms.roomNumber }}</p>
-              <p class="mb-1 text-muted"><i class="fas fa-user"></i> {{ rooms.maxGuests }} khách</p>
+              <p class="mb-2 fw-bold fs-5">{{ rooms.roomName }}</p>
+              <!-- <p class="mb-1 fw-bold fs-5">Phòng {{ rooms.roomNumber }}</p> -->
+              <p class="mb-2 text-muted"><i class="fas fa-users"></i> {{ rooms.adults }} khách</p>
               <p class="mb-1 text-success">{{ formatCurrency(rooms.price) }} VND/Đêm</p>
               <div class="room-features d-flex justify-content-start flex-wrap pt-3">
                 <div class="me-4 mb-2"><i class="fa-solid fa-bed me-1"></i> King Size Bed</div>
@@ -95,11 +96,11 @@
           <!-- Date Summary Section -->
           <div class="date d-flex justify-content-around border border-secondary rounded-3 p-3 mb-3 shadow-sm bg-white">
             <div>
-              <p class="text-start fw-bold">Check-in</p>
+              <p class="text-start fw-bold">Thời gian nhận phòng</p>
               <p class="fs-6">{{ checkin }}</p>
             </div>
             <div>
-              <p class="text-start fw-bold">Check-out</p>
+              <p class="text-start fw-bold">Thời gian trả phòng</p>
               <p class="fs-6">{{ checkout }}</p>
             </div>
           </div>
@@ -112,7 +113,7 @@
               <p class="fw-bold text-success"></p>
             </div>
             <div class="d-flex justify-content-between my-2">
-              <p>Thời gian:</p>
+              <p class="fs-5">Thời gian:</p>
               <p class="fw-bold">{{ calculateDays() }} ngày</p>
             </div>
             <div class="d-flex justify-content-between my-2">
@@ -120,16 +121,17 @@
               <p>0 VND</p>
             </div>
             <div class="d-flex justify-content-between fw-bold my-3" v-if="rooms">
-              <p>Tổng tiền:</p>
+              <p class="fs-5">Tổng tiền:</p>
               <p class="text-danger">{{ formatCurrency(rooms.price * calculateDays()) }}</p>
             </div>
 
             <!-- Payment Button -->
             <!-- <button class="btn btn-success w-100 rounded-3" @click.prevent="createBooking" >Thanh toán</button> -->
             <button class="btn btn-success w-100 rounded-3" @click.prevent="handlePayment">
-              Thanh toán
+              Thanh toán ngân hàng
             </button>
           </div>
+
         </div>
       </form>
     </div>
