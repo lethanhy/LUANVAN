@@ -14,16 +14,18 @@
 
     <div class="row" v-if="rooms">
       <!-- Room Image Section -->
-      <div class="col-lg-5 d-flex justify-content-center align-items-center ">
+      <div class="col-lg-6 d-flex justify-content-start align-items-start ">
         <img :src="`http://localhost:3000/uploads/${rooms.image}`" alt="Room Image" class="img-fluid">
       </div>
 
       <!-- Room Details Section -->
-      <div class="col-lg-7 ">
+      <div class="col-lg-6 ">
         <div class="ml-4">
 
-          <h1 class="fw-bold fst-italic text-start">{{ rooms.roomName }}</h1>
+          <h3 class="fw-bold fst-italic text-start">{{ rooms.roomName }}</h3>
           <p class=" text-start text-danger fs-4">{{ formatCurrency(rooms.price) }}/Đêm</p>
+          <p class=" text-start">Người lớn: {{ rooms.adults }}</p>
+          <p class=" text-start">Trẻ em: {{ rooms.children }}</p>
           <p class="text-start">{{ rooms.description }}</p>
 
           <hr>
@@ -32,20 +34,20 @@
           <!-- Features Section -->
           <div class="d-flex justify-content-around pt-2">
             <div>
-              <p><i class="fa-solid fa-bed"></i> Giường cỡ lớn</p>
+              <p><i class="fa-solid fa-bed me-2 text-success fs-4"></i> Giường cỡ lớn</p>
             </div>
             <div>
-              <p><i class="fa-solid fa-water"></i> Nhìn ra biển</p>
+              <p><i class="fa-solid fa-water me-2 text-success fs-4"></i> Nhìn ra biển</p>
             </div>
           </div>
           <hr>
           
           <div class="d-flex justify-content-around">
             <div>
-              <p><i class="fa-solid fa-ruler-combined"></i> Diện tích 50m²</p>
+              <p><i class="fa-solid fa-ruler-combined me-2 text-success fs-4"></i> Diện tích 50m²</p>
             </div>
             <div>
-              <p><i class="fa-solid fa-utensils"></i> Bữa sáng miễn phí</p>
+              <p><i class="fa-solid fa-utensils me-2 text-success fs-4"></i> Bữa sáng miễn phí</p>
             </div>
           </div>
           <hr>
@@ -79,10 +81,8 @@
           <div class="m-3">
             <i class="fa-solid fa-spa"></i>
             <p>SPA</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of.
-              
+            <p>Các liệu pháp thư giãn như massage,
+               xông hơi, tắm bùn, và chăm sóc da.
             </p>
           </div>
         </div>
@@ -91,9 +91,8 @@
           <div class="m-3">
             <i class="fa-solid fa-bowl-food"></i>
             <p>FOOD</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of.
+            <p>  Phục vụ các bữa ăn với thực đơn đa
+               dạng từ món ăn địa phương đến quốc tế.
                
             </p>
           </div>
@@ -103,9 +102,8 @@
           <div class="m-3">
             <i class="fa-solid fa-users"></i>
             <p>ACTIVITIES</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of.
+            <p>  Nơi giải trí an toàn và vui nhộn cho trẻ nhỏ.
+              Các hoạt động như nhạc sống, biểu diễn văn hóa, và các lớp học nấu ăn.
                 
             </p>
           </div>
@@ -115,9 +113,8 @@
           <div class="m-3">
             <i class="fa-solid fa-car"></i>
             <p>TRANSPORTATION</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of. 
+            <p> Đưa đón khách hàng từ sân bay đến khách sạn và ngược lại.
+              Hỗ trợ khách thuê xe hơi hoặc xe đạp để khám phá khu vực lân cận. 
             </p>
           </div>
         </div>
@@ -126,9 +123,8 @@
           <div class="m-3">
             <i class="fa-solid fa-wifi"></i>
             <p>WIFI</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of. 
+            <p> Wi-Fi thường có sẵn trong tất cả các khu vực của khách sạn, bao gồm phòng nghỉ,
+               khu vực hội nghị, nhà hàng và khu vực hồ bơi. 
             </p>
           </div>
         </div>
@@ -137,9 +133,7 @@
           <div class="m-3">
             <i class="fa-solid fa-dumbbell"></i>
             <p>GYM</p>
-            <p> Lorem Ipsum has been the industry's
-              standard dummy text ever since the 1500s,
-                when an unknown printer took a galley of. 
+            <p> Trang bị các thiết bị tập luyện để khách duy trì thói quen rèn luyện thể chất. 
             </p>
           </div>
         </div>
@@ -184,7 +178,7 @@
 
     </div>
 
-    <div class="suggest">
+    <!-- <div class="suggest">
       <h3 class="text-dark text-start mb-3 mt-3 "> YOU MAY ALSO LIKE</h3>
       <div class="suggest--room">
         <div class="bg-white shadow border rounded-3">
@@ -220,7 +214,7 @@
           <button class="btn btn-success">Xem thêm</button>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- <div class="comment mt-3">
       <h3 class="text-dark  mb-3 mt-3 ">COMMENT</h3>
@@ -470,9 +464,11 @@ export default {
   margin: 0px;
 }
 .img-fluid {
-
-  height: 350px;
+  height: auto;
+  max-height: 100%; /* Điều chỉnh chiều cao tối đa để khớp với nội dung */
+  object-fit: cover; /* Đảm bảo hình ảnh không bị méo */
 }
+
 
 .notification {
   position: fixed;

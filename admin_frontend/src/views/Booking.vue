@@ -40,9 +40,9 @@
        <!-- Search Bar for Payment Status -->
        <div class="search-bar">
         <select v-model="searchType" class="form-select" required>
-          <option value="">Đơn hàng</option>
-          <option value="tại chỗ">Tại chỗ</option>
-          <option value="online">Online</option>
+          <option value="">Đơn đặt phòng</option>
+          <option value="tại chỗ">Tại khách sạn</option>
+          <option value="online">Trực tuyến</option>
         </select>
       </div>
 
@@ -102,10 +102,10 @@
             Website Online
           </td>
           <td v-if="booking.bookingType === 'tại chỗ'">
-            <p class="text-info">Tại khách sạn</p>
+            <p class="text-primary fst-italic">Tại khách sạn</p>
           </td>
           <td v-if="booking.bookingType === 'online'">
-            <p class="text-info">Trực tuyến</p>
+            <p class="text-primary fst-italic">Trực tuyến</p>
           </td>
           <td>
             <button 

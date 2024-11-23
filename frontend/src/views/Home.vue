@@ -195,6 +195,20 @@
 </template>
 
 <script>
+
+window.addEventListener('scroll', function () {
+  var element = this.document.querySelector('.room--img')
+  var position = element.getBoundingClientRect()
+
+  if (position.top < this.window.innerHeight && position.bottom >= 0) {
+    element.classList.add('visible')
+
+  }else {
+    element.classList.remove('visible')
+  }
+})
+
+
 import api from '../api';
 export default {
 
@@ -454,6 +468,8 @@ export default {
   padding: 2rem 0;
 }
 
+
+
 .about img {
   border-radius: 60% 60% 0% 0%;
 }
@@ -495,12 +511,35 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-}
 
+  transform: scale(0);
+  transition: all 0.7s;
+
+  /* animation-duration: 3s;
+  animation-name: spin ; */
+}
+.room--img.visible {
+  transform: scale(1);
+}
 .room--img img{
   width: 360px;
   height: 350px;
+
+  
 }
+
+/* @keyframes spin{
+  0% {
+
+  }
+  50%{
+    scale: 2;
+  }
+  100%{
+    transform: rotate(360deg);
+    border-radius: 50%;
+  }
+} */
 
 @media screen and (max-width: 800px) {
 

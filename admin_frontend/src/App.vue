@@ -96,7 +96,7 @@ import TheWelcome from './components/TheWelcome.vue'
                   
                   <div class="dropdown">
                     <a class="nav-link dropdown-toggle d-flex" href="#" id="dropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <img src="./assets/logo.jpg" alt="">
+                      <img :src="`http://localhost:3000${staff.image}`" alt="">
                       <p class="fs-5">{{ user.name }}</p>
                      <!-- <p>{{ user.role }}</p> -->
                     </a>
@@ -159,6 +159,7 @@ export default {
       contacts:[],
       totalContact: 0, // Add this line
       errorMessage:null,
+      staff:[],
 
     };
   },
@@ -236,12 +237,24 @@ export default {
   } catch (error) {
     console.log('Error fetching contacts:', error);
   }
-}
+},
+    async getStaff() {
+      try {
+        const staffId = this.user.id;
+        const response = await api.get(`/staff/${staffId}`);
+        this.staff = response.data;
+      } catch (error) {
+        console.log('Error fetching staff', error)
+      }
+    }
+
+
 
 
   },
   created() {
     this.getContact();
+    this.getStaff()
   }
 };
 </script>

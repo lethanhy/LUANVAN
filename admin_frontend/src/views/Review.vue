@@ -85,7 +85,7 @@
           <div v-if="selectedReview" class="review--user">
             <h4 class="pb-2 fw-bold text-success">Đánh giá của khách</h4>
             <div class="review--header">
-              <img src="../assets/logo.jpg" alt="User Avatar" />
+              <img :src="`http://localhost:3000${selectedReview.customer.image}`" alt="User Avatar" />
               <div>
                 <p>{{ selectedReview.customer.name }}</p>
                 <div class="d-flex align-items-center">
@@ -107,7 +107,7 @@
           <div v-if="selectedReview.phanhoi" class="m-4">
             <h4 class="pb-2 fw-bold text-success">Phản hồi của mình</h4>
             <div class="d-flex align-items-start mb-3">
-              <img src="../assets/logo.jpg" class="rounded-circle me-2" width="40" alt="Admin Avatar" />
+              <img :src="`http://localhost:3000${selectedReview.phanhoi.staff.image}`" class="rounded-circle me-2" width="40" alt="Admin Avatar" />
               <div>
                 <p class="mb-1 fw-semibold">{{ selectedReview.phanhoi.staff.name }}</p>
                 <small class="text-muted">{{ selectedReview.phanhoi.staff.role }}</small>

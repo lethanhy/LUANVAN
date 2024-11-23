@@ -157,6 +157,33 @@ const changePassword = async (req, res) => {
     }
 }
 
+// Handle image upload
+const uploadProfileImage = async (req, res) => {
+    try {
+      // Make sure the file is uploaded
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded!' });
+      }
+  
+      // Find the customer by ID and update the profile image
+      const staff = await Staff.findById(req.params.staffId);
+      if (!staff) {
+        return res.status(404).json({ message: 'Staff not found' });
+      }
+  
+      // Save the image URL (path of the uploaded image)
+      staff.image = `/uploads/${req.file.filename}`;
+  
+      // Save the customer record
+      await staff.save();
+  
+      res.status(200).json({ message: 'Profile image updated successfully', imageUrl: staff.image });
+    } catch (error) {
+      console.error('Error uploading profile image:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
 
 
 
@@ -170,6 +197,7 @@ module.exports = {
     register,
     getStaffById,
     getStaffByRole,
-    changePassword
+    changePassword,
+    uploadProfileImage
     
 };

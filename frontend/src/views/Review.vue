@@ -3,7 +3,7 @@
       <h1 class="mb-4 fw-bold text-primary">Tất cả đánh giá của tôi</h1>
       <div v-if="reviews && reviews.length" v-for="review in reviews" :key="review._id" class="review--user">
         <div class="review--header">
-          <img src="../assets/unnamed.png" alt="User Avatar" />
+          <img :src="`http://localhost:3000${review.customer.image}`" alt="User Avatar" />
           <div>
             <p>{{ review.customer.name }}</p>
             <div class="d-flex align-items-center">
@@ -37,7 +37,7 @@
         <!-- Reply Section -->
         <div class="collapse mt-3" :id="'replySection' + review._id">
           <div class="d-flex align-items-start mb-3">
-            <img src="../assets/unnamed.png" class="rounded-circle me-2" width="40" alt="Admin Avatar" />
+            <img :src="`http://localhost:3000${review.phanhoi?.staff?.image}`" class="rounded-circle me-2" width="40" alt="Admin Avatar" />
             <div>
               <p class="mb-1 fw-semibold">{{ review.phanhoi?.staff?.name }}</p>
               <small class="text-muted">Quản lý</small>
@@ -120,7 +120,7 @@ export default {
 }
 
 .review--header img {
-  width: 40px;
+  width: 45px;
   margin-right: 10px;
 }
 

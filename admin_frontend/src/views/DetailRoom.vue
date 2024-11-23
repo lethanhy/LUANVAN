@@ -433,10 +433,15 @@ export default {
             }
             console.log(id)
 
+                   // Lấy ngày hiện tại theo định dạng YYYY-MM-DD
+            const currentDate = new Date().toISOString().slice(0, 10); 
+
             // Tạo đối tượng dữ liệu cập nhật
             const updateData = {
                 status: 'hoàn thành',
+                checkoutDate: currentDate,
                 checkoutTime: this.currentTime,
+                
             };
 
             // // Hiển thị trạng thái tải

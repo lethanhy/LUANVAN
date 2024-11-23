@@ -1,7 +1,7 @@
 const Booking = require("../models/booking.model.js");
 const Room = require("../models/room.model.js");
 const Customer = require("../models/customer.model.js");
-const Cart = require("../models/cart.model.js");
+
 const MenuItem = require("../models/menu.model.js");
 const Staff = require("../models/staff.model.js");
 const Invoice = require("../models/invoice.model.js");
@@ -666,63 +666,80 @@ const earlyCheckout = async (req, res) => {
         const { id } = req.params;
         const updateData = req.body;
 
-        // Tìm phòng theo ID
-        const booking = await Booking.findById(id).populate('room');
+        // Extract checkoutDate and checkoutTime
+        const { checkoutDate, checkoutTime } = updateData;
 
+        // Find booking by ID
+        const booking = await Booking.findById(id).populate('room');
         if (!booking) {
             return res.status(404).send({ message: "Không tìm thấy phòng" });
         }
 
-        // Cập nhật các trường của booking
-        Object.assign(booking, updateData);
+        // Validate and set checkout date and time
+        if (checkoutDate) {
+            const checkoutDateTime = checkoutTime
+                ? `${checkoutDate}T${checkoutTime}:00`
+                : `${checkoutDate}T00:00:00`;
 
+            booking.checkout = new Date(checkoutDateTime);
 
-         // Cập nhật thời gian checkout nếu có trong updateData
-         if (updateData.checkoutTime) {
-            booking.checkoutTime = updateData.checkoutTime;
+            if (isNaN(booking.checkout)) {
+                return res.status(400).send({ message: "Ngày hoặc giờ checkout không hợp lệ" });
+            }
+        } else {
+            return res.status(400).send({ message: "Ngày checkout không được cung cấp" });
         }
 
-        // Tính tiền phòng
-        const roomRate = booking.room.price
-        const checkinDate = new Date(booking.checkin);
-        const checkoutDate = new Date(booking.checkout);
-        const numberOfDays = (checkoutDate - checkinDate) / (1000 * 60 * 60 * 24);  // Tính số ngày ở
+        // Update other fields
+        if (checkoutTime) {
+            booking.checkoutTime = checkoutTime;
+        }
 
-        // Tính tổng tiền phòng
+        // Calculate room charges
+        const roomRate = booking.room.price;
+        const checkinDate = new Date(booking.checkin);
+        const checkoutDateObj = booking.checkout;
+        const numberOfDays = Math.ceil(
+            (checkoutDateObj - checkinDate) / (1000 * 60 * 60 * 24)
+        );
+
         const totalRoomAmount = roomRate * numberOfDays;
 
-        // Tính tổng tiền các món trong đơn hàng
-        const totalOrderAmount = calculateTotalAmount(booking.orders) || 0;
+        // Calculate total order amount
+        const totalOrderAmount = calculateTotalAmount(booking.orders || []) || 0;
 
-        // Cộng tổng tiền phòng và tổng tiền các món
+        // Calculate total amount
         const totalAmount = totalRoomAmount + totalOrderAmount;
 
-        // Tạo mới một hóa đơn
+        // Create invoice
         const invoice = await Invoice.create({
-            booking,
+            booking: booking._id,
             totalAmount,
         });
 
-        await invoice.save();
-
-        // Cập nhật trạng thái phòng
+        // Update booking status and payment
         booking.status = 'hoàn thành';
         booking.paid = true;
-        booking.payment.phuongthuc = "Thanh toán tiền mặt";
-        booking.payment.paymentStatus = "thành công";
+        booking.payment = {
+            phuongthuc: "Thanh toán tiền mặt",
+            paymentStatus: "thành công",
+        };
+
         await booking.save();
 
-        const room = await Room.findById(booking.room);
+        // Update room status
+        const room = await Room.findById(booking.room._id);
+        if (room) {
+            room.trangthai = 'Chưa dọn dẹp';
+            await room.save();
+        }
 
-        room.trangthai = 'Chưa dọn dẹp';
-        await room.save();
-
-
-        res.send(booking);
+        res.send({ booking, invoice });
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
 };
+
 
 // Hàm tính tổng tiền từ mảng orders
 const calculateTotalAmount = (orders) => {

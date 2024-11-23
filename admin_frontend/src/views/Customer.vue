@@ -113,11 +113,14 @@
                     </ul>
                 </nav>
 
-            <!-- Success Message -->
-            <div v-if="showSuccessMessage" class="success-message">
-                <span class="checkmark">✔️</span>
-                <span>{{ successMessage }}</span>
-            </div>
+                    <!-- Success and Failure Message -->
+                    <div v-if="showSuccessMessage" class="success-message" :class="{ 'failure': isFailure }">
+                        <span class="checkmark">{{ isFailure ? '❌' : '✔️' }}</span>
+                        <span>{{ successMessage }}</span>
+                    </div>
+
+
+            
 
             <!-- Add Customer Modal -->
             <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
@@ -247,6 +250,7 @@ export default {
     data() {
         return {
             showSuccessMessage: false,
+            isFailure: false, // new flag for tracking failure state
             successMessage: '',
             showModal: false,
             showModalEdit: false,
@@ -337,19 +341,20 @@ export default {
                     };
                     this.showModal = false;
                     await this.getAllCustomer();
+                    // Success logic
+                    this.isFailure = false;
                     this.successMessage = 'Thêm khách hàng thành công!';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
+                    this.isFailure = true;
                     this.successMessage = 'Thêm khách hàng thất bại';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
+                this.showSuccessMessage = true;
+                setTimeout(() => (this.showSuccessMessage = false), 3000);
             } catch (error) {
-                console.log('Error adding customer:', error);
+                this.isFailure = true;
                 this.successMessage = 'Có lỗi xảy ra khi thêm khách hàng';
                 this.showSuccessMessage = true;
-                setTimeout(() => this.showSuccessMessage = false, 3000);
+                setTimeout(() => (this.showSuccessMessage = false), 3000);
             }
         },
         async deleteCustomer(id) {
@@ -357,17 +362,18 @@ export default {
                 const response = await api.delete(`/customers/${id}`);
                 if (response.status === 200) { // 200 OK status
                     await this.getAllCustomer();
+                    // Success logic
+                    this.isFailure = false;
                     this.successMessage = 'Xóa khách hàng thành công!';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
+                    this.isFailure = true;
                     this.successMessage = 'Xóa khách hàng thất bại';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
+                this.showSuccessMessage = true;
+                setTimeout(() => (this.showSuccessMessage = false), 3000);
             } catch (error) {
-                console.log('Error deleting customer:', error);
-                this.successMessage = 'Có lỗi xảy ra khi xóa khách hàng';
+                this.isFailure = true;
+                this.successMessage = error.response?.data?.message;
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
@@ -378,17 +384,17 @@ export default {
                 if (response.status === 200) { // 200 OK status
                     this.showModalEdit = false;
                     await this.getAllCustomer();
+                    this.isFailure = false;
                     this.successMessage = 'Cập nhật khách hàng thành công!';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 } else {
+                    this.isFailure = true;
                     this.successMessage = 'Cập nhật khách hàng thất bại';
-                    this.showSuccessMessage = true;
-                    setTimeout(() => this.showSuccessMessage = false, 3000);
                 }
+                this.showSuccessMessage = true;
+                setTimeout(() => (this.showSuccessMessage = false), 3000);
             } catch (error) {
-                console.log('Error updating customer:', error);
-                this.successMessage = 'Có lỗi xảy ra khi cập nhật khách hàng';
+                this.isFailure = true;
+                this.successMessage =  error.response?.data?.message;
                 this.showSuccessMessage = true;
                 setTimeout(() => this.showSuccessMessage = false, 3000);
             }
@@ -492,4 +498,10 @@ export default {
 .xoaCustomerTrue {
     color: #2def5a;
 }
+.success-message.failure {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
 </style>

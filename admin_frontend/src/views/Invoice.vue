@@ -23,22 +23,14 @@
 
       <!-- Search Bar for Room Type -->
       <div class="search-bar">
-        <select id="type" v-model="roomTypeQuery" class="form-select">
+        <select id="type" v-model="searchTotal" class="form-select">
           <option value="">Tổng tiền</option>
           <option value="single">Từ cao đến thấp</option>
           <option value="double">Từ thấp đến cao</option>
         </select>
       </div>
 
-      <!-- Search Bar for Room Status -->
-      <div class="search-bar">
-        <select id="status" v-model="roomTrangthai" class="form-select">
-          <option value="">Trạng thái phòng</option>
-          <option value="Đã dọn dẹp">Đã dọn dẹp</option>
-          <option value="Chưa dọn dẹp">Chưa dọn dẹp</option>
-        </select>
-      </div>
-
+      
       <!-- Nút xuất file -->
       <button class="btn btn-primary mb-3 shadow" @click="exportToCSV">
         <i class="fas fa-file-export"></i> Xuất file CSV
@@ -97,8 +89,7 @@ export default {
       invoices: [], // Danh sách hóa đơn
       searchQuery: "", // Tìm kiếm theo tên
       searchDate: "", // Tìm kiếm theo ngày
-      roomTypeQuery: "", // Tìm kiếm loại phòng
-      roomTrangthai: "", // Tìm kiếm trạng thái phòng
+     searchTotal:"",
       errorMessage: "", // Thông báo lỗi
       currentPage: 1, // Current active page
       itemsPerPage: 5, // Number of items to show per page
@@ -108,26 +99,35 @@ export default {
     this.fetchInvoices();
   },
   computed: {
-    filteredInvoices() {
-      return this.invoices
-        .filter(invoice => {
-          const matchesName = invoice.booking.customer.name.toLowerCase().includes(this.searchQuery.toLowerCase());
-          const matchesDate = !this.searchDate || invoice.issuedDate.includes(this.searchDate);
-          const matchesRoomType = !this.roomTypeQuery || invoice.booking.room.type.toLowerCase().includes(this.roomTypeQuery.toLowerCase());
-          const matchesRoomStatus = !this.roomTrangthai || invoice.booking.room.trangthai.toLowerCase().includes(this.roomTrangthai.toLowerCase());
-          return matchesName && matchesDate && matchesRoomType && matchesRoomStatus;
-        })
-        // .sort((a, b) => a.totalAmount - b.totalAmount);
-    },
-    paginatedInvoices() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredInvoices.slice(start, end);
-    },
-    totalPages() {
-      return Math.ceil(this.filteredInvoices.length / this.itemsPerPage);
-    },
-  },
+      filteredInvoices() {
+        let filtered = this.invoices
+          .filter(invoice => {
+            const matchesName = invoice.booking.customer.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+            const matchesDate = !this.searchDate || invoice.issuedDate.includes(this.searchDate);
+            return matchesName && matchesDate;
+          });
+
+        // Sorting by totalAmount when searchTotal is selected
+        if (this.searchTotal === "single") {
+          // Sort from high to low (descending order)
+          filtered.sort((a, b) => b.totalAmount - a.totalAmount);
+        } else if (this.searchTotal === "double") {
+          // Sort from low to high (ascending order)
+          filtered.sort((a, b) => a.totalAmount - b.totalAmount);
+        }
+
+        return filtered || []; // Ensure it returns an empty array if undefined
+      },
+      paginatedInvoices() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.filteredInvoices.slice(start, end); // Ensure filteredInvoices is always an array
+      },
+      totalPages() {
+        return Math.ceil(this.filteredInvoices.length / this.itemsPerPage);
+      },
+},
+
   methods: {
     async fetchInvoices() {
       try {

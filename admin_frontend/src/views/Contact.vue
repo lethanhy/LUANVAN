@@ -13,19 +13,21 @@
 
 
       <h2 class="mb-2 text-info">Liên hệ</h2>
-      <div class="contact--body bg-light shadow">
-        <table class="table table-borderless m-3 ">
+      <div class="contact--body">
+        <table v-if="contacts && contacts.length" class="table table-striped table-hover text-center table-borderless">
           <thead class=" ">
             <tr>
-              <th>Tên</th>
-              <th>Địa chỉ</th>
-              <th>Số điện thoại</th>
-              <th>Tin nhắn</th>
-              <th>Hành động</th>
+              <th scope="col">STT</th>
+              <th scope="col">Tên</th>
+              <th scope="col">Địa chỉ</th>
+              <th scope="col">Số điện thoại</th>
+              <th scope="col">Tin nhắn</th>
+              <th scope="col">Hành động</th>
             </tr>
           </thead>
-          <tbody v-for="contact in contacts" :key="contact._id" class="">
+          <tbody v-for="(contact, index) in contacts" :key="contact._id" class="">
             <tr>
+              <th scope="row">{{ index + 1 }}</th>
               <td>
                 <div class="d-flex align-items-center">
                   <img
@@ -55,6 +57,8 @@
             </tr>
         </tbody>
         </table>
+
+        <div v-else class="text-danger">Chưa có liên hệ nào.</div>
       </div>
     </div>
 

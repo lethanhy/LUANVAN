@@ -159,13 +159,13 @@ class PaymentController {
                       });
                   }
 
-                   // Tính tổng chi phí
-                   const totalCost = await calculateTotalCost(bookingUpdate.checkin, bookingUpdate.checkout, bookingUpdate.room.price);
+                  //  // Tính tổng chi phí
+                  //  const totalCost = await calculateTotalCost(bookingUpdate.checkin, bookingUpdate.checkout, bookingUpdate.room.price);
 
-                   await Invoice.create({
-                     booking: orderId,
-                     totalAmount: totalCost, // Convert amount to appropriate format if needed
-                   });
+                  //  await Invoice.create({
+                  //    booking: orderId,
+                  //    totalAmount: totalCost, // Convert amount to appropriate format if needed
+                  //  });
 
                   // Gửi email xác nhận khi thanh toán thành công
               sendBookingConfirmationEmail(

@@ -4,10 +4,9 @@
         <div class="row d-flex" v-if="staff">
           <div class="col-lg-4 d-flex flex-column align-items-center border-end">
             <div class="img-container text-center m-3">
-              <img src="../assets/logo.jpg" alt="Avatar" class="img--avata mb-3" />
-              <h3 class="fw-bold fst-italic">{{ staff.name }}</h3>
-              <p>{{ staff.role }}</p>
-              <button class="btn btn-primary">Chỉnh sửa ảnh</button>
+              <img :src="`http://localhost:3000${staff.image}`" alt="Profile" class="img--avata" />
+              <input type="file" @change="handleImageUpload" class="form-control-file mt-3" />
+              <button class="btn btn-primary mt-3" @click="updateProfileImage">Cập nhật ảnh đại diện</button>
             </div>
           </div>
           <div class="col-lg-8">
@@ -72,6 +71,7 @@
         oldPassword:'',
         newPassword:'',
         message:'',
+        newProfileImage: null,
       };
     },
     async created() {
@@ -99,6 +99,38 @@
       // Thêm logic chỉnh sửa ảnh ở đây
       alert('Chỉnh sửa ảnh đang được thực hiện...');
     },
+    handleImageUpload(event) {
+      this.newProfileImage = event.target.files[0];
+    },
+
+    async updateProfileImage() {
+  if (!this.newProfileImage) {
+    alert('Please select an image first!');
+    return;
+  }
+
+  try {
+    const staffId = this.$route.params.id;
+    const formData = new FormData();
+    formData.append('image', this.newProfileImage);
+
+    // Display loading state
+    this.isLoading = true;
+
+    const response = await api.put(`/staff/${staffId}/upload-image`, formData);
+    this.staff.image = response.data.imageUrl;
+    
+    // Notify success
+    alert('Profile image updated successfully!');
+  } catch (error) {
+    console.error('Failed to update image:', error);
+    alert('Failed to update image. Please try again.');
+  } finally {
+    // Remove loading state
+    this.isLoading = false;
+  }
+},
+
 
     async handleChangePassword() {
           if (!this.oldPassword || !this.newPassword) {
@@ -119,6 +151,8 @@
             this.message = error.response?.data || 'Có lỗi xảy ra.';
           }
       },
+
+      
       closeModal() {
       this.showModal = false;
       this.oldPassword = '';

@@ -31,7 +31,12 @@ import TheWelcome from './components/TheWelcome.vue'
               <button><a href=""><router-link to="/customers/login">Đăng nhập</router-link></a></button>
             </div>
             <div v-else class="nav__button" id="dropdown">
-              <button class="dropbtn"> {{ user.name }}</button>
+              <button class="dropbtn" style="display: flex; align-items: center; gap: 0.5rem;"><img 
+                :src="customers.image ? `http://localhost:3000${customers.image}` : '/default-profile.png'"
+                :alt="`Profile picture of ${user.name}`"
+                class="profile-image"> 
+                <span>{{ user.name }}</span>
+              </button>
               <div class="dropdown-content">
                 <a href="#"><router-link :to="{ name: 'Customers', params: { id: user.id } }">Tài khoản</router-link></a>
                 <a href="#"><router-link :to="{ name: 'History', params: { id: user.id } }">Lịch sử</router-link></a>
@@ -126,6 +131,7 @@ import TheWelcome from './components/TheWelcome.vue'
 <script setup>
 import { ref,computed, onMounted } from 'vue';
 import { useUserStore } from './stores/userStore';
+import api from './api';
 
 // Use the store
 const userStore = useUserStore();
@@ -137,6 +143,7 @@ const customers = ref([])
 // Khôi phục trạng thái người dùng khi ứng dụng tải lại
 onMounted(() => {
   userStore.restoreUser();
+  getCustomer()
 
 });
 
@@ -156,15 +163,23 @@ const sendMessage = () => {
   }
 };
 
-// const getCustomer = async () => {
-//   try {
-//     const id = user.value.id;
-//     const response = await api.get(`/customer/${id}`);
-//     customers.value = response.data;
-//   } catch (error) {
+const getCustomer = async () => {
+  try {
+    const id = user.value.id;
+    if (!id) {
+      console.warn("User ID is undefined or null.");
+      return;
+    }
+
+    const response = await api.get(`/customers/${id}`);
+    customers.value = response.data; // Ensure this matches your API's response structure
     
-//   }
-// }
+  } catch (error) {
+    console.error("Error fetching customer data:", error.message);
+    // You can add more error handling logic here (e.g., show a notification to the user)
+  }
+};
+
 
 
 
@@ -319,20 +334,21 @@ img{
 }
 .nav__button button {
   padding: 0.5rem 1rem;
-  background-color: rgb(174, 245, 250);
+  background-color:white;
   border: none;
   border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
+  border: 1px solid rgb(88, 232, 250);
   /* transition: background-color 0.3s; */
 }
 .nav__button button a{
   color: var(--text-dark);
 }
 
-.nav__button button:hover {
+/* .nav__button button:hover {
   background-color: #43E8E4;
-}
+} */
 
 .link a {
   font-weight: 500;
@@ -493,5 +509,10 @@ img{
   border-radius: 5px;
   cursor: pointer;
 }
+.profile-image {
+  width: 40px;
+  border-radius: 50%; /* Makes the image circular */
+}
+
 
 </style>

@@ -127,8 +127,8 @@
             
         <div class="order--footer pt-3">
             <div class="d-grid gap-2 d-md-flex justify-content-center">
-                <button type="submit" class="btn btn-success">Lưu</button>
-                <button type="button" class="btn btn-light" @click="resetForm"><router-link to="/bookings" class="text-decoration-none">Hủy</router-link></button>
+                <button type="submit" class="btn btn-success">Tạo phòng</button>
+                <button type="button" class="btn btn-danger" @click="resetForm"><router-link to="/bookings" class="text-decoration-none text-white">Thoát</router-link></button>
             </div>  
         </div>
       </form>
@@ -142,9 +142,9 @@
               </div>
               <p class="fs-3 fw-bold mt-2">Tạo phòng thành công</p>
               <p class="m-2">Mọi thứ đều hoạt động bình thường.</p>
-              <div class="success--input">
+              <!-- <div class="success--input">
                 <button  @click="$router.push('/')" class="btn border border-success text-success m-2">Tiếp tục</button>
-              </div>
+              </div> -->
           </div>
       </div>
   </template>
@@ -263,7 +263,7 @@ export default {
               // Thông báo thành công cho người dùng
               // this.successMessage = 'Tạo phòng thành công!';
               this.showSuccessMessage = true;
-              // setTimeout(() => this.showSuccessMessage = false, 3000);
+              setTimeout(() => this.showSuccessMessage = false, 3000);
               this.resetForm();
             } catch (error) {
               console.log('Error creating bookings:', error.response.data);
@@ -488,6 +488,9 @@ form {
     .order--body {
         flex-direction: column;
         gap: 1.5rem; /* Tăng khoảng cách giữa các phần khi cột bị xếp chồng */
+    }
+    .col-6 {
+      width: 100%;
     }
 
     h1 {

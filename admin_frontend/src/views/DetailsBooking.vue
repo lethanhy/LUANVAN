@@ -225,7 +225,7 @@
                                   <span v-else>Đặt phòng online</span></p>
                             </div>
                             <div>
-                                <p class="mb-1">Số người: {{ bookings.adults }}</p>
+                                <p class="mb-1">Số người: {{ bookings.room.adults }}</p>
                                 <p class="mb-1">Số ngày: {{ calculateDays(bookings.checkin, bookings.checkout) }}</p>
                             </div>
                         </div>

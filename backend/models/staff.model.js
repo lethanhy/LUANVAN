@@ -28,6 +28,10 @@ const StaffSchema = mongoose.Schema(
           
            
         },
+        image: {
+            type: String, // Lưu trữ URL của hình ảnh
+            required: false // Không bắt buộc
+        },
         
     },
     {
