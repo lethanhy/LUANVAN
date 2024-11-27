@@ -44,6 +44,9 @@ async function sendBookingConfirmationEmail(to, bookingDetails) {
             <strong style="color: #333;">Mã đặt phòng:</strong> ${bookingDetails.BookingID}
           </li>
           <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Số phòng:</strong> ${bookingDetails.roomNumber}
+          </li>
+          <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
             <strong style="color: #333;">Ngày nhận phòng:</strong> ${formatDate(bookingDetails.checkin)}
           </li>
           <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">

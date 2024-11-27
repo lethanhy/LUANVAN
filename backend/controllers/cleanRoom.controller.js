@@ -141,10 +141,8 @@ const updateCleanMobile = async (req, res) => {
 
   try {
     // Find the room assignment by cleanroomId
-    const assignment = await CleanRoom.findOne({ 
-      _id: cleanroomId, 
-      status: { $nin: ['đã dọn dẹp'] } 
-    }).populate('room');
+    const assignment = await CleanRoom.findById(
+      cleanroomId).populate('room');
 
     if (!assignment) {
       return res.status(404).json({ message: 'Assignment not found' }); // 404 - Not Found

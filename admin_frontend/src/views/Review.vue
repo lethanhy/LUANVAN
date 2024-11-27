@@ -85,7 +85,7 @@
           <div v-if="selectedReview" class="review--user">
             <h4 class="pb-2 fw-bold text-success">Đánh giá của khách</h4>
             <div class="review--header">
-              <img :src="`http://localhost:3000${selectedReview.customer.image}`" alt="User Avatar" />
+              <img v-if="selectedReview.customer.image" :src="`http://localhost:3000${selectedReview.customer.image}`" alt="User Avatar" />
               <div>
                 <p>{{ selectedReview.customer.name }}</p>
                 <div class="d-flex align-items-center">

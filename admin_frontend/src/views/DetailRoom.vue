@@ -55,7 +55,7 @@
 
                     <!-- <p v-else>Chưa có dịch vụ nào được đặt.</p> -->
 
-                    <button @click="showModal = true" v-if="room.booking.status === 'đã đặt'" class="btn btn-success">Thêm dịch vụ</button>
+                    <button @click="showModal = true" v-if="Object.keys(room.booking).length !== 0" class="btn btn-success">Thêm dịch vụ</button>
                   </div>
                 </div>
                 <!-- <div class="DetailRoom--service bg-white">

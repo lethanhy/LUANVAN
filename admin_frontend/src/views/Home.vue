@@ -58,87 +58,75 @@
 
           <div class="admin-dashboard">
               <h2 class="text-primary fw-bold">Thống kê doanh thu</h2>
-              <div class="m-4">
-                <h4 class="">Doanh thu theo ngày</h4>
-                <table class="table table-bordered  m-2">
-                  <thead>
-                    <tr>
-                      <th>Ngày</th>
-                      <th>Doanh thu (VND)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="revenue in dailyRevenue" :key="revenue._id">
-                      <td>{{ revenue._id }}</td>
-                      <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+               <!-- Bảng Doanh thu theo ngày -->
+  <div class="m-4">
+    <h4>Doanh thu theo ngày</h4>
+    <table class="table table-bordered m-2">
+      <thead>
+        <tr>
+          <th>Ngày</th>
+          <th>Doanh thu (VND)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="revenue in paginatedDailyRevenue" :key="revenue._id">
+          <td>{{ revenue._id }}</td>
+          <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <button 
+        :disabled="dailyPage === 1" 
+        @click="dailyPage--"
+        class="btn btn-primary">
+        Prev
+      </button>
+      <span>Trang {{ dailyPage }} / {{ dailyTotalPages }}</span>
+      <button 
+        :disabled="dailyPage === dailyTotalPages" 
+        @click="dailyPage++"
+        class="btn btn-primary">
+        Next
+      </button>
+    </div>
+  </div>
+              <!-- Bảng Doanh thu theo tháng -->
+  <div class="m-4">
+    <h4>Doanh thu theo tháng</h4>
+    <table class="table table-bordered m-2">
+      <thead>
+        <tr>
+          <th>Tháng</th>
+          <th>Doanh thu (VND)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="revenue in paginatedMonthlyRevenue" :key="revenue._id">
+          <td>{{ revenue._id }}</td>
+          <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pagination">
+      <button 
+        :disabled="monthlyPage === 1" 
+        @click="monthlyPage--"
+        class="btn btn-primary">
+        Prev
+      </button>
+      <span>Trang {{ monthlyPage }} / {{ monthlyTotalPages }}</span>
+      <button 
+        :disabled="monthlyPage === monthlyTotalPages" 
+        @click="monthlyPage++"
+        class="btn btn-primary">
+        Next
+      </button>
+    </div>
+  </div>
 
-              
-
-
-              </div>
-              <div class="m-4">
-                <h4>Doanh thu theo tháng</h4>
-                <table class="table table-bordered  m-2">
-                  <thead>
-                    <tr>
-                      <th>Tháng</th>
-                      <th>Doanh thu (VND)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="revenue in monthlyRevenue" :key="revenue._id">
-                      <td>{{ revenue._id }}</td>
-                      <td>{{ revenue.totalRevenue.toLocaleString('vi-VN') }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          <!-- <h3 class="text-info m-3">Lịch đặt phòng</h3>
-        <table class="table table-borderless m-2">
-          <thead>
-            <tr>
-              <th scope="col">STT</th>
-              <th scope="col">Khách</th>
-              <th scope="col">Phòng</th>
-              <th scope="col">Ngày</th>
-              <th scope="col">Trạng thái</th>
-
-            </tr>
-          </thead>
-          <tbody v-if="bookings.length">
-            <tr v-for="(booking, index) in bookings.slice(0, 7)" :key="booking._id">
-              <th scope="row">{{ index + 1 }}</th>
-              <td>{{ booking.customer.name }}</td>
-              <td>{{ booking.room.roomNumber }}</td>
-              <td>{{ formatDate(booking.checkin) }}</td>
-              <td>
-                <button 
-                  class="btn" 
-                  :class="{
-                    'text-success': booking.status === 'hoàn thành', 
-                    'text-danger': booking.status === 'hủy',
-                    'text-primary': booking.status === 'đã đặt',
-
-                  }"
-                >
-                  {{ booking.status }}
-                </button>
-              </td>
-
-            </tr>
-          </tbody>
-          <tr v-else>
-            <td colspan="4">Đang tải dữ liệu...</td>
-          </tr>
-        </table>
-        <div class="text-end pb-2">
-          <button class="btn btn-dark text-white"><router-link to="/bookings" class="text-decoration-none text-white">Xem thêm</router-link></button>
-        </div> -->
-
+        </div>
+         
 
 
         </div>
@@ -150,7 +138,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted,computed } from 'vue';
 import BarChart from '@/components/BarChart.vue';
 import api from '../api'; // Ensure this points to your axios instance
 
@@ -254,6 +242,30 @@ export default defineComponent({
       }
     }
 
+      // Phân trang Doanh thu theo ngày
+      const dailyPage = ref(1);
+    const dailyItemsPerPage = 3; // Số mục trên mỗi trang
+    const dailyTotalPages = computed(() =>
+      Math.ceil(dailyRevenue.value.length / dailyItemsPerPage)
+    );
+    const paginatedDailyRevenue = computed(() => {
+      const start = (dailyPage.value - 1) * dailyItemsPerPage;
+      const end = start + dailyItemsPerPage;
+      return dailyRevenue.value.slice(start, end);
+    });
+
+    // Phân trang Doanh thu theo tháng
+    const monthlyPage = ref(1);
+    const monthlyItemsPerPage = 5; // Số mục trên mỗi trang
+    const monthlyTotalPages = computed(() =>
+      Math.ceil(monthlyRevenue.value.length / monthlyItemsPerPage)
+    );
+    const paginatedMonthlyRevenue = computed(() => {
+      const start = (monthlyPage.value - 1) * monthlyItemsPerPage;
+      const end = start + monthlyItemsPerPage;
+      return monthlyRevenue.value.slice(start, end);
+    });
+
     
 
     onMounted(async () => {
@@ -269,7 +281,12 @@ export default defineComponent({
     });
 
     return { totalRooms, bookings, totalContacts, bookingRooms, totalCustomer, formatDate, dailyRevenue,
-      monthlyRevenue,
+      monthlyRevenue, dailyPage,
+      dailyTotalPages,
+      paginatedDailyRevenue,
+      monthlyPage,
+      monthlyTotalPages,
+      paginatedMonthlyRevenue,
        };
   }
 });
@@ -425,6 +442,32 @@ export default defineComponent({
 .admin-dashboard {
   padding: 20px;
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 10px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: bold;
+}
+
 /* .main--table .admin-dashboard table {
   width: 100%;
   border-collapse: collapse;

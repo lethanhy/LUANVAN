@@ -9,6 +9,7 @@ const auth = require('../middleware/auth.js');
 router.get('/', bookingController.getBooking);
 router.post('/order', bookingController.createBooking);
 router.post('/order/user', bookingController.createBookingUser);
+router.post('/order/user/checkin', bookingController.createBookingUserCheckin);
 
 router.post('/order/cart', bookingController.addCart);
 // router.get('/order/cart', bookingController.getCart);

@@ -47,7 +47,7 @@
                 <label for="start-date">Thời gian kết thúc</label>
                 <div  class="input-wrapper">
                     <i class="fas fa-calendar-alt"></i>
-                    <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate" placeholder="Thời gian kết thúc" required />
+                    <input type="date" v-model="checkout"   :min="getCheckoutMinDate()" @change="validateCheckout" placeholder="Thời gian kết thúc" required />
                 </div>
             </div>
 
@@ -201,25 +201,44 @@ export default {
     await this.getRoomAvailable();
   },
   methods: {
-    async getRoomAvailable() {
-  console.log('Check-in date:', this.checkin);
-  console.log('Check-out date:', this.checkout);
-  
-  if (this.checkin && this.checkout) {
-    try {
-      const response = await api.get('/bookings/order', {
-        params: {
-          checkin: this.checkin,
-          checkout: this.checkout
-        }
-      });
-      this.rooms = response.data;
-    } catch (error) {
-      console.log('Failed to load room details:', error);
-      alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
+
+    validateCheckout() {
+    // Ensure checkout date is after check-in date
+    if (this.checkout && this.checkin && this.checkout <= this.checkin) {
+      alert('Ngày trả phòng phải sau ngày nhận phòng và lớn hơn ngày nhận phòng!');
+      this.checkout = ''; // Reset the checkout date
     }
-  }
-},
+  },
+
+   // Ensure the checkout date's min date is dynamically updated based on the check-in date
+   getCheckoutMinDate() {
+    return this.checkin ? this.checkin : this.minDate;
+  },
+
+
+
+
+
+    async getRoomAvailable() {
+      console.log('Check-in date:', this.checkin);
+      console.log('Check-out date:', this.checkout);
+      
+      if (this.checkin && this.checkout) {
+        try {
+          const response = await api.get('/bookings/order', {
+            params: {
+              checkin: this.checkin,
+              checkout: this.checkout
+            }
+          });
+          this.rooms = response.data;
+        } catch (error) {
+          console.log('Failed to load room details:', error);
+          alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
+        }
+      }
+    },
+    
     addRoom(room) {
       const exists = this.selectedRooms.find(selectedRoom => selectedRoom.roomNumber === room.roomNumber);
       if (!exists) {

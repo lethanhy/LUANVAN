@@ -107,7 +107,10 @@
           <div class="text-center">
             <h2 class="fw-bold text-danger">50% Off</h2>
             <p>Giảm đến 50%, kèm bữa sáng miễn phí và đưa đón sân bay. Đặt ngay để tận hưởng!</p>
-            <div class="btn btn-info text-white">Đặt ngay</div>
+            <div class="btn btn-info text-white">
+              <router-link to="/rooms" class="text-white">Đặt ngay</router-link>
+              
+            </div>
           </div>
         </div>
 
@@ -119,7 +122,7 @@
           <div class="text-center">
             <h2 class="fw-bold text-danger">30% Off</h2>
             <p>Giảm đến 30%, kèm bữa sáng miễn phí và đưa đón sân bay. Đặt ngay để tận hưởng!</p>
-            <div class="btn btn-info  text-white">Đặt ngay</div>
+            <div class="btn btn-info  text-white"><router-link to="/rooms" class="text-white">Đặt ngay</router-link></div>
           </div>
         </div>
       </div>
@@ -140,11 +143,12 @@
           <span class="me-3">Diện tích: 100-150cm</span>
           <span><i class="fas fa-wifi"></i>  Wi-Fi</span>
 
-          <h2 class="mt-2">800.000 VND</h2>
+          <h2 class="mt-2 text-danger">800.000 VND</h2>
 
           <div class="d-inline-flex align-items-center">
             <button class="btn btn-info d-flex align-items-center">
-              Đặt ngay <i class="fa-solid fa-arrow-right ms-2"></i>
+              <router-link to="/rooms" class="text-white">Đặt ngay <i class="fa-solid fa-arrow-right ms-2"></i></router-link>
+              
             </button>
           </div>
 

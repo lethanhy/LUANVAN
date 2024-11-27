@@ -40,8 +40,8 @@
               <div class="room-header">
                 <p class="room-number">Phòng {{ bookings.room.roomNumber }}</p>
                 <div class="room-dates">
-                  <p>Ngày nhận phòng: <span>{{ formatDate(bookings.checkin) }}</span></p>
-                  <p>Ngày trả phòng: <span>{{ formatDate(bookings.checkout) }}</span></p>
+                  <p>Ngày nhận phòng: <span>{{ formatDate(bookings.checkin) }} {{ bookings.checkinTime }}</span></p>
+                  <p>Ngày trả phòng: <span>{{ formatDate(bookings.checkout) }} {{ bookings.checkoutTime }}</span></p>
                 </div>
               </div>
               <div class="room-info">
@@ -51,6 +51,8 @@
 
               <button v-if="bookings.status === 'đã đặt'" @click="handleChangeRoom" class="btn btn-info mt-2 text-white ">Đổi phòng</button>
             </div>
+
+            
 
             <!-- <div
               class="room-details"
@@ -103,7 +105,12 @@
       <div class="total-amount p-3">
             <div>
               <h4 class="section-title">Tổng tiền</h4>
+              
               <p class="total-text">Tổng tiền: {{ formatCurrency(calculateTotal()) }} VND</p>
+              <div class="form-group">
+                <input type="text" name="" id="" class="" placeholder="Nhập số tiền giảm giá...">
+              </div>
+              <p class="total-text">Tổng tiền cuối:  VND</p>
             </div>
             <!-- <button @click="generateExcel" class="btn ">In</button> -->
             <div class="text-center" >
@@ -114,10 +121,14 @@
 
               </div>
 
-              <div  v-else="!bookings.paid && bookings.status !== 'đã hủy'" >
+              <div  v-else-if="!bookings.paid && bookings.status !== 'đã hủy'" >
                 <button class="btn btn-danger text-white me-2">Chưa thanh toán</button>
                 <button class="btn btn-primary" @click="handlePayment">Thanh toán</button>
 
+              </div>
+
+              <div v-else-if="bookings.status === 'đã hủy'">
+                <button class="btn btn-danger">Đã hủy</button>
               </div>
 
 
@@ -207,7 +218,12 @@
                 <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
                     <div class="modal-content p-3 modal-sm">
                         <!-- Hotel Info -->
-                        <h5 class="modal-title text-center mb-2">Ocean Breeze Hotel</h5>
+                         <div class="d-flex justify-content-center align-items-center">
+                          <img src="../assets/logo.png" alt="" style="width: 40px;">
+                          <h5 class="modal-title text-center mb-2 text-primary">Ocean Breeze Hotel</h5>
+                         </div>
+                         
+                        
                         <p class="text-center mb-1">ĐC: 28 Đường Thi Sách, Phường Thắng Tám, TP Vũng Tàu, BR-VT</p>
                         <p class="text-center mb-3">ĐT: 0939 834 780</p>
 
@@ -220,13 +236,14 @@
                             <div>
                                 <p class="mb-1">{{ bookings.customer.name }}</p>
                                 <p class="mb-1">Ngày tạo: {{ currentDate }}</p>
-                                <p class="mb-1">Số hóa đơn: 2</p>
+                                <p class="mb-1">Số hóa đơn: #{{ bookings._id }}</p>
                                 <p class="mb-1">Nhân viên: <span v-if="bookings.staff">{{ bookings.staff.name }}</span>
                                   <span v-else>Đặt phòng online</span></p>
                             </div>
                             <div>
-                                <p class="mb-1">Số người: {{ bookings.room.adults }}</p>
-                                <p class="mb-1">Số ngày: {{ calculateDays(bookings.checkin, bookings.checkout) }}</p>
+                                <p class="mb-1">Người lớn: {{ bookings.room.adults }}</p>
+                                <p class="mb-1">Trẻ em: {{ bookings.room.children }}</p>
+                                <p class="mb-1">Số ngày: {{ calculateDays(bookings.checkin, bookings.checkout) }} Ngày</p>
                             </div>
                         </div>
 

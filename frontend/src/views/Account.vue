@@ -7,7 +7,7 @@
         <div class="text-center mt-3">
           <img :src="`http://localhost:3000${customers.image}`" alt="Profile" class="profile-img" />
           <input type="file" @change="handleImageUpload" class="form-control-file mt-3" />
-          <button class="btn btn-primary mt-3" @click="updateProfileImage">Update New Image</button>
+          <button class="btn btn-primary mt-3" @click="updateProfileImage">Cập nhật hình ảnh</button>
         </div>
       </div>
 
@@ -144,6 +144,7 @@ export default {
         formData.append('image', this.newProfileImage);
         const response = await api.put(`/customers/${this.customers._id}/upload-image`, formData);
         this.customers.image = response.data.imageUrl;
+        alert('Cập nhật thành công!');
       } catch (error) {
         console.log('Failed to update image:', error);
       }

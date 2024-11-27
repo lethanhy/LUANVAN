@@ -172,6 +172,7 @@ class PaymentController {
                 bookingUpdate.customer.email, // Email của khách hàng
                 {
                   BookingID: bookingUpdate._id,
+                  roomNumber:bookingUpdate.room.roomNumber,
                   checkin: bookingUpdate.checkin,
                   checkout: bookingUpdate.checkout,
                   roomType: bookingUpdate.room.type,

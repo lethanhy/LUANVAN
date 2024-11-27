@@ -127,6 +127,9 @@
 
             <!-- Payment Button -->
             <!-- <button class="btn btn-success w-100 rounded-3" @click.prevent="createBooking" >Thanh toán</button> -->
+            <button class="btn btn-primary w-100 rounded-3 mb-2" @click.prevent="payCheckin">
+              Thanh toán khi nhận phòng
+            </button>
             <button class="btn btn-success w-100 rounded-3" @click.prevent="handlePayment">
               Thanh toán ngân hàng
             </button>
@@ -140,9 +143,10 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import api from '../api';
 import { useUserStore } from '../stores/userStore';
+
 
 export default {
   name: 'OrderRoom',
@@ -150,6 +154,7 @@ export default {
   setup() {
     const userStore = useUserStore();
     const route = useRoute();
+    const router = useRouter(); // Initialize useRouter
     const user = ref({ ...userStore.user }); // Tạo một đối tượng user có thể chỉnh sửa
 
     const rooms = ref(null);
@@ -274,6 +279,41 @@ const createPayment = async (bookingId) => {
   }
 };
 
+const payCheckin = async () => {
+ 
+  if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
+    alert('Vui lòng điền đầy đủ thông tin!');
+    return;
+  }
+
+  const bookingData = {
+    checkin: new Date(route.query.checkin).toISOString(),
+    checkout: new Date(route.query.checkout).toISOString(),
+    room: rooms.value._id,
+    customer: userStore.user.id,
+    infomation: {
+        name: user.value.name, // Sử dụng thông tin từ user có thể chỉnh sửa
+        address: user.value.address,
+        phone: user.value.phone,
+        message: user.value.message,
+      }
+  };
+
+  try {
+    const response = await api.post('/bookings/order/user/checkin', bookingData);
+    console.log('API response:', response.data); // Thêm dòng này để xem phản hồi
+    const bookingId = response.data.bookingId; // Lấy ID booking từ phản hồi
+    alert('Đặt phòng thành công!');
+    router.push('/');
+
+   
+  } catch (error) {
+    console.error('Lỗi khi tạo booking:', error);
+    alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
+    throw error; // Ném lỗi để xử lý ngoài hàm nếu cần
+  }
+}
+
 
 
 
@@ -294,7 +334,8 @@ const createPayment = async (bookingId) => {
       calculateDays,
       createBooking,
       createPayment,
-      handlePayment
+      handlePayment,
+      payCheckin
       
     };
   },

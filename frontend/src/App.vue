@@ -14,9 +14,11 @@ import TheWelcome from './components/TheWelcome.vue'
     </header> -->
 
     <nav class="nav">
-      <div class="nav__logo">
+      <div class="nav__logo d-flex justify-content-center align-items-center">
+        <img src="./assets/Thiết kế chưa có tên.png" alt="" style="width: 70px;">
        
-        Ocean Breeze Hotel</div>
+        <p>Ocean Breeze Hotel</p>
+      </div>
 
       <div class="nav__menu">
           <ul class="nav__links">
@@ -33,7 +35,7 @@ import TheWelcome from './components/TheWelcome.vue'
             <div v-else class="nav__button" id="dropdown">
               <button class="dropbtn" style="display: flex; align-items: center; gap: 0.5rem;"><img 
                 :src="customers.image ? `http://localhost:3000${customers.image}` : '/default-profile.png'"
-                :alt="`Profile picture of ${user.name}`"
+                :alt="`image`"
                 class="profile-image"> 
                 <span>{{ user.name }}</span>
               </button>
@@ -339,7 +341,7 @@ img{
   border-radius: 5px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid rgb(88, 232, 250);
+  border: 1px solid rgb(62, 68, 72);
   /* transition: background-color 0.3s; */
 }
 .nav__button button a{

@@ -1,6 +1,6 @@
 <template>
     <div class="container review">
-      <h1 class="mb-4 fw-bold text-primary">Tất cả đánh giá của tôi</h1>
+      <h1 class="mb-4 fw-bold text-primary">Tất cả đánh giá</h1>
       <div v-if="reviews && reviews.length" v-for="review in reviews" :key="review._id" class="review--user">
         <div class="review--header">
           <img :src="`http://localhost:3000${review.customer.image}`" alt="User Avatar" />
@@ -76,8 +76,8 @@ export default {
 
     const getReviews = async () => {
       try {
-        const customerId = userStore.user.id;
-        const response = await api.get(`/review/${customerId}`);
+        // const customerId = userStore.user.id;
+        const response = await api.get(`/review`);
         reviews.value = response.data;
       } catch (error) {
         console.error('Failed to fetch reviews:', error);

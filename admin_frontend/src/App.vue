@@ -8,7 +8,10 @@ import TheWelcome from './components/TheWelcome.vue'
     <div  v-if="isLoggedIn">
     <div class="body">
     <div class="sidebar">
-        <div class="logo">OCEAN BREEZE</div>
+        <div class="logo">
+          <img src="./assets/logo.png" alt="" style="width: 70px; margin-left: -17px;">
+          <!-- <p>Ocean Breeze</p> -->
+        </div>
             <ul class="menu">
                 <li class="active">
                     <a href="#" >
@@ -103,7 +106,7 @@ import TheWelcome from './components/TheWelcome.vue'
 
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                       <li><a class="dropdown-item" href="#"><router-link :to="{ name: 'Profile', params: { id: user.id } }" class="fs-6 menu-item text-dark">Tài khoản</router-link></a></li>
-                      <li><a class="dropdown-item" href="#">Lịch sử</a></li>
+                      <!-- <li><a class="dropdown-item" href="#">Lịch sử</a></li> -->
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item"  @click="logout" href="#">Đăng xuất</a></li>
                     </ul>
@@ -299,10 +302,11 @@ export default {
 }
 .logo{
     height: 55px;
-    margin-top: 10px ;
+    /* margin-top: 10px ; */
     padding: 6px;
     font-weight: normal;
 }
+
 .menu{
     height: 88%;
     position: relative;
@@ -431,6 +435,8 @@ export default {
   align-items: center;
   gap: 10px; /* Khoảng cách giữa ảnh và chữ */
   cursor: pointer;
+  border: 1px solid rgb(62, 68, 72);
+  border-radius: 10px;
 }
 
 .dropdown-toggle img {

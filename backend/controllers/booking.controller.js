@@ -43,6 +43,7 @@ const createBooking = async (req, res) => {
                 phone,
                 address,
                 email,
+               
             });
             await customer.save();
         }
@@ -62,10 +63,10 @@ const createBooking = async (req, res) => {
                 checkin: room.checkin,
                 checkout: room.checkout,
                 bookingType:"tại chỗ",
-                // payment: {
-                //     phuongthuc:"Thanh toán tiền mặt",
-                //     paymentStatus:"thành công"
-                // },
+                payment: {
+                    phuongthuc:"Thanh toán tiền mặt",
+                    paymentStatus:"thành công"
+                },
             });
             await newBooking.save();
   
@@ -121,6 +122,40 @@ const createBookingUser = async (req, res) => {
                 return res.status(500).json({ message: 'Server error' });
             }
 }
+
+const createBookingUserCheckin = async (req, res) => {
+    const { checkin, checkout, customer, room,payment, infomation} = req.body;
+     // Validation
+            if (!checkin || !checkout || !customer || !room) {
+                return res.status(400).json({ message: 'All fields are required' });
+            }
+
+            const newBooking = new Booking({
+                checkin,
+                checkout,
+                paid: false,
+                customer,
+                room,
+                status:"chờ xác nhận",
+                bookingType:"online",
+                payment:{
+                    phuongthuc:'Thanh toán tiền mặt',
+                    paymentStatus:'thành công'
+                },
+                infomation
+            });
+
+            
+            try {
+                const savedBooking = await newBooking.save();
+               
+                return res.status(201).json({ bookingId: savedBooking._id });
+            } catch (error) {
+                console.error('Error creating booking:', error);
+                return res.status(500).json({ message: 'Server error' });
+            }
+}
+
 
   
 
@@ -676,21 +711,21 @@ const earlyCheckout = async (req, res) => {
         }
 
         // Validate and set checkout date and time
-        if (checkoutDate) {
-            const checkoutDateTime = checkoutTime
-                ? `${checkoutDate}T${checkoutTime}:00`
-                : `${checkoutDate}T00:00:00`;
+        // if (checkoutDate) {
+        //     const checkoutDateTime = checkoutTime
+        //         ? `${checkoutDate}T${checkoutTime}:00`
+        //         : `${checkoutDate}T00:00:00`;
 
-            booking.checkout = new Date(checkoutDateTime);
+        //     booking.checkout = new Date(checkoutDateTime);
 
-            if (isNaN(booking.checkout)) {
-                return res.status(400).send({ message: "Ngày hoặc giờ checkout không hợp lệ" });
-            }
-        } else {
-            return res.status(400).send({ message: "Ngày checkout không được cung cấp" });
-        }
+        //     if (isNaN(booking.checkout)) {
+        //         return res.status(400).send({ message: "Ngày hoặc giờ checkout không hợp lệ" });
+        //     }
+        // } else {
+        //     return res.status(400).send({ message: "Ngày checkout không được cung cấp" });
+        // }
 
-        // Update other fields
+        // // Update other fields
         if (checkoutTime) {
             booking.checkoutTime = checkoutTime;
         }
@@ -720,10 +755,10 @@ const earlyCheckout = async (req, res) => {
         // Update booking status and payment
         booking.status = 'hoàn thành';
         booking.paid = true;
-        booking.payment = {
-            phuongthuc: "Thanh toán tiền mặt",
-            paymentStatus: "thành công",
-        };
+        // booking.payment = {
+        //     phuongthuc: "Thanh toán tiền mặt",
+        //     paymentStatus: "thành công",
+        // };
 
         await booking.save();
 
@@ -925,7 +960,8 @@ module.exports = {
     getDailyBookings,
     getMonthlyBookings,
     getRoomByUserOnline,
-    changeRoom
+    changeRoom,
+    createBookingUserCheckin
 
 
 };
