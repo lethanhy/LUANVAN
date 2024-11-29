@@ -12,6 +12,10 @@ const InvoiceSchema = mongoose.Schema(
         totalAmount: {
             type: Number,
         },
+        staff:{
+            type: String,
+
+        },
         paymentStatus: {
             type: String,
             enum: ['Pending', 'Paid'],

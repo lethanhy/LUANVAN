@@ -95,10 +95,13 @@ async function sendCreateStaffConfirmationEmail(to, staff) {
             <strong style="color: #333;">Mật khẩu:</strong> ${staff.password}
           </li>
           <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
+            <strong style="color: #333;">Số điện thoại:</strong> ${staff.phone}
+          </li>
+          <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
             <strong style="color: #333;">Vị trí công việc:</strong> ${staff.role}
           </li>
            <li style="margin-bottom: 12px; padding: 8px 0; border-bottom: 1px solid #ddd;">
-            <strong style="color: #333;">Lưu ý:</strong>Bạn có thể thay đổi mật khẩu tài khoản.
+            <strong style="color: #333;">Lưu ý:</strong> Bạn có thể thay đổi mật khẩu tài khoản.
           </li>
         </ul>
         <p style="margin-top: 20px; text-align: center; font-size: 15px; color: #777;">Chúng tôi rất vui khi chào đón bạn trở thành viên của Ocean Breeze hotel!</p>

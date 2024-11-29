@@ -54,6 +54,7 @@ const addStaff = async (req, res) => {
             {
               name: staff.name,
               password: staff.password,
+              phone: staff.phone,
               role: staff.role,
             }
           );

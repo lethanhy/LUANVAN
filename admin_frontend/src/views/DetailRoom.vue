@@ -76,7 +76,7 @@
   
           <div class="DetailRoom--status bg-white">
             <div class="col-md-12 mb-3">
-              <label for="status" class="form-label">Cập nhật tình trạng phòng</label>
+              <label for="status" class="form-label">Tình trạng phòng</label>
               <select  v-model="roomStatus" class="form-select" id="status" required>
                 <option value="đã đặt">Phòng đã đặt</option>
                 <option value="đã nhận">Phòng đã nhận</option>
@@ -172,7 +172,7 @@ export default {
   computed: {
     roomStatus: {
     get() {
-      return this.room.booking.length === 0 ? 'trống' : this.room.booking.status;
+      return this.room.booking.length === 0 ? 'phòng trống' : this.room.booking.status;
     },
     set(newStatus) {
       if (this.room.booking.length > 0) {

@@ -47,7 +47,6 @@
           <th>STT</th>
           <th>Ngày</th>
           <th>Tên khách</th>
-          <th>Nhân viên</th>
           <th>Phương thức</th>
           <th>Tổng tiền</th>
           <th>Thao tác</th>
@@ -59,7 +58,6 @@
           <td>{{ index + 1 }}</td>
           <td>{{ formatDate(invoice.issuedDate) }}</td>
           <td>{{ invoice.booking.customer.name }}</td>
-          <td>{{ invoice.booking?.staff?.name || 'không có' }}</td>
           <td>{{ invoice.booking?.payment.phuongthuc || 'không có' }}</td>
           <td>{{ formatCurrency(invoice.totalAmount) }} VND</td>
           <td><button class="bg-danger" @click="deleteInvoice(invoice._id)">Xóa</button></td>
