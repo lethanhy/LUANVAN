@@ -29,7 +29,8 @@
             <p class="text-success">Ngày trả phòng: {{ formatDate(booking.checkout) }} {{ booking.checkoutTime }}</p>
             <p>Phòng {{ booking.room?.roomNumber || 'N/A' }}</p>
             <p>Tổng ngày ở: {{ calculateDays(booking.checkin, booking.checkout) }} Ngày</p>
-            <p>Tổng người ở: {{ booking.room?.maxGuests || 0 }} Người</p>
+            <p>Tổng người lớn: {{ booking.room?.adults || 0 }} Người</p>
+            <p>Tổng trẻ em: {{ booking.room?.children || 0 }} Người</p>
             <div v-if="booking.orders.length > 0">
               <p v-for="order in booking.orders" :key="order.id">
                 {{ order.itemName }} - {{ order.quantity }} x {{ order.price }} VND

@@ -90,7 +90,7 @@
                 <thead>
                     <tr class="table-info">
                         <th scope="col">Số phòng</th>
-                        <th scope="col">Số người</th>
+                        <!-- <th scope="col">Số người</th> -->
                         <th scope="col">Ngày bắt đầu</th>
                         <th scope="col">Ngày kết thúc</th>
                         <th scope="col">Xóa</th>
@@ -105,9 +105,9 @@
               <tbody>
                 <tr v-for="(selectedRoom, index) in selectedRooms" :key="index">
                   <td>{{ selectedRoom.roomNumber }}</td>
-                  <td>
-                    <input type="number" id=""  class="num-people-input" v-model="selectedRoom.numPeople" min="1" />
-                  </td>
+                  <!-- <td>
+                    <input type="number" id=""  class="num-people-input" v-model="selectedRoom.room.children" min="1" />
+                  </td> -->
                   <td>{{ selectedRoom.checkin }}</td>
                   <td>{{ selectedRoom.checkout }}</td>
                   <td>
@@ -225,10 +225,12 @@ export default {
       
       if (this.checkin && this.checkout) {
         try {
+          const formattedCheckin = `${this.checkin}T14:00:00`;
+          const formattedCheckout = `${this.checkout}T12:00:00`;
           const response = await api.get('/bookings/order', {
             params: {
-              checkin: this.checkin,
-              checkout: this.checkout
+              checkin: formattedCheckin,
+              checkout: formattedCheckout
             }
           });
           this.rooms = response.data;

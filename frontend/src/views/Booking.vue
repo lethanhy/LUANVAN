@@ -1,16 +1,16 @@
 <template>
   <div class="booking">
     <div class="sidebar__booking">
-      <h1>Booking Details</h1>
+      <h1>Tìm kiếm</h1>
       <form action="">
         <div class="group__booking">
           <div class="form__booking">
-            <div class="input__booking">
-              <label for="checkin">Ngày nhận phòng</label>
+            <div class="input__booking text-start">
+              <label for="checkin ">Ngày nhận phòng</label>
               <input type="date" v-model="checkin" :min="minDate" id="checkin">
             </div>
           </div>
-          <div class="form__booking">
+          <div class="form__booking text-start">
             <div class="input__booking">
               <label for="checkout">Ngày trả phòng</label>
               <input type="date" v-model="checkout" id="checkout" :min="getCheckoutMinDate()" @change="validateCheckout">
@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <div class="group__booking">
+        <div class="group__booking text-start">
           <div class="form__booking">
           <div class="input__booking">
             <label for="adults">Người lớn</label>
@@ -39,7 +39,7 @@
       </form>
 
       <hr></hr>
-      <h4>Filter By</h4>
+      <!-- <h4>Filter By</h4> -->
 
      <!-- Filter by Rating
      <div class="rating">
@@ -218,10 +218,12 @@ export default {
   
       if (this.checkin && this.checkout) {
         try {
+          const formattedCheckin = `${this.checkin}T14:00:00`;
+          const formattedCheckout = `${this.checkout}T12:00:00`;
           const response = await api.get('/bookings/Online', {
             params: {
-              checkin: this.checkin,
-              checkout: this.checkout,
+              checkin: formattedCheckin,
+              checkout: formattedCheckout,
               adults: this.adults,
               children: this.children,
 
@@ -272,6 +274,8 @@ export default {
    // Lấy checkin và checkout từ query nếu có
   const checkinDate = this.$route.query.checkin;
   const checkoutDate = this.$route.query.checkout;
+  const numberAdults = this.$route.query.adults;
+  const numberChildren = this.$route.query.children;
 
   // Kiểm tra và gán giá trị
   if (checkinDate) {
@@ -279,6 +283,12 @@ export default {
   }
   if (checkoutDate) {
     this.checkout = checkoutDate;
+  }
+  if (numberAdults) {
+    this.adults = numberAdults;
+  }
+  if (numberChildren) {
+    this.children = numberChildren;
   }
 
   console.log('Checkin Date:', this.checkin);
@@ -315,13 +325,17 @@ export default {
 }
 
 .sidebar__booking {
+  position: sticky; /* Giữ thanh cố định khi cuộn */
+  top: 1rem; /* Khoảng cách từ đỉnh của viewport */
   background: whitesmoke;
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 20%;
-  min-width: 300px; /* Ensures sidebar doesn't get too small */
+  min-width: 300px; /* Đảm bảo sidebar không quá nhỏ */
+  height: fit-content; /* Để đảm bảo chiều cao tự động */
 }
+
 
 .group__booking {
   display: flex;
@@ -378,6 +392,7 @@ export default {
 }
 
 .main__booking {
+
  
   background: white;
   padding: 2rem;

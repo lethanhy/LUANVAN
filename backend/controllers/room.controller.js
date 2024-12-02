@@ -379,73 +379,135 @@ const getRoomByUserId = async (req, res) => {
     }
 };
 
+// const getRoomByIdAndDate = async (req, res) => {
+//     try {
+//         const { id } = req.params; // Room ID from route parameters
+//         const selectedDate = new Date(req.query.date + 'T00:00:00Z'); // Date from query parameters
+//         // selectedDate.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00
+
+//         // console.log('Raw Date Input:', req.query.date); // Log để kiểm tra giá trị
+//         // console.log('Selected Date:', selectedDate); // Log để kiểm tra giá trị đã chuyển đổi
+
+//         // 1. Fetch the room by ID
+//         const room = await Room.findById(id);
+//         if (!room) {
+//             return res.status(404).json({ message: 'Room not found' });
+//         }
+
+//         // 2. Find an unpaid booking for the given room ID and date range
+//         const bookingForDate = await Booking.findOne({
+//             room: id,
+//             // paid: false,
+//             status: { $nin: ['đã hủy', 'hoàn thành', 'chờ xác nhận'] },
+//             checkin: { $lte: selectedDate }, // Selected date must be on or after check-in
+//             checkout: { $gte: selectedDate }  // Selected date must be on or before check-out
+//         })
+//         .populate('customer')
+//         .populate('orders');
+
+//         // 3. Prepare booking details if a booking is found
+//         const bookingDetails = bookingForDate
+//             ? {
+//                 bookingId: bookingForDate._id,
+//                 customerName: bookingForDate.customer?.name || 'Unknown',
+//                 customerPhone: bookingForDate.customer?.phone || 'Unknown',
+//                 checkin: bookingForDate.checkin,
+//                 checkout: bookingForDate.checkout,
+//                 checkinTime: bookingForDate.checkinTime,
+//                 daysBooked: Math.ceil(
+//                     (new Date(bookingForDate.checkout) - new Date(bookingForDate.checkin)) / (1000 * 60 * 60 * 24)
+//                 ),
+//                 status: bookingForDate.status,
+//                 orders: bookingForDate.orders.map(order => ({
+//                     orderId: order._id,
+//                     itemName: order.itemName,
+//                     quantity: order.quantity,
+//                     price: order.price,
+//                     totalPrice: order.quantity * order.price
+//                 })),
+//             }
+//             : null;
+
+//             // console.log('Selected Date:', selectedDate);
+//         // console.log('Room ID:', id);
+//         // console.log('Bookings Found:', bookingForDate);
+
+//         // 4. Construct the final room data with booking info
+//         const roomData = {
+//             ...room.toObject(),
+//             // status: bookingDetails ? 'đã đặt' : 'trống', // Booked or available
+//             booking: bookingDetails || {}
+//         };
+
+//         // 5. Return the room and booking data
+//         res.status(200).json(roomData);
+//     } catch (error) {
+//         console.error('Error fetching room or booking:', error);
+//         res.status(500).json({ message: 'Lỗi khi lấy phòng hoặc booking', error: error.message || error });
+//     }
+// };
 const getRoomByIdAndDate = async (req, res) => {
     try {
-        const { id } = req.params; // Room ID from route parameters
-        const selectedDate = new Date(req.query.date + 'T00:00:00Z'); // Date from query parameters
-        // selectedDate.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00
+        const { id } = req.params;
+        const rawDate = req.query.date;
 
-        // console.log('Raw Date Input:', req.query.date); // Log để kiểm tra giá trị
-        // console.log('Selected Date:', selectedDate); // Log để kiểm tra giá trị đã chuyển đổi
-
-        // 1. Fetch the room by ID
-        const room = await Room.findById(id);
-        if (!room) {
-            return res.status(404).json({ message: 'Room not found' });
+        if (!rawDate) {
+            return res.status(400).json({ message: 'Ngày không hợp lệ' });
         }
 
-        // 2. Find an unpaid booking for the given room ID and date range
+        const selectedDate = new Date(rawDate);
+        selectedDate.setUTCHours(0, 0, 0, 0);
+        console.log('Selected Date:', selectedDate);
+
+        const room = await Room.findById(id);
+        if (!room) {
+            return res.status(404).json({ message: 'Không tìm thấy phòng' });
+        }
+
         const bookingForDate = await Booking.findOne({
             room: id,
-            // paid: false,
             status: { $nin: ['đã hủy', 'hoàn thành', 'chờ xác nhận'] },
-            checkin: { $lte: selectedDate }, // Selected date must be on or after check-in
-            checkout: { $gte: selectedDate }  // Selected date must be on or before check-out
+            checkin: { $lte: new Date(selectedDate.setUTCHours(23, 59, 59, 999)) },
+            checkout: { $gte: new Date(selectedDate.setUTCHours(0, 0, 0, 0)) },
         })
-        .populate('customer')
-        .populate('orders');
+            .populate('customer')
+            .populate('orders');
 
-        // 3. Prepare booking details if a booking is found
+        console.log('Booking Found:', bookingForDate);
+
         const bookingDetails = bookingForDate
             ? {
-                bookingId: bookingForDate._id,
-                customerName: bookingForDate.customer?.name || 'Unknown',
-                customerPhone: bookingForDate.customer?.phone || 'Unknown',
-                checkin: bookingForDate.checkin,
-                checkout: bookingForDate.checkout,
-                checkinTime: bookingForDate.checkinTime,
-                daysBooked: Math.ceil(
-                    (new Date(bookingForDate.checkout) - new Date(bookingForDate.checkin)) / (1000 * 60 * 60 * 24)
-                ),
-                status: bookingForDate.status,
-                orders: bookingForDate.orders.map(order => ({
-                    orderId: order._id,
-                    itemName: order.itemName,
-                    quantity: order.quantity,
-                    price: order.price,
-                    totalPrice: order.quantity * order.price
-                })),
-            }
+                  bookingId: bookingForDate._id,
+                  customerName: bookingForDate.customer?.name || 'Không rõ',
+                  customerPhone: bookingForDate.customer?.phone || 'Không rõ',
+                  checkin: bookingForDate.checkin,
+                  checkout: bookingForDate.checkout,
+                  checkinTime: bookingForDate.checkinTime,
+                  chechoutTime: bookingForDate.chechoutTime,
+                  status: bookingForDate.status,
+                  orders: bookingForDate.orders.map(order => ({
+                      orderId: order._id,
+                      itemName: order.itemName,
+                      quantity: order.quantity,
+                      price: order.price,
+                      totalPrice: order.quantity * order.price,
+                  })),
+              }
             : null;
 
-            // console.log('Selected Date:', selectedDate);
-        // console.log('Room ID:', id);
-        // console.log('Bookings Found:', bookingForDate);
-
-        // 4. Construct the final room data with booking info
         const roomData = {
             ...room.toObject(),
-            // status: bookingDetails ? 'đã đặt' : 'trống', // Booked or available
-            booking: bookingDetails || {}
+            booking: bookingDetails || {},
         };
 
-        // 5. Return the room and booking data
         res.status(200).json(roomData);
     } catch (error) {
         console.error('Error fetching room or booking:', error);
-        res.status(500).json({ message: 'Lỗi khi lấy phòng hoặc booking', error: error.message || error });
+        res.status(500).json({ message: 'Lỗi khi lấy phòng hoặc booking', error: error.message });
     }
 };
+
+
 
 const getRoomUndeleted = async (req,res) => {
     try {

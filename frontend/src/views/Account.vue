@@ -71,7 +71,7 @@
               <label for="nationality" class="form-label">Căn cước công dân:</label>
             </div>
             <div class="col-8">
-              <input type="text" id="cccd" class="form-control" v-model="customers.cccd" placeholder="Việt Nam">
+              <input type="text" id="cccd" class="form-control" v-model="customers.cccd" placeholder="cccd...">
             </div>
           </div>
 
@@ -152,7 +152,7 @@ export default {
     async saveChanges() {
       try {
         await api.put(`/customers/${this.customers._id}`, this.customers);
-        alert('Customer details updated successfully');
+        alert('Cập nhật thông tin thành công');
       } catch (error) {
         console.log('Failed to save changes:', error);
         alert('Failed to update customer details');

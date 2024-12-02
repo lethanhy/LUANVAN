@@ -19,17 +19,32 @@ function formatDate(dateString) {
   });
 }
 
-// Hàm tính số ngày giữa check-in và check-out
-function calculateStayDuration(checkinDate, checkoutDate) {
-  const checkin = new Date(checkinDate);
-  const checkout = new Date(checkoutDate);
-  const diffTime = checkout - checkin;  // Tính chênh lệch thời gian (milisecond)
-  const diffDays = diffTime / (1000 * 3600 * 24);  // Chuyển đổi milisecond thành số ngày
-  return diffDays;
+ // Function to calculate days between two dates
+ function calculateDaysBetween(checkinDate, checkoutDate) {
+  const start = new Date(checkinDate);
+  const end = new Date(checkoutDate);
+
+  // Tính thời gian chênh lệch (millisecond)
+  const differenceInTime = end.getTime() - start.getTime();
+
+  // Chuyển đổi millisecond sang ngày
+  const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+  // Làm tròn lên
+  return Math.ceil(differenceInDays);
 }
 
+// Hàm tính số ngày giữa check-in và check-out
+// function calculateStayDuration(checkinDate, checkoutDate) {
+//   const checkin = new Date(checkinDate);
+//   const checkout = new Date(checkoutDate);
+//   const diffTime = checkout - checkin;  // Tính chênh lệch thời gian (milisecond)
+//   const diffDays = diffTime / (1000 * 3600 * 24);  // Chuyển đổi milisecond thành số ngày
+//   return diffDays;
+// }
+
 async function sendBookingConfirmationEmail(to, bookingDetails) {
-  const stayDuration = calculateStayDuration(bookingDetails.checkin, bookingDetails.checkout);
+  const stayDuration = calculateDaysBetween(bookingDetails.checkin, bookingDetails.checkout);
 
   const mailOptions = {
     from: "Mail",

@@ -107,10 +107,10 @@
               <h4 class="section-title">Tổng tiền</h4>
               
               <p class="total-text">Tổng tiền: {{ formatCurrency(calculateTotal()) }} VND</p>
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <input type="text" name="" id="" class="" placeholder="Nhập số tiền giảm giá...">
               </div>
-              <p class="total-text">Tổng tiền cuối:  VND</p>
+              <p class="total-text">Tổng tiền cuối:  VND</p> -->
             </div>
             <!-- <button @click="generateExcel" class="btn ">In</button> -->
             <div class="text-center" >
@@ -337,21 +337,19 @@
       async getRoomAvailable() {
         console.log('Check-in date:', this.bookings.checkin);
         console.log('Check-out date:', this.bookings.checkout);
-  
- 
-    try {
-      const response = await api.get('/bookings/order', {
-        params: {
-          checkin: this.bookings.checkin,
-          checkout: this.bookings.checkout
+        try {
+          const response = await api.get('/bookings/order', {
+            params: {
+              checkin: this.bookings.checkin,
+              checkout: this.bookings.checkout
+            }
+          });
+          this.rooms = response.data;
+        } catch (error) {
+          console.log('Failed to load room details:', error);
+          alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
         }
-      });
-      this.rooms = response.data;
-    } catch (error) {
-      console.log('Failed to load room details:', error);
-      alert('Lỗi khi tải thông tin phòng. Vui lòng thử lại sau.');
-    }
-},
+    },
 
       getCurrentDate() {
       const today = new Date();

@@ -18,7 +18,7 @@
 
             <div class="form__group">
               <div class="input__group">
-                <input type="date" v-model="checkout"  :min="checkin ? checkin : minDate">
+                <input type="date" v-model="checkout" :min="getCheckoutMinDate()" @change="validateCheckout">
                 <!-- <label for="">Check Out Date</label> -->
               </div>
               <p>Ngày trả phòng</p>
@@ -26,7 +26,7 @@
 
             <div class="form__group">
               <div class="input__group">
-                <input type="number" placeholder="2 người" min="1">
+                <input type="number" v-model="adults" placeholder="2 người" min="1">
                 <!-- <label for="">Adults</label> -->
               </div>
               <p>Người lớn</p>
@@ -34,7 +34,7 @@
 
             <div class="form__group">
               <div class="input__group">
-                <input type="number" placeholder="0 người" min="0">
+                <input type="number" v-model="children" placeholder="0 người" min="0">
                 <!-- <label for="">Children</label> -->
               </div>
               <p>Trẻ em</p>
@@ -221,6 +221,8 @@ export default {
      minDate: new Date().toISOString().split('T')[0], // Lấy ngày hiện tại
      checkin:'',
      checkout:'',
+     adults:'',
+     children:'',
     };
 
   },
@@ -228,6 +230,19 @@ export default {
 
   },
   methods: {
+
+    validateCheckout() {
+    // Ensure checkout date is after check-in date
+    if (this.checkout && this.checkin && this.checkout <= this.checkin) {
+      alert('Ngày trả phòng phải sau ngày nhận phòng và lớn hơn ngày nhận phòng!');
+      this.checkout = ''; // Reset the checkout date
+    }
+  },
+
+  // Ensure the checkout date's min date is dynamically updated based on the check-in date
+  getCheckoutMinDate() {
+    return this.checkin ? this.checkin : this.minDate;
+  },
 
     handleSubmit() {
       // Check if checkout date is after checkin date

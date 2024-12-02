@@ -83,18 +83,20 @@ export default {
   },
   methods: {
     // Function to calculate days between two dates
-    calculateDaysBetween(startDate, endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+   calculateDaysBetween(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-      // Calculate the time difference in milliseconds
-      const differenceInTime = end.getTime() - start.getTime();
+    // Tính thời gian chênh lệch (millisecond)
+    const differenceInTime = end.getTime() - start.getTime();
 
-      // Convert milliseconds to days
-      const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+    // Chuyển đổi millisecond sang ngày
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
 
-      return differenceInDays;
-    },
+    // Làm tròn lên
+    return Math.ceil(differenceInDays);
+}
+
   }
 };
 </script>

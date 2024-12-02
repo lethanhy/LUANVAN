@@ -54,14 +54,23 @@ const createBooking = async (req, res) => {
   
         // Create bookings and update room statuses
         const bookingPromises = rooms.map(async (room) => {
+
+             // Set default check-in (14:00) and check-out (12:00) times
+             const checkinDate = new Date(room.checkin);
+             checkinDate.setHours(14, 0, 0); // 14:00
+   
+             const checkoutDate = new Date(room.checkout);
+             checkoutDate.setHours(12, 0, 0); // 12:00
             // Create new booking for each room
             const newBooking = new Booking({
                 staff: staff,
                 customer: customerId,
                 room: room.id, // Assuming room.id is ObjectId
                 paid: false,
-                checkin: room.checkin,
-                checkout: room.checkout,
+                checkin: checkinDate,
+                checkout: checkoutDate,
+                // checkin: room.checkin,
+                // checkout: room.checkout,
                 bookingType:"tại chỗ",
                 payment: {
                     phuongthuc:"Thanh toán tiền mặt",
@@ -95,33 +104,40 @@ const createBooking = async (req, res) => {
 };
 
 const createBookingUser = async (req, res) => {
-    const { checkin, checkout, customer, room,payment, infomation} = req.body;
-     // Validation
-            if (!checkin || !checkout || !customer || !room) {
-                return res.status(400).json({ message: 'All fields are required' });
-            }
+    const { checkin, checkout, customer, room, payment, infomation } = req.body;
 
-            const newBooking = new Booking({
-                checkin,
-                checkout,
-                paid: false,
-                customer,
-                room,
-                status:"chờ xác nhận",
-                payment,
-                infomation
-            });
+    // Validation
+    if (!checkin || !checkout || !customer || !room) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
 
-            
-            try {
-                const savedBooking = await newBooking.save();
-               
-                return res.status(201).json({ bookingId: savedBooking._id });
-            } catch (error) {
-                console.error('Error creating booking:', error);
-                return res.status(500).json({ message: 'Server error' });
-            }
-}
+    // Set default check-in (14:00) and check-out (12:00) times
+    const checkinDate = new Date(checkin);
+    checkinDate.setHours(14, 0, 0); // 14:00
+
+    const checkoutDate = new Date(checkout);
+    checkoutDate.setHours(12, 0, 0); // 12:00
+
+    const newBooking = new Booking({
+        checkin: checkinDate,
+        checkout: checkoutDate, // Use checkoutDate here
+        paid: false,
+        customer,
+        room,
+        status: "chờ xác nhận",
+        payment,
+        infomation,
+    });
+
+    try {
+        const savedBooking = await newBooking.save();
+        return res.status(201).json({ bookingId: savedBooking._id });
+    } catch (error) {
+        console.error('Error creating booking:', error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+};
+
 
 const createBookingUserCheckin = async (req, res) => {
     const { checkin, checkout, customer, room,payment, infomation} = req.body;
@@ -341,58 +357,119 @@ const deleteBooking = async (req, res) => {
 //     }
 // }
 
+// const getRoomByAvailable = async (req, res) => {
+//     const { checkin, checkout } = req.query; // Expect query parameters for checkin and checkout dates
+
+//     try {
+//         // Step 1: Find all bookings that overlap with the requested date range
+//         const overlappingBookings = await Booking.find({
+//             $and: [
+//                 {
+//                 $or: [
+//                     { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Overlaps with the requested period
+//                     { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
+//                     { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checki
+//                 ],
+//                 },
+//         { status: { $nin: ["đã hủy","hoàn thành"]}}
+//     ]
+           
+            
+//         }).select('room'); // Only select the room field
+
+//         // Step 2: Extract the IDs of rooms that are booked
+//         const bookedRoomIds = overlappingBookings.map(bookings => bookings.room);
+
+//         // Step 3: Find rooms that are NOT in the bookedRoomIds array
+//         const availableRooms = await Room.find({
+//             _id: { $nin: bookedRoomIds },
+//             // maxGuests: adults,
+//             // children:children, // Exclude rooms that are booked
+//             trangthai: 'Đã dọn dẹp', // Ensure the room is marked as available
+//             xoaRoom: true,
+//         });
+
+//         // Step 4: Return available rooms
+//         res.status(200).json(availableRooms);
+//     } catch (error) {
+//         console.error('Error fetching available rooms:', error);
+//         res.status(500).json({ message: 'Error fetching available rooms' });
+//     }
+// };
+
 const getRoomByAvailable = async (req, res) => {
-    const { checkin, checkout } = req.query; // Expect query parameters for checkin and checkout dates
+    const { checkin, checkout } = req.query; // Lấy thông tin checkin và checkout từ query
 
     try {
-        // Step 1: Find all bookings that overlap with the requested date range
+        // Kiểm tra nếu không có checkin hoặc checkout
+        if (!checkin || !checkout) {
+            return res.status(400).json({ message: 'Vui lòng cung cấp ngày nhận và trả phòng' });
+        }
+
+        // Đảm bảo giờ checkin là 14h và checkout là 12h
+        const checkinDate = new Date(checkin);
+        checkinDate.setHours(14, 0, 0, 0); // Set thời gian checkin là 14h
+
+        const checkoutDate = new Date(checkout);
+        checkoutDate.setHours(12, 0, 0, 0); // Set thời gian checkout là 12h
+
+        if (checkinDate >= checkoutDate) {
+            return res.status(400).json({ message: 'Thời gian nhận phòng phải trước thời gian trả phòng' });
+        }
+
+        // Bước 1: Tìm tất cả các booking trùng thời gian được yêu cầu
         const overlappingBookings = await Booking.find({
             $and: [
                 {
-                $or: [
-                    { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Overlaps with the requested period
-                    { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
-                    { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checki
-                ],
+                    $or: [
+                        { checkin: { $lt: checkoutDate }, checkout: { $gt: checkinDate } }, // Trùng với khoảng thời gian yêu cầu
+                        { checkin: { $eq: checkoutDate } }, // Không cho phép đặt phòng vào ngày checkout
+                        { checkout: { $eq: checkinDate } }  // Không cho phép đặt phòng vào ngày checkin
+                    ],
                 },
-        { status: { $nin: ["đã hủy","hoàn thành"]}}
-    ]
-           
-            
-        }).select('room'); // Only select the room field
+                { status: { $nin: ["đã hủy", "hoàn thành"] } } // Loại trừ các booking đã hủy hoặc hoàn thành
+            ]
+        }).select('room'); // Chỉ lấy trường room
 
-        // Step 2: Extract the IDs of rooms that are booked
-        const bookedRoomIds = overlappingBookings.map(bookings => bookings.room);
+        // Bước 2: Trích xuất ID của các phòng đã đặt
+        const bookedRoomIds = overlappingBookings.map(booking => booking.room);
 
-        // Step 3: Find rooms that are NOT in the bookedRoomIds array
+        // Bước 3: Tìm các phòng chưa được đặt
         const availableRooms = await Room.find({
-            _id: { $nin: bookedRoomIds },
-            // maxGuests: adults,
-            // children:children, // Exclude rooms that are booked
-            trangthai: 'Đã dọn dẹp', // Ensure the room is marked as available
-            xoaRoom: true,
+            _id: { $nin: bookedRoomIds }, // Loại trừ các phòng đã được đặt
+            trangthai: 'Đã dọn dẹp', // Chỉ chọn các phòng đã dọn dẹp
+            xoaRoom: true // Chỉ chọn các phòng chưa bị xóa
         });
 
-        // Step 4: Return available rooms
+        // Bước 4: Trả về danh sách các phòng khả dụng
         res.status(200).json(availableRooms);
     } catch (error) {
         console.error('Error fetching available rooms:', error);
-        res.status(500).json({ message: 'Error fetching available rooms' });
+        res.status(500).json({ message: 'Lỗi khi tìm phòng trống', error: error.message || error });
     }
 };
+
 
 const getRoomByUserOnline = async (req, res) => {
     const { checkin, checkout, adults, children } = req.query; // Thêm adults và children vào tham số truy vấn
 
     try {
+
+         // Đảm bảo giờ checkin là 14h và checkout là 12h
+         const checkinDate = new Date(checkin);
+         checkinDate.setHours(14, 0, 0, 0); // Set thời gian checkin là 14h
+ 
+         const checkoutDate = new Date(checkout);
+         checkoutDate.setHours(12, 0, 0, 0); // Set thời gian checkout là 12h
+
         // Step 1: Tìm các booking trùng lặp với khoảng thời gian yêu cầu
         const overlappingBookings = await Booking.find({
             $and: [
                 {
-                    $or: [
-                        { checkin: { $lt: checkout }, checkout: { $gt: checkin } }, // Trùng với khoảng thời gian
-                        { checkin: { $eq: checkout } }, // Không cho đặt phòng vào ngày checkout
-                        { checkout: { $eq: checkin } }  // Không cho đặt phòng vào ngày checkin
+                   $or: [
+                        { checkin: { $lt: checkoutDate }, checkout: { $gt: checkinDate } }, // Trùng với khoảng thời gian yêu cầu
+                        { checkin: { $eq: checkoutDate } }, // Không cho phép đặt phòng vào ngày checkout
+                        { checkout: { $eq: checkinDate } }  // Không cho phép đặt phòng vào ngày checkin
                     ],
                 },
                 { status: { $nin: ["đã hủy", "hoàn thành"] } } // Loại trừ trạng thái đã hủy hoặc hoàn thành

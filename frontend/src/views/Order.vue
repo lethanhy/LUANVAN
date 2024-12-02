@@ -280,39 +280,43 @@ const createPayment = async (bookingId) => {
 };
 
 const payCheckin = async () => {
- 
-  if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
-    alert('Vui lòng điền đầy đủ thông tin!');
-    return;
-  }
-
-  const bookingData = {
-    checkin: new Date(route.query.checkin).toISOString(),
-    checkout: new Date(route.query.checkout).toISOString(),
-    room: rooms.value._id,
-    customer: userStore.user.id,
-    infomation: {
-        name: user.value.name, // Sử dụng thông tin từ user có thể chỉnh sửa
-        address: user.value.address,
-        phone: user.value.phone,
-        message: user.value.message,
+      if (!checkin.value || !checkout.value || !userStore.user.id || !rooms.value?._id) {
+        alert('Vui lòng điền đầy đủ thông tin!');
+        return;
       }
-  };
 
-  try {
-    const response = await api.post('/bookings/order/user/checkin', bookingData);
-    console.log('API response:', response.data); // Thêm dòng này để xem phản hồi
-    const bookingId = response.data.bookingId; // Lấy ID booking từ phản hồi
-    alert('Đặt phòng thành công!');
-    router.push('/');
+      const checkinDate = new Date(route.query.checkin);
+      checkinDate.setHours(14, 0, 0); // Set to 14:00
 
-   
-  } catch (error) {
-    console.error('Lỗi khi tạo booking:', error);
-    alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
-    throw error; // Ném lỗi để xử lý ngoài hàm nếu cần
-  }
-}
+      const checkoutDate = new Date(route.query.checkout);
+      checkoutDate.setHours(12, 0, 0); // Set to 12:00
+
+      const bookingData = {
+        checkin: checkinDate.toISOString(), // Convert to ISO string after setting time
+        checkout: checkoutDate.toISOString(),
+        room: rooms.value._id,
+        customer: userStore.user.id,
+        infomation: {
+          name: user.value.name, // Use editable user information
+          address: user.value.address,
+          phone: user.value.phone,
+          message: user.value.message,
+        },
+      };
+
+      try {
+        const response = await api.post('/bookings/order/user/checkin', bookingData);
+        console.log('API response:', response.data); // Log response for debugging
+        const bookingId = response.data.bookingId; // Extract booking ID from response
+        alert('Đặt phòng thành công!');
+        router.push('/'); // Redirect to home page
+      } catch (error) {
+        console.error('Lỗi khi tạo booking:', error);
+        alert('Có lỗi xảy ra khi đặt phòng. Vui lòng thử lại.');
+        throw error; // Re-throw error for external handling if needed
+      }
+};
+
 
 
 
